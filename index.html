@@ -4,168 +4,279 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VEDA | Premium Intelligence</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Default Theme (Matrix) */
-            --bg-base: #050608;
-            --bg-grad1: #161b2e;
-            --bg-grad2: #0a1120;
-            --accent: #00ffaa;
-            --accent-glow: rgba(0, 255, 170, 0.3);
+            /* Fallback variables, dynamically overwritten by JS */
+            --bg-base: #0b0c10;
+            --bg-grad1: #1f2833;
+            --bg-grad2: #0b0c10;
+            --accent: #66fcf1;
+            --accent-glow: rgba(102, 252, 241, 0.2);
+            --surface: rgba(255, 255, 255, 0.02);
+            --surface-hover: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #f0f0f0;
+            --text-muted: #8892b0;
             
-            /* Glass Constants */
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-hover: rgba(255, 255, 255, 0.08);
-            --border: rgba(255, 255, 255, 0.12);
-            --text: #e0e0e0;
+            color-scheme: dark;
         }
 
+        /* --- CORE STYLES --- */
         body {
             margin: 0;
-            background: var(--bg-base);
+            background-color: var(--bg-base);
             background-image: 
-                radial-gradient(circle at 0% 0%, var(--bg-grad1) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, var(--bg-grad2) 0%, transparent 50%);
-            color: var(--text);
+                radial-gradient(circle at 15% 0%, var(--bg-grad1) 0%, transparent 45%),
+                radial-gradient(circle at 85% 100%, var(--bg-grad2) 0%, transparent 45%);
+            background-attachment: fixed;
+            color: var(--text-main);
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background 0.8s ease;
+            transition: background-color 1s ease, background-image 1s ease;
         }
 
         .container {
-            max-width: 1200px;
+            width: 100%;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 4vh 2vw;
+            box-sizing: border-box;
         }
 
+        /* --- HEADER --- */
         header {
             text-align: center;
-            margin-bottom: 60px;
-            animation: fadeIn 1s ease-out;
+            margin-bottom: 3rem;
+            animation: fadeInDown 1s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         h1 {
             font-weight: 300;
-            letter-spacing: 12px;
+            letter-spacing: clamp(4px, 1vw, 12px);
             text-transform: uppercase;
-            font-size: 2.8rem;
+            font-size: clamp(2rem, 4vw, 3.5rem);
             margin: 0;
-            background: linear-gradient(to right, #ffffff, var(--accent));
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            transition: background 0.5s ease;
+            transition: background 1s ease;
         }
 
-        /* --- Dynamic Control Panel --- */
+        /* --- SEARCH BAR --- */
         .search-container {
             position: relative;
-            max-width: 600px;
-            margin: 0 auto 30px auto;
+            width: clamp(280px, 60%, 800px);
+            margin: 0 auto 2.5rem auto;
+            transition: transform 0.4s ease;
+        }
+
+        .search-container:focus-within {
+            transform: scale(1.02);
         }
 
         #searchInput {
             width: 100%;
-            padding: 15px 25px;
-            background: var(--glass);
+            padding: 1.2rem 2rem;
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 50px;
-            color: white;
-            font-size: 1rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-main);
+            font-size: 1.1rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
-        #searchInput::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-            transition: color 0.3s ease;
-        }
-
+        #searchInput::placeholder { color: var(--text-muted); transition: color 0.3s; }
+        
         #searchInput:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-            background: rgba(255,255,255,0.05);
-            width: 105%;
-            margin-left: -2.5%;
+            box-shadow: 0 0 25px var(--accent-glow), inset 0 0 10px rgba(255,255,255,0.02);
+            background: var(--surface-hover);
         }
 
-        .filters {
+        /* --- DYNAMIC FILTERS & CUSTOM DROPDOWNS --- */
+        .filters-wrapper {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 50px;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 4rem;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
         }
 
-        select, input[type="date"] {
-            appearance: none;
-            background: var(--glass);
+        .date-picker {
+            background: var(--surface);
             border: 1px solid var(--border);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 12px;
-            cursor: pointer;
+            color: var(--text-main);
+            padding: 14px 24px;
+            border-radius: 14px;
             font-family: inherit;
+            font-size: 0.95rem;
+            backdrop-filter: blur(12px);
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            cursor: pointer;
         }
 
-        select:hover, input:hover {
+        .date-picker:hover, .date-picker:focus {
             border-color: var(--accent);
-            background: var(--glass-hover);
+            background: var(--surface-hover);
+            box-shadow: 0 0 15px var(--accent-glow);
+            outline: none;
+        }
+
+        /* CUSTOM DROPDOWN UI */
+        .custom-dropdown {
+            position: relative;
+            min-width: 240px;
+            font-size: 0.95rem;
+        }
+
+        .dropdown-selected {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 14px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-selected:hover {
+            border-color: var(--accent);
+            background: var(--surface-hover);
             box-shadow: 0 0 15px var(--accent-glow);
         }
 
-        /* --- News Feed Grid --- */
+        .dropdown-selected::after {
+            content: '▼';
+            font-size: 0.7em;
+            color: var(--accent);
+            transition: transform 0.3s;
+        }
+
+        .custom-dropdown.active .dropdown-selected::after {
+            transform: rotate(-180deg);
+        }
+
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 15, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-height: 0;
+            overflow-y: auto;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .custom-dropdown.active .dropdown-options {
+            max-height: 350px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dropdown-option {
+            padding: 14px 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            transform: translateX(-10px);
+            opacity: 0;
+        }
+
+        .custom-dropdown.active .dropdown-option {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Staggered animation for dropdown items */
+        .custom-dropdown.active .dropdown-option:nth-child(1) { transition-delay: 0.05s; }
+        .custom-dropdown.active .dropdown-option:nth-child(2) { transition-delay: 0.1s; }
+        .custom-dropdown.active .dropdown-option:nth-child(3) { transition-delay: 0.15s; }
+        .custom-dropdown.active .dropdown-option:nth-child(4) { transition-delay: 0.2s; }
+        .custom-dropdown.active .dropdown-option:nth-child(5) { transition-delay: 0.25s; }
+
+        .dropdown-option:hover {
+            color: var(--accent);
+            background: var(--surface-hover);
+            padding-left: 30px; /* Slight indent on hover */
+        }
+
+        /* Scrollbar for dropdowns */
+        .dropdown-options::-webkit-scrollbar { width: 6px; }
+        .dropdown-options::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
+
+        /* --- DYNAMIC NEWS GRID --- */
         #news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
+            gap: clamp(1.5rem, 2vw, 2.5rem);
+            /* Base Mobile Layout */
+            grid-template-columns: 1fr; 
         }
 
         .card {
-            background: var(--glass);
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 24px;
+            padding: clamp(1.5rem, 3vw, 2.5rem);
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px) scale(0.98);
         }
 
         .card.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
 
         .card:hover {
             border-color: var(--accent);
-            background: var(--glass-hover);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px var(--accent-glow);
+            background: var(--surface-hover);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 20px var(--accent-glow);
+            transform: translateY(-8px);
         }
 
         .card-tag {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--accent);
             text-transform: uppercase;
             font-weight: 600;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
             transition: color 0.3s ease;
         }
 
         .card-title {
-            font-size: 1.25rem;
-            line-height: 1.4;
-            margin-bottom: 25px;
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            line-height: 1.5;
+            margin-bottom: 2rem;
             font-weight: 400;
-            color: #fff;
+            color: var(--text-main);
         }
 
         .card-footer {
@@ -173,36 +284,81 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 20px;
+            padding-top: 1.5rem;
             border-top: 1px solid var(--border);
         }
 
         .read-btn {
-            color: #fff;
+            color: var(--text-main);
             text-decoration: none;
             font-size: 0.85rem;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .read-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--accent);
+            transition: left 0.4s ease;
+            z-index: -1;
         }
 
         .read-btn:hover {
-            background: var(--accent);
-            color: #000;
+            color: var(--bg-base);
+            border-color: var(--accent);
             box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .read-btn:hover::before {
+            left: 0;
         }
 
         .timestamp {
             font-size: 0.75rem;
-            color: rgba(255,255,255,0.4);
+            color: var(--text-muted);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        /* --- RESPONSIVE SHAPE-SHIFTING --- */
+        
+        /* TABLET (Medium Devices) */
+        @media (min-width: 768px) {
+            #news-grid { grid-template-columns: repeat(2, 1fr); }
+            .filters-wrapper { gap: 25px; }
+        }
+
+        /* DESKTOP (Large Devices) */
+        @media (min-width: 1024px) {
+            #news-grid { grid-template-columns: repeat(3, 1fr); }
+            .custom-dropdown { min-width: 260px; }
+        }
+
+        /* ULTRA WIDE (Extra Large) */
+        @media (min-width: 1600px) {
+            #news-grid { grid-template-columns: repeat(4, 1fr); }
+            .container { max-width: 1800px; }
+        }
+
+        /* MOBILE EXTREME (Extra Small) */
+        @media (max-width: 500px) {
+            .filters-wrapper { flex-direction: column; width: 100%; }
+            .date-picker, .custom-dropdown { width: 100%; box-sizing: border-box; }
+            #searchInput { border-radius: 16px; } /* Blockier on mobile */
+            .card { border-radius: 16px; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -210,61 +366,49 @@
 
 <div class="container">
     <header>
-        <h1>VEDA PLATFORM</h1>
+        <h1>VEDA Matrix</h1>
     </header>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Initializing uplink...">
+        <input type="text" id="searchInput" placeholder="Initializing neural link...">
     </div>
 
-    <div class="filters">
-        <input type="date" id="datePicker">
-        <select id="channelFilter">
-            <option value="all">Global Matrix</option>
-        </select>
-        <select id="themeSelector">
-            <!-- Themes injected by JS -->
-        </select>
+    <div class="filters-wrapper">
+        <input type="date" id="datePicker" class="date-picker">
+        
+        <!-- Custom Channel Dropdown -->
+        <div class="custom-dropdown" id="channelDropdown">
+            <div class="dropdown-selected" id="channelSelected">Global Matrix (All)</div>
+            <div class="dropdown-options" id="channelOptions">
+                <div class="dropdown-option" data-value="all">Global Matrix (All)</div>
+            </div>
+        </div>
+
+        <!-- Custom Theme Dropdown -->
+        <div class="custom-dropdown" id="themeDropdown">
+            <div class="dropdown-selected" id="themeSelected">Select Theme</div>
+            <div class="dropdown-options" id="themeOptions">
+                <!-- Injected via JS -->
+            </div>
+        </div>
     </div>
 
     <div id="news-grid"></div>
 </div>
 
 <script>
-    // --- 1. THEME ENGINE ---
+    // --- 1. PREMIUM AUTHENTIC THEME ENGINE ---
     const themes = {
-        "Matrix (Default)": { base: "#050608", grad1: "#161b2e", grad2: "#0a1120", accent: "#00ffaa", glow: "rgba(0, 255, 170, 0.3)" },
-        "Cyberpunk": { base: "#0a0008", grad1: "#2a0026", grad2: "#110014", accent: "#ff00e6", glow: "rgba(255, 0, 230, 0.3)" },
-        "Deep Space": { base: "#02010a", grad1: "#0b052e", grad2: "#030214", accent: "#4d4dff", glow: "rgba(77, 77, 255, 0.3)" },
-        "Sunset Glass": { base: "#120500", grad1: "#330a00", grad2: "#1a0300", accent: "#ff6600", glow: "rgba(255, 102, 0, 0.3)" },
-        "Ocean Depths": { base: "#000812", grad1: "#001a33", grad2: "#000a1a", accent: "#00d4ff", glow: "rgba(0, 212, 255, 0.3)" },
-        "Blood Moon": { base: "#0f0000", grad1: "#330000", grad2: "#1a0000", accent: "#ff3333", glow: "rgba(255, 51, 51, 0.3)" },
-        "Amethyst": { base: "#0d001a", grad1: "#26004d", grad2: "#130026", accent: "#b366ff", glow: "rgba(179, 102, 255, 0.3)" },
-        "Gold Rush": { base: "#121000", grad1: "#332900", grad2: "#1a1600", accent: "#ffd700", glow: "rgba(255, 215, 0, 0.3)" },
-        "Arctic Frost": { base: "#000a12", grad1: "#001f33", grad2: "#000d1a", accent: "#80dfff", glow: "rgba(128, 223, 255, 0.3)" },
-        "Forest Canopy": { base: "#001205", grad1: "#00330f", grad2: "#001a08", accent: "#33ff77", glow: "rgba(51, 255, 119, 0.3)" },
-        "Synthwave": { base: "#0d041a", grad1: "#240047", grad2: "#11002e", accent: "#ff0055", glow: "rgba(255, 0, 85, 0.3)" },
-        "Midnight City": { base: "#010014", grad1: "#05003b", grad2: "#020021", accent: "#9933ff", glow: "rgba(153, 51, 255, 0.3)" },
-        "Volcanic": { base: "#140300", grad1: "#3d0a00", grad2: "#1f0500", accent: "#ff4d00", glow: "rgba(255, 77, 0, 0.3)" },
-        "Emerald City": { base: "#00140a", grad1: "#003d1f", grad2: "#001f0f", accent: "#00ff88", glow: "rgba(0, 255, 136, 0.3)" },
-        "Nebula": { base: "#0a001a", grad1: "#1f004d", grad2: "#140033", accent: "#ff00aa", glow: "rgba(255, 0, 170, 0.3)" },
-        "Copper Patina": { base: "#0f0a05", grad1: "#2e1a0b", grad2: "#1f140a", accent: "#5ce6e6", glow: "rgba(92, 230, 230, 0.3)" },
-        "Stealth Mode": { base: "#080808", grad1: "#1f1f1f", grad2: "#0f0f0f", accent: "#cccccc", glow: "rgba(204, 204, 204, 0.3)" },
-        "Sakura": { base: "#14050a", grad1: "#3d0f1f", grad2: "#1f0a14", accent: "#ffb3cc", glow: "rgba(255, 179, 204, 0.3)" },
-        "Solar Flare": { base: "#1a0a00", grad1: "#4d1f00", grad2: "#2e1400", accent: "#ffaa00", glow: "rgba(255, 170, 0, 0.3)" },
-        "Biohazard": { base: "#0a1400", grad1: "#1f3d00", grad2: "#142e00", accent: "#aaff00", glow: "rgba(170, 255, 0, 0.3)" },
-        "Royal Velvet": { base: "#050014", grad1: "#14003d", grad2: "#0a001f", accent: "#ffcc00", glow: "rgba(255, 204, 0, 0.3)" }
+        "Obsidian Pearl": { base: "#07080a", grad1: "#141821", grad2: "#07080a", accent: "#66fcf1", glow: "rgba(102, 252, 241, 0.25)" },
+        "Sapphire Depth": { base: "#020914", grad1: "#0a192f", grad2: "#010409", accent: "#64ffda", glow: "rgba(100, 255, 218, 0.25)" },
+        "Midnight Ember": { base: "#0d0202", grad1: "#260606", grad2: "#080101", accent: "#ff4d4d", glow: "rgba(255, 77, 77, 0.25)" },
+        "Royal Amethyst": { base: "#0a0512", grad1: "#1f0f33", grad2: "#05020a", accent: "#c299ff", glow: "rgba(194, 153, 255, 0.25)" },
+        "Gilded Carbon": { base: "#0a0a0a", grad1: "#1a1a1a", grad2: "#050505", accent: "#e6c200", glow: "rgba(230, 194, 0, 0.25)" },
+        "Emerald Frost": { base: "#010a08", grad1: "#02241d", grad2: "#000504", accent: "#00fa9a", glow: "rgba(0, 250, 154, 0.25)" }
     };
 
-    const themeSelector = document.getElementById('themeSelector');
+    const themeNames = Object.keys(themes);
     
-    Object.keys(themes).forEach(themeName => {
-        const opt = document.createElement('option');
-        opt.value = themeName;
-        opt.textContent = `Theme: ${themeName}`;
-        themeSelector.appendChild(opt);
-    });
-
     function applyTheme(themeName) {
         const theme = themes[themeName];
         if(!theme) return;
@@ -273,97 +417,122 @@
         document.documentElement.style.setProperty('--bg-grad2', theme.grad2);
         document.documentElement.style.setProperty('--accent', theme.accent);
         document.documentElement.style.setProperty('--accent-glow', theme.glow);
-        localStorage.setItem('veda-theme', themeName);
+        document.getElementById('themeSelected').innerText = themeName;
     }
 
-    const savedTheme = localStorage.getItem('veda-theme') || "Matrix (Default)";
-    themeSelector.value = savedTheme;
-    applyTheme(savedTheme);
-    themeSelector.addEventListener('change', (e) => applyTheme(e.target.value));
+    // 🎲 Random Theme on Load
+    const randomTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
+    applyTheme(randomTheme);
 
-    // --- 2. DYNAMIC TYPING PLACEHOLDER ENGINE ---
+    // --- 2. CUSTOM DROPDOWN LOGIC ---
+    function setupDropdown(dropdownId, selectedId, optionsId, onChangeCallback) {
+        const dropdown = document.getElementById(dropdownId);
+        const selected = document.getElementById(selectedId);
+        const optionsContainer = document.getElementById(optionsId);
+
+        // Toggle Open/Close
+        selected.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close others
+            document.querySelectorAll('.custom-dropdown').forEach(d => {
+                if(d !== dropdown) d.classList.remove('active');
+            });
+            dropdown.classList.toggle('active');
+        });
+
+        // Handle Option Click
+        optionsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dropdown-option')) {
+                const value = e.target.getAttribute('data-value');
+                const text = e.target.innerText;
+                selected.innerText = text;
+                dropdown.classList.remove('active');
+                if (onChangeCallback) onChangeCallback(value, text);
+            }
+        });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
+    });
+
+    // Populate Theme Dropdown
+    const themeOptionsContainer = document.getElementById('themeOptions');
+    themeNames.forEach(themeName => {
+        const opt = document.createElement('div');
+        opt.className = 'dropdown-option';
+        opt.setAttribute('data-value', themeName);
+        opt.innerText = themeName;
+        themeOptionsContainer.appendChild(opt);
+    });
+
+    // Init Dropdowns
+    setupDropdown('themeDropdown', 'themeSelected', 'themeOptions', (val) => applyTheme(val));
+    
+    // Channel dropdown requires a global variable to track selection for omni-search
+    let currentChannelFilter = 'all';
+    setupDropdown('channelDropdown', 'channelSelected', 'channelOptions', (val) => {
+        currentChannelFilter = val;
+        filterAndRender();
+    });
+
+
+    // --- 3. DYNAMIC TYPING PLACEHOLDER ENGINE ---
     const searchInput = document.getElementById('searchInput');
     const suggestions = [
-        'Try searching "The Hindu"...',
-        'Try searching "Iran"...',
-        'Search for "Economy"...',
-        'Try searching "India"...',
-        'Search "Telugu News"...',
-        'Try searching "Markets"...',
-        'Search for "Global Matrix"...',
-        'Try searching "Sports"...',
-        'Search "Technology"...'
+        'Analyze "The Hindu"...',
+        'Extract "Global Economy"...',
+        'Scan for "Markets"...',
+        'Intercept "Telugu News"...',
+        'Decode "Technology"...',
+        'Monitor "Sports"...'
     ];
-    
-    // Shuffle suggestions on load to make it random
     suggestions.sort(() => Math.random() - 0.5);
 
-    let suggestionIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    let typingTimer;
+    let suggestionIndex = 0; let charIndex = 0; let isDeleting = false; let typingTimer;
 
     function typePlaceholder() {
-        // Stop animation completely if user is focused on the input
         if (document.activeElement === searchInput) {
-            searchInput.placeholder = "Search global intelligence...";
+            searchInput.placeholder = "Query global matrix...";
             clearTimeout(typingTimer);
             return;
         }
-
         const currentWord = suggestions[suggestionIndex];
-
-        if (isDeleting) {
-            charIndex--;
-        } else {
-            charIndex++;
-        }
-
+        if (isDeleting) charIndex--; else charIndex++;
+        
         searchInput.placeholder = currentWord.substring(0, charIndex) + "|";
-
         let typingSpeed = isDeleting ? 30 : 80;
 
         if (!isDeleting && charIndex === currentWord.length) {
-            typingSpeed = 2500; // Pause at the end of the fully typed word
-            isDeleting = true;
+            typingSpeed = 2500; isDeleting = true;
         } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            suggestionIndex = (suggestionIndex + 1) % suggestions.length;
-            typingSpeed = 500; // Pause before typing the next word
+            isDeleting = false; suggestionIndex = (suggestionIndex + 1) % suggestions.length; typingSpeed = 500;
         }
-
         typingTimer = setTimeout(typePlaceholder, typingSpeed);
     }
-
-    // Start typing effect
     typePlaceholder();
 
-    // Pause typing when user clicks in, resume if they click out and left it empty
     searchInput.addEventListener('focus', () => {
-        clearTimeout(typingTimer);
-        searchInput.placeholder = "Search global intelligence...";
+        clearTimeout(typingTimer); searchInput.placeholder = "Query global matrix...";
     });
     searchInput.addEventListener('blur', () => {
-        if (searchInput.value.trim() === '') {
-            typePlaceholder();
-        }
+        if (searchInput.value.trim() === '') typePlaceholder();
     });
 
-    // --- 3. DATA ENGINE & OMNI-SEARCH ---
+    // --- 4. DATA ENGINE & OMNI-SEARCH ---
     let rawData = [];
     const grid = document.getElementById('news-grid');
-    const channelFilter = document.getElementById('channelFilter');
     const datePicker = document.getElementById('datePicker');
-
     datePicker.value = new Date().toISOString().split('T')[0];
 
     async function init(date) {
-        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; opacity:0.5;">Accessing Archive...</p>';
+        grid.innerHTML = '<p style="text-align:center; opacity:0.5; width:100%;">Establishing Secure Connection to VEDA Archive...</p>';
         const year = date.split('-')[0];
         
         try {
             const res = await fetch(`${year}/${date}.json`);
-            if (!res.ok) throw new Error("No data found for this period.");
+            if (!res.ok) throw new Error("Intelligence not found for this temporal coordinate.");
             const data = await res.json();
             
             rawData = [];
@@ -373,35 +542,43 @@
                 });
             });
 
+            // 🎲 SHUFFLE NEWS
+            rawData.sort(() => Math.random() - 0.5);
+
             populateChannels(Object.keys(data.feeds));
             filterAndRender();
         } catch (e) {
-            grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--accent);">${e.message}</p>`;
+            grid.innerHTML = `<p style="text-align:center; color:var(--accent); width:100%;">${e.message}</p>`;
         }
     }
 
     function populateChannels(sources) {
-        channelFilter.innerHTML = '<option value="all">Global Matrix (All)</option>';
+        const container = document.getElementById('channelOptions');
+        // Reset container keeping the 'All' option
+        container.innerHTML = '<div class="dropdown-option" data-value="all">Global Matrix (All)</div>';
+        
         sources.sort().forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s;
-            opt.textContent = s.replace(/_/g, ' ');
-            channelFilter.appendChild(opt);
+            const opt = document.createElement('div');
+            opt.className = 'dropdown-option';
+            opt.setAttribute('data-value', s);
+            opt.innerText = s.replace(/_/g, ' ');
+            container.appendChild(opt);
         });
+        // Reset Selection state
+        document.getElementById('channelSelected').innerText = "Global Matrix (All)";
+        currentChannelFilter = 'all';
     }
 
     function filterAndRender() {
         const searchTerm = searchInput.value.toLowerCase();
-        const selectedSource = channelFilter.value;
-
+        
         const filtered = rawData.filter(item => {
-            // OMNI-SEARCH: Checks Title, Channel Source, AND Published Date
             const matchesSearch = 
                 item.title.toLowerCase().includes(searchTerm) || 
                 item.source.toLowerCase().replace(/_/g, ' ').includes(searchTerm) ||
                 (item.published_at && item.published_at.toLowerCase().includes(searchTerm));
                 
-            const matchesSource = selectedSource === 'all' || item.source === selectedSource;
+            const matchesSource = currentChannelFilter === 'all' || item.source === currentChannelFilter;
             return matchesSearch && matchesSource;
         });
 
@@ -411,7 +588,7 @@
     function render(items) {
         grid.innerHTML = '';
         if (items.length === 0) {
-            grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No results match your query.</p>';
+            grid.innerHTML = '<p style="text-align:center; width:100%;">No data matches current query parameters.</p>';
             return;
         }
 
@@ -423,17 +600,17 @@
                 <div class="card-title">${item.title}</div>
                 <div class="card-footer">
                     <span class="timestamp">${item.published_at.split(' ').slice(0,4).join(' ')}</span>
-                    <a href="${item.url}" target="_blank" class="read-btn">Full Report →</a>
+                    <a href="${item.url}" target="_blank" class="read-btn">Access Log</a>
                 </div>
             `;
             grid.appendChild(card);
             
-            setTimeout(() => card.classList.add('visible'), i * 50);
+            // Staggered cinematic entrance
+            setTimeout(() => card.classList.add('visible'), i * 40); 
         });
     }
 
     searchInput.addEventListener('input', filterAndRender);
-    channelFilter.addEventListener('change', filterAndRender);
     datePicker.addEventListener('change', (e) => init(e.target.value));
 
     init(datePicker.value);
