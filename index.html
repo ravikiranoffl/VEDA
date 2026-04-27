@@ -7,24 +7,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Default Theme (Matrix) */
+            --bg-base: #050608;
+            --bg-grad1: #161b2e;
+            --bg-grad2: #0a1120;
+            --accent: #00ffaa;
+            --accent-glow: rgba(0, 255, 170, 0.3);
+            
+            /* Glass Constants */
             --glass: rgba(255, 255, 255, 0.03);
             --glass-hover: rgba(255, 255, 255, 0.08);
             --border: rgba(255, 255, 255, 0.12);
-            --accent: #00ffaa;
-            --accent-glow: rgba(0, 255, 170, 0.3);
             --text: #e0e0e0;
         }
 
         body {
             margin: 0;
-            background: #050608;
+            background: var(--bg-base);
             background-image: 
-                radial-gradient(circle at 0% 0%, #161b2e 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, #0a1120 0%, transparent 50%);
+                radial-gradient(circle at 0% 0%, var(--bg-grad1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, var(--bg-grad2) 0%, transparent 50%);
             color: var(--text);
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.8s ease;
         }
 
         .container {
@@ -45,9 +52,10 @@
             text-transform: uppercase;
             font-size: 2.8rem;
             margin: 0;
-            background: linear-gradient(to bottom, #fff, #888);
+            background: linear-gradient(to right, #ffffff, var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            transition: background 0.5s ease;
         }
 
         /* --- Dynamic Control Panel --- */
@@ -66,8 +74,13 @@
             color: white;
             font-size: 1rem;
             backdrop-filter: blur(10px);
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-sizing: border-box;
+        }
+
+        #searchInput::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.3s ease;
         }
 
         #searchInput:focus {
@@ -82,14 +95,9 @@
         .filters {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 50px;
             flex-wrap: wrap;
-        }
-
-        .custom-select {
-            position: relative;
-            min-width: 200px;
         }
 
         select, input[type="date"] {
@@ -101,13 +109,14 @@
             border-radius: 12px;
             cursor: pointer;
             font-family: inherit;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             backdrop-filter: blur(10px);
         }
 
         select:hover, input:hover {
             border-color: var(--accent);
             background: var(--glass-hover);
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
         /* --- News Feed Grid --- */
@@ -125,7 +134,7 @@
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(10px);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
             transform: translateY(20px);
         }
@@ -137,8 +146,8 @@
 
         .card:hover {
             border-color: var(--accent);
-            background: rgba(255,255,255,0.06);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--glass-hover);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px var(--accent-glow);
         }
 
         .card-tag {
@@ -148,6 +157,7 @@
             font-weight: 600;
             letter-spacing: 2px;
             margin-bottom: 15px;
+            transition: color 0.3s ease;
         }
 
         .card-title {
@@ -175,12 +185,14 @@
             padding: 8px 16px;
             border-radius: 8px;
             background: rgba(255,255,255,0.05);
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
         }
 
         .read-btn:hover {
             background: var(--accent);
             color: #000;
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
         .timestamp {
@@ -202,7 +214,7 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search global intelligence...">
+        <input type="text" id="searchInput" placeholder="Initializing uplink...">
     </div>
 
     <div class="filters">
@@ -210,19 +222,139 @@
         <select id="channelFilter">
             <option value="all">Global Matrix</option>
         </select>
+        <select id="themeSelector">
+            <!-- Themes injected by JS -->
+        </select>
     </div>
 
     <div id="news-grid"></div>
 </div>
 
 <script>
+    // --- 1. THEME ENGINE ---
+    const themes = {
+        "Matrix (Default)": { base: "#050608", grad1: "#161b2e", grad2: "#0a1120", accent: "#00ffaa", glow: "rgba(0, 255, 170, 0.3)" },
+        "Cyberpunk": { base: "#0a0008", grad1: "#2a0026", grad2: "#110014", accent: "#ff00e6", glow: "rgba(255, 0, 230, 0.3)" },
+        "Deep Space": { base: "#02010a", grad1: "#0b052e", grad2: "#030214", accent: "#4d4dff", glow: "rgba(77, 77, 255, 0.3)" },
+        "Sunset Glass": { base: "#120500", grad1: "#330a00", grad2: "#1a0300", accent: "#ff6600", glow: "rgba(255, 102, 0, 0.3)" },
+        "Ocean Depths": { base: "#000812", grad1: "#001a33", grad2: "#000a1a", accent: "#00d4ff", glow: "rgba(0, 212, 255, 0.3)" },
+        "Blood Moon": { base: "#0f0000", grad1: "#330000", grad2: "#1a0000", accent: "#ff3333", glow: "rgba(255, 51, 51, 0.3)" },
+        "Amethyst": { base: "#0d001a", grad1: "#26004d", grad2: "#130026", accent: "#b366ff", glow: "rgba(179, 102, 255, 0.3)" },
+        "Gold Rush": { base: "#121000", grad1: "#332900", grad2: "#1a1600", accent: "#ffd700", glow: "rgba(255, 215, 0, 0.3)" },
+        "Arctic Frost": { base: "#000a12", grad1: "#001f33", grad2: "#000d1a", accent: "#80dfff", glow: "rgba(128, 223, 255, 0.3)" },
+        "Forest Canopy": { base: "#001205", grad1: "#00330f", grad2: "#001a08", accent: "#33ff77", glow: "rgba(51, 255, 119, 0.3)" },
+        "Synthwave": { base: "#0d041a", grad1: "#240047", grad2: "#11002e", accent: "#ff0055", glow: "rgba(255, 0, 85, 0.3)" },
+        "Midnight City": { base: "#010014", grad1: "#05003b", grad2: "#020021", accent: "#9933ff", glow: "rgba(153, 51, 255, 0.3)" },
+        "Volcanic": { base: "#140300", grad1: "#3d0a00", grad2: "#1f0500", accent: "#ff4d00", glow: "rgba(255, 77, 0, 0.3)" },
+        "Emerald City": { base: "#00140a", grad1: "#003d1f", grad2: "#001f0f", accent: "#00ff88", glow: "rgba(0, 255, 136, 0.3)" },
+        "Nebula": { base: "#0a001a", grad1: "#1f004d", grad2: "#140033", accent: "#ff00aa", glow: "rgba(255, 0, 170, 0.3)" },
+        "Copper Patina": { base: "#0f0a05", grad1: "#2e1a0b", grad2: "#1f140a", accent: "#5ce6e6", glow: "rgba(92, 230, 230, 0.3)" },
+        "Stealth Mode": { base: "#080808", grad1: "#1f1f1f", grad2: "#0f0f0f", accent: "#cccccc", glow: "rgba(204, 204, 204, 0.3)" },
+        "Sakura": { base: "#14050a", grad1: "#3d0f1f", grad2: "#1f0a14", accent: "#ffb3cc", glow: "rgba(255, 179, 204, 0.3)" },
+        "Solar Flare": { base: "#1a0a00", grad1: "#4d1f00", grad2: "#2e1400", accent: "#ffaa00", glow: "rgba(255, 170, 0, 0.3)" },
+        "Biohazard": { base: "#0a1400", grad1: "#1f3d00", grad2: "#142e00", accent: "#aaff00", glow: "rgba(170, 255, 0, 0.3)" },
+        "Royal Velvet": { base: "#050014", grad1: "#14003d", grad2: "#0a001f", accent: "#ffcc00", glow: "rgba(255, 204, 0, 0.3)" }
+    };
+
+    const themeSelector = document.getElementById('themeSelector');
+    
+    Object.keys(themes).forEach(themeName => {
+        const opt = document.createElement('option');
+        opt.value = themeName;
+        opt.textContent = `Theme: ${themeName}`;
+        themeSelector.appendChild(opt);
+    });
+
+    function applyTheme(themeName) {
+        const theme = themes[themeName];
+        if(!theme) return;
+        document.documentElement.style.setProperty('--bg-base', theme.base);
+        document.documentElement.style.setProperty('--bg-grad1', theme.grad1);
+        document.documentElement.style.setProperty('--bg-grad2', theme.grad2);
+        document.documentElement.style.setProperty('--accent', theme.accent);
+        document.documentElement.style.setProperty('--accent-glow', theme.glow);
+        localStorage.setItem('veda-theme', themeName);
+    }
+
+    const savedTheme = localStorage.getItem('veda-theme') || "Matrix (Default)";
+    themeSelector.value = savedTheme;
+    applyTheme(savedTheme);
+    themeSelector.addEventListener('change', (e) => applyTheme(e.target.value));
+
+    // --- 2. DYNAMIC TYPING PLACEHOLDER ENGINE ---
+    const searchInput = document.getElementById('searchInput');
+    const suggestions = [
+        'Try searching "The Hindu"...',
+        'Try searching "Iran"...',
+        'Search for "Economy"...',
+        'Try searching "India"...',
+        'Search "Telugu News"...',
+        'Try searching "Markets"...',
+        'Search for "Global Matrix"...',
+        'Try searching "Sports"...',
+        'Search "Technology"...'
+    ];
+    
+    // Shuffle suggestions on load to make it random
+    suggestions.sort(() => Math.random() - 0.5);
+
+    let suggestionIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingTimer;
+
+    function typePlaceholder() {
+        // Stop animation completely if user is focused on the input
+        if (document.activeElement === searchInput) {
+            searchInput.placeholder = "Search global intelligence...";
+            clearTimeout(typingTimer);
+            return;
+        }
+
+        const currentWord = suggestions[suggestionIndex];
+
+        if (isDeleting) {
+            charIndex--;
+        } else {
+            charIndex++;
+        }
+
+        searchInput.placeholder = currentWord.substring(0, charIndex) + "|";
+
+        let typingSpeed = isDeleting ? 30 : 80;
+
+        if (!isDeleting && charIndex === currentWord.length) {
+            typingSpeed = 2500; // Pause at the end of the fully typed word
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            suggestionIndex = (suggestionIndex + 1) % suggestions.length;
+            typingSpeed = 500; // Pause before typing the next word
+        }
+
+        typingTimer = setTimeout(typePlaceholder, typingSpeed);
+    }
+
+    // Start typing effect
+    typePlaceholder();
+
+    // Pause typing when user clicks in, resume if they click out and left it empty
+    searchInput.addEventListener('focus', () => {
+        clearTimeout(typingTimer);
+        searchInput.placeholder = "Search global intelligence...";
+    });
+    searchInput.addEventListener('blur', () => {
+        if (searchInput.value.trim() === '') {
+            typePlaceholder();
+        }
+    });
+
+    // --- 3. DATA ENGINE & OMNI-SEARCH ---
     let rawData = [];
     const grid = document.getElementById('news-grid');
-    const searchInput = document.getElementById('searchInput');
     const channelFilter = document.getElementById('channelFilter');
     const datePicker = document.getElementById('datePicker');
 
-    // Auto-set today
     datePicker.value = new Date().toISOString().split('T')[0];
 
     async function init(date) {
@@ -234,7 +366,6 @@
             if (!res.ok) throw new Error("No data found for this period.");
             const data = await res.json();
             
-            // Flatten data for easier searching
             rawData = [];
             Object.keys(data.feeds).forEach(source => {
                 data.feeds[source].forEach(item => {
@@ -264,7 +395,12 @@
         const selectedSource = channelFilter.value;
 
         const filtered = rawData.filter(item => {
-            const matchesSearch = item.title.toLowerCase().includes(searchTerm);
+            // OMNI-SEARCH: Checks Title, Channel Source, AND Published Date
+            const matchesSearch = 
+                item.title.toLowerCase().includes(searchTerm) || 
+                item.source.toLowerCase().replace(/_/g, ' ').includes(searchTerm) ||
+                (item.published_at && item.published_at.toLowerCase().includes(searchTerm));
+                
             const matchesSource = selectedSource === 'all' || item.source === selectedSource;
             return matchesSearch && matchesSource;
         });
@@ -292,17 +428,14 @@
             `;
             grid.appendChild(card);
             
-            // Staggered animation
             setTimeout(() => card.classList.add('visible'), i * 50);
         });
     }
 
-    // Dynamic Listeners
     searchInput.addEventListener('input', filterAndRender);
     channelFilter.addEventListener('change', filterAndRender);
     datePicker.addEventListener('change', (e) => init(e.target.value));
 
-    // Initial Load
     init(datePicker.value);
 </script>
 
