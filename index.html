@@ -1,355 +1,620 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Gemini Chronicle Agent | Archive</title>
-  
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEDA | Premium Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Fallback variables, dynamically overwritten by JS */
+            --bg-base: #0b0c10;
+            --bg-grad1: #1f2833;
+            --bg-grad2: #0b0c10;
+            --accent: #66fcf1;
+            --accent-glow: rgba(102, 252, 241, 0.2);
+            --surface: rgba(255, 255, 255, 0.02);
+            --surface-hover: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #f0f0f0;
+            --text-muted: #8892b0;
+            
+            color-scheme: dark;
+        }
 
-    /* CSS Variables for Dark/Light Mode Support */
-    :root[data-theme="light"] {
-      --bg-color: #f1f5f9;
-      --text-color: #334155;
-      --card-bg: #ffffff;
-      --border-color: #e2e8f0;
-      --accent-color: #0369a1;
-      --accent-hover: #0284c7;
-      --today-bg: #f0fdf4;
-      --today-border: #10b981;
-      --today-text: #064e3b;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    }
+        /* --- CORE STYLES --- */
+        body {
+            margin: 0;
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 15% 0%, var(--bg-grad1) 0%, transparent 45%),
+                radial-gradient(circle at 85% 100%, var(--bg-grad2) 0%, transparent 45%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 1s ease, background-image 1s ease;
+        }
 
-    :root[data-theme="dark"] {
-      --bg-color: #0f172a;
-      --text-color: #e2e8f0;
-      --card-bg: #1e293b;
-      --border-color: #334155;
-      --accent-color: #38bdf8;
-      --accent-hover: #7dd3fc;
-      --today-bg: #064e3b;
-      --today-border: #34d399;
-      --today-text: #a7f3d0;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    }
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4vh 2vw;
+            box-sizing: border-box;
+        }
 
-    /* Base Styling */
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
+        h1 {
+            font-weight: 300;
+            letter-spacing: clamp(4px, 1vw, 12px);
+            text-transform: uppercase;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin: 0;
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: background 1s ease;
+        }
 
-    /* Header Styling */
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
+        /* --- SEARCH BAR --- */
+        .search-container {
+            position: relative;
+            width: clamp(280px, 60%, 800px);
+            margin: 0 auto 2.5rem auto;
+            transition: transform 0.4s ease;
+        }
 
-    .header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 32px;
-      margin: 0 0 10px 0;
-      letter-spacing: 1px;
-    }
+        .search-container:focus-within {
+            transform: scale(1.02);
+        }
 
-    .header p {
-      font-size: 15px;
-      opacity: 0.8;
-      margin: 0;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 600;
-    }
+        #searchInput {
+            width: 100%;
+            padding: 1.2rem 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
 
-    /* Controls Styling */
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 15px 20px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      transition: all 0.3s ease;
-    }
+        #searchInput::placeholder { color: var(--text-muted); transition: color 0.3s; }
+        
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 25px var(--accent-glow), inset 0 0 10px rgba(255,255,255,0.02);
+            background: var(--surface-hover);
+        }
 
-    .controls-group {
-      display: flex;
-      gap: 15px;
-    }
+        /* --- DYNAMIC FILTERS & CUSTOM DROPDOWNS --- */
+        .filters-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
+        }
 
-    .premium-dropdown {
-      padding: 10px 15px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+        .date-picker {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-    .premium-dropdown:focus {
-      border-color: var(--accent-color);
-    }
+        .date-picker:hover, .date-picker:focus {
+            border-color: var(--accent);
+            background: var(--surface-hover);
+            box-shadow: 0 0 15px var(--accent-glow);
+            outline: none;
+        }
 
-    /* News List Styling */
-    .news-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+        /* CUSTOM DROPDOWN UI */
+        .custom-dropdown {
+            position: relative;
+            min-width: 240px;
+            font-size: 0.95rem;
+        }
 
-    .news-item {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-      text-decoration: none;
-      color: var(--text-color);
-    }
+        .dropdown-selected {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 14px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
 
-    .news-item:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent-color);
-    }
+        .dropdown-selected:hover {
+            border-color: var(--accent);
+            background: var(--surface-hover);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
 
-    .news-date {
-      font-weight: 700;
-      font-size: 14px;
-      opacity: 0.7;
-      margin-bottom: 5px;
-      display: block;
-    }
+        .dropdown-selected::after {
+            content: '▼';
+            font-size: 0.7em;
+            color: var(--accent);
+            transition: transform 0.3s;
+        }
 
-    .news-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-    }
+        .custom-dropdown.active .dropdown-selected::after {
+            transform: rotate(-180deg);
+        }
 
-    .read-btn {
-      color: var(--accent-color);
-      font-weight: 600;
-      font-size: 14px;
-    }
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 15, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-height: 0;
+            overflow-y: auto;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 1000;
+        }
 
-    /* Specific Styling for TODAY'S LIVE REPORT */
-    .news-item.today-report {
-      background-color: var(--today-bg);
-      border: 1px solid var(--today-border);
-      border-left: 5px solid var(--today-border);
-    }
+        .custom-dropdown.active .dropdown-options {
+            max-height: 350px;
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    .news-item.today-report .news-title {
-      color: var(--today-text);
-    }
+        .dropdown-option {
+            padding: 14px 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            transform: translateX(-10px);
+            opacity: 0;
+        }
 
-    .live-badge {
-      display: inline-block;
-      background-color: var(--today-border);
-      color: #fff;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-right: 10px;
-      vertical-align: middle;
-      animation: pulse 2s infinite;
-    }
+        .custom-dropdown.active .dropdown-option {
+            transform: translateX(0);
+            opacity: 1;
+        }
 
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
+        /* Staggered animation for dropdown items */
+        .custom-dropdown.active .dropdown-option:nth-child(1) { transition-delay: 0.05s; }
+        .custom-dropdown.active .dropdown-option:nth-child(2) { transition-delay: 0.1s; }
+        .custom-dropdown.active .dropdown-option:nth-child(3) { transition-delay: 0.15s; }
+        .custom-dropdown.active .dropdown-option:nth-child(4) { transition-delay: 0.2s; }
+        .custom-dropdown.active .dropdown-option:nth-child(5) { transition-delay: 0.25s; }
 
-    /* Mobile Responsiveness */
-    @media (max-width: 600px) {
-      .controls { flex-direction: column; gap: 15px; align-items: stretch; }
-      .controls-group { flex-direction: column; }
-      .news-item { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .read-btn { align-self: flex-end; }
-    }
-  </style>
+        .dropdown-option:hover {
+            color: var(--accent);
+            background: var(--surface-hover);
+            padding-left: 30px; /* Slight indent on hover */
+        }
+
+        /* Scrollbar for dropdowns */
+        .dropdown-options::-webkit-scrollbar { width: 6px; }
+        .dropdown-options::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
+
+        /* --- DYNAMIC NEWS GRID --- */
+        #news-grid {
+            display: grid;
+            gap: clamp(1.5rem, 2vw, 2.5rem);
+            /* Base Mobile Layout */
+            grid-template-columns: 1fr; 
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: clamp(1.5rem, 3vw, 2.5rem);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            background: var(--surface-hover);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 20px var(--accent-glow);
+            transform: translateY(-8px);
+        }
+
+        .card-tag {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .card-title {
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            font-weight: 400;
+            color: var(--text-main);
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .read-btn {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .read-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--accent);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .read-btn:hover {
+            color: var(--bg-base);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .read-btn:hover::before {
+            left: 0;
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- RESPONSIVE SHAPE-SHIFTING --- */
+        
+        /* TABLET (Medium Devices) */
+        @media (min-width: 768px) {
+            #news-grid { grid-template-columns: repeat(2, 1fr); }
+            .filters-wrapper { gap: 25px; }
+        }
+
+        /* DESKTOP (Large Devices) */
+        @media (min-width: 1024px) {
+            #news-grid { grid-template-columns: repeat(3, 1fr); }
+            .custom-dropdown { min-width: 260px; }
+        }
+
+        /* ULTRA WIDE (Extra Large) */
+        @media (min-width: 1600px) {
+            #news-grid { grid-template-columns: repeat(4, 1fr); }
+            .container { max-width: 1800px; }
+        }
+
+        /* MOBILE EXTREME (Extra Small) */
+        @media (max-width: 500px) {
+            .filters-wrapper { flex-direction: column; width: 100%; }
+            .date-picker, .custom-dropdown { width: 100%; box-sizing: border-box; }
+            #searchInput { border-radius: 16px; } /* Blockier on mobile */
+            .card { border-radius: 16px; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
+<div class="container">
+    <header>
+        <h1>VEDA Matrix</h1>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Initializing neural link...">
+    </div>
+
+    <div class="filters-wrapper">
+        <input type="date" id="datePicker" class="date-picker">
+        
+        <!-- Custom Channel Dropdown -->
+        <div class="custom-dropdown" id="channelDropdown">
+            <div class="dropdown-selected" id="channelSelected">Global Matrix (All)</div>
+            <div class="dropdown-options" id="channelOptions">
+                <div class="dropdown-option" data-value="all">Global Matrix (All)</div>
+            </div>
+        </div>
+
+        <!-- Custom Theme Dropdown -->
+        <div class="custom-dropdown" id="themeDropdown">
+            <div class="dropdown-selected" id="themeSelected">Select Theme</div>
+            <div class="dropdown-options" id="themeOptions">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="news-grid"></div>
+</div>
+
+<script>
+    // --- 1. PREMIUM AUTHENTIC THEME ENGINE ---
+    const themes = {
+        "Obsidian Pearl": { base: "#07080a", grad1: "#141821", grad2: "#07080a", accent: "#66fcf1", glow: "rgba(102, 252, 241, 0.25)" },
+        "Sapphire Depth": { base: "#020914", grad1: "#0a192f", grad2: "#010409", accent: "#64ffda", glow: "rgba(100, 255, 218, 0.25)" },
+        "Midnight Ember": { base: "#0d0202", grad1: "#260606", grad2: "#080101", accent: "#ff4d4d", glow: "rgba(255, 77, 77, 0.25)" },
+        "Royal Amethyst": { base: "#0a0512", grad1: "#1f0f33", grad2: "#05020a", accent: "#c299ff", glow: "rgba(194, 153, 255, 0.25)" },
+        "Gilded Carbon": { base: "#0a0a0a", grad1: "#1a1a1a", grad2: "#050505", accent: "#e6c200", glow: "rgba(230, 194, 0, 0.25)" },
+        "Emerald Frost": { base: "#010a08", grad1: "#02241d", grad2: "#000504", accent: "#00fa9a", glow: "rgba(0, 250, 154, 0.25)" }
+    };
+
+    const themeNames = Object.keys(themes);
     
-    <div class="header">
-      <h1>THE GEMINI CHRONICLE AGENT</h1>
-      <p>Global Intelligence Archive</p>
-    </div>
+    function applyTheme(themeName) {
+        const theme = themes[themeName];
+        if(!theme) return;
+        document.documentElement.style.setProperty('--bg-base', theme.base);
+        document.documentElement.style.setProperty('--bg-grad1', theme.grad1);
+        document.documentElement.style.setProperty('--bg-grad2', theme.grad2);
+        document.documentElement.style.setProperty('--accent', theme.accent);
+        document.documentElement.style.setProperty('--accent-glow', theme.glow);
+        document.getElementById('themeSelected').innerText = themeName;
+    }
 
-    <div class="controls">
-      <div style="font-weight: 600; font-size: 15px;">
-        Viewing: <span id="reportCount" style="color: var(--accent-color);">100</span> Reports
-      </div>
-      <div class="controls-group">
-        <select id="limitDropdown" class="premium-dropdown">
-          <option value="100" selected>Latest 100 Reports</option>
-          <option value="500">Latest 500 Reports</option>
-          <option value="2000">All Reports (Slow)</option>
-        </select>
-        
-        <select id="themeDropdown" class="premium-dropdown">
-          <option value="light" selected>Light Mode</option>
-          <option value="dark">Dark Mode</option>
-        </select>
-      </div>
-    </div>
+    // 🎲 Random Theme on Load
+    const randomTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
+    applyTheme(randomTheme);
 
-    <div id="newsContainer" class="news-list">
-      </div>
+    // --- 2. CUSTOM DROPDOWN LOGIC ---
+    function setupDropdown(dropdownId, selectedId, optionsId, onChangeCallback) {
+        const dropdown = document.getElementById(dropdownId);
+        const selected = document.getElementById(selectedId);
+        const optionsContainer = document.getElementById(optionsId);
 
-  </div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      
-      const themeDropdown = document.getElementById("themeDropdown");
-      const limitDropdown = document.getElementById("limitDropdown");
-      const newsContainer = document.getElementById("newsContainer");
-      const reportCountDisplay = document.getElementById("reportCount");
-
-      // --- 1. THEME HANDLING ---
-      themeDropdown.addEventListener("change", (e) => {
-        document.documentElement.setAttribute("data-theme", e.target.value);
-      });
-
-      // --- 2. GENERATE MOCK DATA (Simulating 2000 JSON files from GitHub) ---
-      // In production, replace this with your actual fetch() logic.
-      let allReports = [];
-      const todayDate = new Date(); // Script assumes this represents "Real Time"
-
-      for (let i = 0; i < 2000; i++) {
-        let tempDate = new Date(todayDate);
-        tempDate.setDate(tempDate.getDate() - i);
-        
-        // Format YYYY-MM-DD
-        const dateStr = tempDate.getFullYear() + '-' + 
-                        String(tempDate.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(tempDate.getDate()).padStart(2, '0');
-        
-        allReports.push({
-          date: dateStr,
-          title: `Global Daily Intelligence Briefing — ${dateStr}`,
-          link: `https://github.com/ravikiranoffl/TGCA/blob/main/${tempDate.getFullYear()}/${dateStr}.md`
+        // Toggle Open/Close
+        selected.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close others
+            document.querySelectorAll('.custom-dropdown').forEach(d => {
+                if(d !== dropdown) d.classList.remove('active');
+            });
+            dropdown.classList.toggle('active');
         });
-      }
 
-      // --- 3. CORE LOGIC: SORT, SLICE, SHUFFLE, PIN ---
-
-      // Helper: Fisher-Yates Shuffle Algorithm
-      function shuffleArray(array) {
-        let shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
-      }
-
-      function renderNewsList(limit) {
-        // A. Get exact today string to match array
-        const todayStr = todayDate.getFullYear() + '-' + 
-                         String(todayDate.getMonth() + 1).padStart(2, '0') + '-' + 
-                         String(todayDate.getDate()).padStart(2, '0');
-
-        // B. Find Today's Report
-        const todayReport = allReports.find(report => report.date === todayStr);
-
-        // C. Remove Today's report from the general pool
-        let otherReports = allReports.filter(report => report.date !== todayStr);
-
-        // D. Sort newest first (Descending)
-        otherReports.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        // E. Slice to get the "Hot Dated" recent pool based on dropdown limit
-        const sliceCount = todayReport ? limit - 1 : limit;
-        let recentPool = otherReports.slice(0, sliceCount);
-
-        // F. Shuffle only the recent pool
-        recentPool = shuffleArray(recentPool);
-
-        // G. Combine: Pin Today at index 0, followed by the shuffled recent pool
-        const finalDisplayArray = todayReport ? [todayReport, ...recentPool] : recentPool;
-
-        // H. Render to DOM
-        newsContainer.innerHTML = ""; 
-        reportCountDisplay.innerText = finalDisplayArray.length;
-        
-        finalDisplayArray.forEach((report, index) => {
-          const reportLink = document.createElement("a");
-          reportLink.href = report.link;
-          reportLink.target = "_blank";
-          
-          // Apply special styling if it's the 0-index AND it matches today's date
-          if (index === 0 && todayReport) {
-            reportLink.className = "news-item today-report";
-            reportLink.innerHTML = `
-              <div>
-                <span class="news-date">LATEST INTELLIGENCE</span>
-                <p class="news-title">
-                  <span class="live-badge">LIVE TODAY</span>
-                  ${report.title}
-                </p>
-              </div>
-              <span class="read-btn">Access Briefing &rarr;</span>
-            `;
-          } else {
-            // Standard Styling
-            reportLink.className = "news-item";
-            reportLink.innerHTML = `
-              <div>
-                <span class="news-date">${report.date}</span>
-                <p class="news-title">${report.title}</p>
-              </div>
-              <span class="read-btn">Read &rarr;</span>
-            `;
-          }
-
-          newsContainer.appendChild(reportLink);
+        // Handle Option Click
+        optionsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dropdown-option')) {
+                const value = e.target.getAttribute('data-value');
+                const text = e.target.innerText;
+                selected.innerText = text;
+                dropdown.classList.remove('active');
+                if (onChangeCallback) onChangeCallback(value, text);
+            }
         });
-      }
+    }
 
-      // --- 4. INITIALIZATION & EVENT LISTENERS ---
-      
-      // Initial render on load (Default to 100)
-      renderNewsList(100);
-
-      // Re-render when dropdown changes
-      limitDropdown.addEventListener("change", (e) => {
-        const selectedLimit = parseInt(e.target.value, 10);
-        renderNewsList(selectedLimit);
-      });
-
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
     });
-  </script>
+
+    // Populate Theme Dropdown
+    const themeOptionsContainer = document.getElementById('themeOptions');
+    themeNames.forEach(themeName => {
+        const opt = document.createElement('div');
+        opt.className = 'dropdown-option';
+        opt.setAttribute('data-value', themeName);
+        opt.innerText = themeName;
+        themeOptionsContainer.appendChild(opt);
+    });
+
+    // Init Dropdowns
+    setupDropdown('themeDropdown', 'themeSelected', 'themeOptions', (val) => applyTheme(val));
+    
+    // Channel dropdown requires a global variable to track selection for omni-search
+    let currentChannelFilter = 'all';
+    setupDropdown('channelDropdown', 'channelSelected', 'channelOptions', (val) => {
+        currentChannelFilter = val;
+        filterAndRender();
+    });
+
+
+    // --- 3. DYNAMIC TYPING PLACEHOLDER ENGINE ---
+    const searchInput = document.getElementById('searchInput');
+    const suggestions = [
+        'Analyze "The Hindu"...',
+        'Extract "Global Economy"...',
+        'Scan for "Markets"...',
+        'Intercept "Telugu News"...',
+        'Decode "Technology"...',
+        'Monitor "Sports"...'
+    ];
+    suggestions.sort(() => Math.random() - 0.5);
+
+    let suggestionIndex = 0; let charIndex = 0; let isDeleting = false; let typingTimer;
+
+    function typePlaceholder() {
+        if (document.activeElement === searchInput) {
+            searchInput.placeholder = "Query global matrix...";
+            clearTimeout(typingTimer);
+            return;
+        }
+        const currentWord = suggestions[suggestionIndex];
+        if (isDeleting) charIndex--; else charIndex++;
+        
+        searchInput.placeholder = currentWord.substring(0, charIndex) + "|";
+        let typingSpeed = isDeleting ? 30 : 80;
+
+        if (!isDeleting && charIndex === currentWord.length) {
+            typingSpeed = 2500; isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false; suggestionIndex = (suggestionIndex + 1) % suggestions.length; typingSpeed = 500;
+        }
+        typingTimer = setTimeout(typePlaceholder, typingSpeed);
+    }
+    typePlaceholder();
+
+    searchInput.addEventListener('focus', () => {
+        clearTimeout(typingTimer); searchInput.placeholder = "Query global matrix...";
+    });
+    searchInput.addEventListener('blur', () => {
+        if (searchInput.value.trim() === '') typePlaceholder();
+    });
+
+    // --- 4. DATA ENGINE & OMNI-SEARCH ---
+    let rawData = [];
+    const grid = document.getElementById('news-grid');
+    const datePicker = document.getElementById('datePicker');
+    datePicker.value = new Date().toISOString().split('T')[0];
+
+    async function init(date) {
+        grid.innerHTML = '<p style="text-align:center; opacity:0.5; width:100%;">Establishing Secure Connection to VEDA Archive...</p>';
+        const year = date.split('-')[0];
+        
+        try {
+            const res = await fetch(`${year}/${date}.json`);
+            if (!res.ok) throw new Error("Intelligence not found for this temporal coordinate.");
+            const data = await res.json();
+            
+            rawData = [];
+            Object.keys(data.feeds).forEach(source => {
+                data.feeds[source].forEach(item => {
+                    rawData.push({ ...item, source });
+                });
+            });
+
+            // 🎲 SHUFFLE NEWS
+            rawData.sort(() => Math.random() - 0.5);
+
+            populateChannels(Object.keys(data.feeds));
+            filterAndRender();
+        } catch (e) {
+            grid.innerHTML = `<p style="text-align:center; color:var(--accent); width:100%;">${e.message}</p>`;
+        }
+    }
+
+    function populateChannels(sources) {
+        const container = document.getElementById('channelOptions');
+        // Reset container keeping the 'All' option
+        container.innerHTML = '<div class="dropdown-option" data-value="all">Global Matrix (All)</div>';
+        
+        sources.sort().forEach(s => {
+            const opt = document.createElement('div');
+            opt.className = 'dropdown-option';
+            opt.setAttribute('data-value', s);
+            opt.innerText = s.replace(/_/g, ' ');
+            container.appendChild(opt);
+        });
+        // Reset Selection state
+        document.getElementById('channelSelected').innerText = "Global Matrix (All)";
+        currentChannelFilter = 'all';
+    }
+
+    function filterAndRender() {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        const filtered = rawData.filter(item => {
+            const matchesSearch = 
+                item.title.toLowerCase().includes(searchTerm) || 
+                item.source.toLowerCase().replace(/_/g, ' ').includes(searchTerm) ||
+                (item.published_at && item.published_at.toLowerCase().includes(searchTerm));
+                
+            const matchesSource = currentChannelFilter === 'all' || item.source === currentChannelFilter;
+            return matchesSearch && matchesSource;
+        });
+
+        render(filtered);
+    }
+
+    function render(items) {
+        grid.innerHTML = '';
+        if (items.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; width:100%;">No data matches current query parameters.</p>';
+            return;
+        }
+
+        items.forEach((item, i) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-tag">${item.source.replace(/_/g, ' ')}</div>
+                <div class="card-title">${item.title}</div>
+                <div class="card-footer">
+                    <span class="timestamp">${item.published_at.split(' ').slice(0,4).join(' ')}</span>
+                    <a href="${item.url}" target="_blank" class="read-btn">Access Log</a>
+                </div>
+            `;
+            grid.appendChild(card);
+            
+            // Staggered cinematic entrance
+            setTimeout(() => card.classList.add('visible'), i * 40); 
+        });
+    }
+
+    searchInput.addEventListener('input', filterAndRender);
+    datePicker.addEventListener('change', (e) => init(e.target.value));
+
+    init(datePicker.value);
+</script>
+
 </body>
 </html>
