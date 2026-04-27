@@ -3,130 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VEDA | Global Archive</title>
+    <title>VEDA | Intelligence Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.2);
+            --glass: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.15);
+            --accent: #4ecca3;
             --text: #ffffff;
         }
 
         body {
             margin: 0;
-            padding: 0;
-            background: radial-gradient(circle at top right, #1a1a2e, #16213e, #0f3460);
+            background: #0a0b10;
+            background-image: radial-gradient(circle at 50% -20%, #1c2a4d, #0a0b10);
             color: var(--text);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 40px 20px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 50px;
-            animation: fadeInDown 0.8s ease-out;
+            margin-bottom: 40px;
         }
 
         h1 {
-            font-weight: 600;
-            letter-spacing: 4px;
+            font-weight: 300;
+            letter-spacing: 8px;
             text-transform: uppercase;
-            margin: 0;
-            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .status-pill {
-            display: inline-block;
-            padding: 5px 15px;
+        /* Control Panel */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
             background: var(--glass);
+            padding: 20px;
+            border-radius: 16px;
             border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 10px;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(15px);
+            margin-bottom: 40px;
         }
 
-        #news-container {
+        select, input[type="date"] {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        select:hover, input:hover {
+            border-color: var(--accent);
+        }
+
+        /* News Grid */
+        #news-grid {
             display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
         }
 
-        .news-card {
+        .card {
             background: var(--glass);
             border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.5s ease forwards;
-            opacity: 0;
+            padding: 24px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: 0.3s;
+            animation: fadeIn 0.5s ease forwards;
         }
 
-        .news-card:hover {
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.15);
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.12);
         }
 
-        .feed-name {
-            font-size: 0.7rem;
-            color: #4ecca3;
-            text-transform: uppercase;
+        .card-tag {
+            font-size: 0.65rem;
+            color: var(--accent);
             font-weight: 600;
-            margin-bottom: 8px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
         }
 
-        .headline {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            line-height: 1.4;
+        .card-title {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
             font-weight: 400;
         }
 
-        .url-link {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            word-break: break-all;
-            display: block;
-            border-top: 1px solid var(--border);
-            padding-top: 10px;
-        }
-
-        .url-link:hover { color: #fff; }
-
-        /* Animations */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Calendar Info Bar */
-        .date-selector {
+        .card-footer {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            gap: 15px;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
         }
 
-        input[type="date"] {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            outline: none;
+        .btn-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+            color: #fff;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -134,68 +149,98 @@
 
 <div class="container">
     <header>
-        <h1>VEDA Platform</h1>
-        <div class="status-pill" id="live-clock">Syncing...</div>
+        <h1>VEDA Intelligence</h1>
     </header>
 
-    <div class="date-selector">
-        <span>Archives:</span>
-        <input type="date" id="datePicker">
+    <div class="controls">
+        <div>
+            <span>Date: </span>
+            <input type="date" id="datePicker">
+        </div>
+        <div>
+            <span>Channel: </span>
+            <select id="channelFilter">
+                <option value="all">All Channels</option>
+                </select>
+        </div>
     </div>
 
-    <div id="news-container">
+    <div id="news-grid">
         </div>
 </div>
 
 <script>
-    // Initialize date to Today (UTC)
+    let globalData = null;
+    const grid = document.getElementById('news-grid');
+    const channelFilter = document.getElementById('channelFilter');
+    const datePicker = document.getElementById('datePicker');
+
+    // Auto-set today
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('datePicker').value = today;
+    datePicker.value = today;
 
-    async function fetchNews(selectedDate) {
-        const container = document.getElementById('news-container');
-        container.innerHTML = '<p style="text-align:center">Fetching data from VEDA Archive...</p>';
+    async function loadData(date) {
+        const year = date.split('-')[0];
+        const path = `${year}/${date}.json`;
         
-        const year = selectedDate.split('-')[0];
-        const url = `${year}/${selectedDate}.json`;
-
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('No data for this date');
-            const data = await response.json();
+            const response = await fetch(path);
+            if (!response.ok) throw new Error("No intelligence found for this date.");
+            globalData = await response.json();
             
-            container.innerHTML = '';
-            
-            // Loop through each feed and headline
-            Object.keys(data.feeds).forEach(feedName => {
-                data.feeds[feedName].forEach((article, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'news-card';
-                    card.style.animationDelay = `${index * 0.05}s`;
-                    
-                    card.innerHTML = `
-                        <div class="feed-name">${feedName.replace(/_/g, ' ')}</div>
-                        <div class="headline">${article.title}</div>
-                        <a href="${article.url}" target="_blank" class="url-link">Source: ${article.url}</a>
-                    `;
-                    container.appendChild(card);
-                });
-            });
-
-            document.getElementById('live-clock').innerText = `Loaded ${data.total_headlines} Headlines from ${selectedDate}`;
-
+            updateFilters(globalData.feeds);
+            renderNews('all');
         } catch (err) {
-            container.innerHTML = `<p style="text-align:center; color: #ff4b2b;">${err.message}. Check if VEDA has run today.</p>`;
+            grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center;">${err.message}</p>`;
         }
     }
 
-    // Event listener for date change
-    document.getElementById('datePicker').addEventListener('change', (e) => {
-        fetchNews(e.target.value);
-    });
+    function updateFilters(feeds) {
+        const currentVal = channelFilter.value;
+        channelFilter.innerHTML = '<option value="all">All Channels</option>';
+        Object.keys(feeds).sort().forEach(feed => {
+            const opt = document.createElement('option');
+            opt.value = feed;
+            opt.innerText = feed.replace(/_/g, ' ');
+            channelFilter.appendChild(opt);
+        });
+        channelFilter.value = currentVal;
+    }
 
-    // Initial load
-    fetchNews(today);
+    function renderNews(filter) {
+        grid.innerHTML = '';
+        if (!globalData) return;
+
+        const feedsToRender = filter === 'all' 
+            ? Object.keys(globalData.feeds) 
+            : [filter];
+
+        feedsToRender.forEach(feedName => {
+            if (!globalData.feeds[feedName]) return;
+            
+            globalData.feeds[feedName].forEach(article => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div>
+                        <div class="card-tag">${feedName.replace(/_/g, ' ')}</div>
+                        <div class="card-title">${article.title}</div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="timestamp">${article.published_at.split(' ').slice(0,4).join(' ')}</span>
+                        <a href="${article.url}" target="_blank" class="btn-link">Read Full Article →</a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        });
+    }
+
+    datePicker.addEventListener('change', (e) => loadData(e.target.value));
+    channelFilter.addEventListener('change', (e) => renderNews(e.target.value));
+
+    // Initial Load
+    loadData(today);
 </script>
 
 </body>
