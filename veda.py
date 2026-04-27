@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import json
 import os
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 # ==========================================
 # VEDA ULTIMATE TARGET MATRIX 
@@ -95,8 +95,13 @@ TARGET_FEEDS = {
     "News_com_au": "https://www.news.com.au/content-feeds/latest-news-national/"
 }
 
+def get_ist_time():
+    """Helper function to always get the current time in IST (UTC+5:30)"""
+    ist_timezone = timezone(timedelta(hours=5, minutes=30))
+    return datetime.now(ist_timezone)
+
 def get_dynamic_filepath():
-    now = datetime.utcnow()
+    now = get_ist_time()
     year_folder = now.strftime("%Y")
     date_file = now.strftime("%Y-%m-%d")
     os.makedirs(year_folder, exist_ok=True)
@@ -118,18 +123,18 @@ def fetch_feed(url):
 
 def update_archive():
     filepath = get_dynamic_filepath()
-    
+
     # 1. Load Daily Archive
     if os.path.exists(filepath):
         with open(filepath, 'r', encoding='utf-8') as f:
             archive = json.load(f)
     else:
         archive = {
-            "date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "date": get_ist_time().strftime("%Y-%m-%d"),
             "total_headlines": 0,
             "feeds": {} # Start completely empty!
         }
-        
+
     # 2. Load Telemetry File (status.json)
     status_filepath = "status.json"
     if os.path.exists(status_filepath):
@@ -140,34 +145,34 @@ def update_archive():
 
     new_items_total = 0
     current_run_status = {} # Will hold 1 or 0 for each feed
-    
+
     for feed_name, url in TARGET_FEEDS.items():
         xml_data = fetch_feed(url)
-        
+
         if not xml_data: 
             current_run_status[feed_name] = 0 # 0 = Dead/Empty
             continue
-            
+
         try:
             root = ET.fromstring(xml_data)
-            
+
             # Check if feed actually has articles
             items = root.findall('.//item') or root.findall('.//{http://www.w3.org/2005/Atom}entry')
             if len(items) == 0:
                 current_run_status[feed_name] = 0 # 0 = Alive, but Zero News
                 continue
-                
+
             current_run_status[feed_name] = 1 # 1 = Success! News Found.
-            
+
             if feed_name not in archive["feeds"]:
                 archive["feeds"][feed_name] = []
-            
+
             existing_ids = {art["id"] for art in archive["feeds"][feed_name]}
-            
+
             for item in items:
                 link_elem = item.find('link')
                 guid_elem = item.find('guid')
-                
+
                 link = ""
                 if link_elem is not None and link_elem.text:
                     link = link_elem.text.strip()
@@ -175,20 +180,20 @@ def update_archive():
                     link = link_elem.get('href').strip()
                 elif guid_elem is not None and guid_elem.text:
                     link = guid_elem.text.strip()
-                    
+
                 if not link or "http" not in link: 
                     continue 
-                    
+
                 article_id = hashlib.md5(link.encode('utf-8')).hexdigest()
-                
+
                 if article_id not in existing_ids:
                     title_elem = item.find('title')
                     title = title_elem.text if title_elem is not None else "Untitled"
-                    
+
                     pub_date = item.find('pubDate')
                     if pub_date is None: pub_date = item.find('{http://www.w3.org/2005/Atom}published')
                     pub_date_text = pub_date.text if pub_date is not None else "N/A"
-                    
+
                     archive["feeds"][feed_name].append({
                         "id": article_id,
                         "title": title.strip(),
@@ -196,34 +201,34 @@ def update_archive():
                         "url": link
                     })
                     new_items_total += 1
-                    
+
         except Exception:
             current_run_status[feed_name] = 0 # 0 = Fake HTML / XML Crash
             continue
 
     archive["total_headlines"] += new_items_total
-    
+
     # ZERO-WASTE CLEANUP: Remove any feeds that still ended up with 0 items
     archive["feeds"] = {k: v for k, v in archive["feeds"].items() if len(v) > 0}
-    
+
     # Save the clean Daily Data
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(archive, f, indent=4, ensure_ascii=False)
-        
+
     # --- SAVE TELEMETRY (status.json) ---
     # Log this exact run with a timestamp
     telemetry_entry = {
-        "run_time_utc": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "run_time_ist": get_ist_time().strftime("%Y-%m-%d %H:%M:%S"),
         "status": current_run_status
     }
     telemetry.append(telemetry_entry)
-    
+
     # Keep only the last 100 runs so the file doesn't crash your editor
     telemetry = telemetry[-100:] 
-    
+
     with open(status_filepath, 'w', encoding='utf-8') as f:
         json.dump(telemetry, f, indent=4, ensure_ascii=False)
-        
+
     print(f"\nVEDA Sync Complete: {new_items_total} new items.")
     print("Telemetry logged to status.json")
 
