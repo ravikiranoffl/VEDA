@@ -8,10 +8,10 @@ from datetime import datetime
 
 TARGET_FEEDS = {
     # --- GLOBAL & GULF (MENA/USA) ---
-    "AlJazeera_English": "https://www.aljazeera.com/xml/rss/all.xml",
-    "Gulf_News_UAE": "https://gulfnews.com/rss",
-    "CNN_USA_Top": "http://rss.cnn.com/rss/cnn_topstories.rss",
-    "BBC_World_News": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "AlJazeera_MENA": "https://www.aljazeera.com/xml/rss/all.xml",
+    "NYT_America": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    "CNN_Top_Stories": "http://rss.cnn.com/rss/cnn_topstories.rss",
+    "BBC_World": "https://feeds.bbci.co.uk/news/world/rss.xml",
 
     # --- NATIONAL TRUTH & ALGORITHMS ---
     "Google_News_India": "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en",
