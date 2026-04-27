@@ -5,9 +5,6 @@ import os
 import hashlib
 from datetime import datetime
 
-# ==========================================
-# VEDA MASTER TARGET MATRIX (AUDITED & VERIFIED)
-# ==========================================
 TARGET_FEEDS = {
     # --- NATIONAL TRUTH ---
     "Google_News_India": "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en",
@@ -24,7 +21,7 @@ TARGET_FEEDS = {
     "Economic_Times_Markets": "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
     "Financial_Express_Economy": "https://www.financialexpress.com/economy/feed/",
 
-    # --- THE SOUTH (Verified Active) ---
+    # --- THE SOUTH (Armor-Piercing Enabled) ---
     "Sakshi_Telugu_AP": "https://www.sakshi.com/rss/andhra-pradesh.xml",
     "Sakshi_Telugu_TS": "https://www.sakshi.com/rss/telangana.xml",
     "The_Hindu_Telangana": "https://www.thehindu.com/news/national/telangana/feeder/default.rss",
@@ -61,6 +58,7 @@ TARGET_FEEDS = {
 }
 
 def get_dynamic_filepath():
+    """Routes data to the correct YYYY/YYYY-MM-DD.json file."""
     now = datetime.utcnow()
     year_folder = now.strftime("%Y")
     date_file = now.strftime("%Y-%m-%d")
@@ -68,16 +66,25 @@ def get_dynamic_filepath():
     return f"{year_folder}/{date_file}.json"
 
 def fetch_feed(url):
+    """Fetches XML using Armor-Piercing Headers to bypass strict WAFs (Cloudflare)."""
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': 'application/rss+xml, application/rdf+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9,te;q=0.8',
+            'Connection': 'keep-alive'
+        }
+        req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=15) as response:
             return response.read()
-    except:
+    except Exception as e:
+        print(f"Failed to fetch {url}: {e}")
         return None
 
 def update_archive():
     filepath = get_dynamic_filepath()
     
+    # Load existing daily data or initialize a new schema
     if os.path.exists(filepath):
         with open(filepath, 'r', encoding='utf-8') as f:
             archive = json.load(f)
@@ -89,6 +96,7 @@ def update_archive():
         }
     
     new_items = 0
+    
     for feed_name, url in TARGET_FEEDS.items():
         xml_data = fetch_feed(url)
         if not xml_data: continue
@@ -96,7 +104,7 @@ def update_archive():
         try:
             root = ET.fromstring(xml_data)
             
-            # Auto-add new feeds to existing JSON without crashing
+            # Ensure feed category exists
             if feed_name not in archive["feeds"]:
                 archive["feeds"][feed_name] = []
             
@@ -104,23 +112,29 @@ def update_archive():
             
             # Find all <item> tags (or <entry> for Atom feeds)
             for item in root.findall('.//item') or root.findall('.//{http://www.w3.org/2005/Atom}entry'):
-                # Extract link depending on RSS or Atom format
+                
+                # --- AGGRESSIVE LINK HUNTING ---
                 link_elem = item.find('link')
-                if link_elem is not None:
-                    link = link_elem.text if link_elem.text else link_elem.get('href', "")
-                else:
-                    continue
+                guid_elem = item.find('guid')
+                
+                link = ""
+                if link_elem is not None and link_elem.text:
+                    link = link_elem.text.strip()
+                elif link_elem is not None and link_elem.get('href'):
+                    link = link_elem.get('href').strip()
+                elif guid_elem is not None and guid_elem.text:
+                    link = guid_elem.text.strip()
                     
-                if not link: continue
+                if not link or "http" not in link: 
+                    continue 
                     
-                # The MD5 Hash Deduplication (Requires the URL)
+                # The MD5 Hash Deduplication
                 article_id = hashlib.md5(link.encode('utf-8')).hexdigest()
                 
                 if article_id not in existing_ids:
                     title_elem = item.find('title')
                     title = title_elem.text if title_elem is not None else "Untitled"
                     
-                    # Check for pubDate (RSS) or published (Atom)
                     pub_date = item.find('pubDate')
                     if pub_date is None: pub_date = item.find('{http://www.w3.org/2005/Atom}published')
                     pub_date_text = pub_date.text if pub_date is not None else "N/A"
@@ -133,11 +147,15 @@ def update_archive():
                     })
                     new_items += 1
         except Exception as e:
+            print(f"Error parsing {feed_name}: {e}")
             continue
 
     archive["total_headlines"] += new_items
+    
+    # Save cleanly with native UTF-8 support
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(archive, f, indent=4, ensure_ascii=False)
+        
     print(f"VEDA Sync: {new_items} new records captured cleanly.")
 
 if __name__ == "__main__":
