@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEDA | Global Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e, #0f3460);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 5px 15px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        #news-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .news-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .news-card:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feed-name {
+            font-size: 0.7rem;
+            color: #4ecca3;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .headline {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .url-link {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            word-break: break-all;
+            display: block;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
+
+        .url-link:hover { color: #fff; }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Calendar Info Bar */
+        .date-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        input[type="date"] {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>VEDA Platform</h1>
+        <div class="status-pill" id="live-clock">Syncing...</div>
+    </header>
+
+    <div class="date-selector">
+        <span>Archives:</span>
+        <input type="date" id="datePicker">
+    </div>
+
+    <div id="news-container">
+        </div>
+</div>
+
+<script>
+    // Initialize date to Today (UTC)
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('datePicker').value = today;
+
+    async function fetchNews(selectedDate) {
+        const container = document.getElementById('news-container');
+        container.innerHTML = '<p style="text-align:center">Fetching data from VEDA Archive...</p>';
+        
+        const year = selectedDate.split('-')[0];
+        const url = `${year}/${selectedDate}.json`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('No data for this date');
+            const data = await response.json();
+            
+            container.innerHTML = '';
+            
+            // Loop through each feed and headline
+            Object.keys(data.feeds).forEach(feedName => {
+                data.feeds[feedName].forEach((article, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'news-card';
+                    card.style.animationDelay = `${index * 0.05}s`;
+                    
+                    card.innerHTML = `
+                        <div class="feed-name">${feedName.replace(/_/g, ' ')}</div>
+                        <div class="headline">${article.title}</div>
+                        <a href="${article.url}" target="_blank" class="url-link">Source: ${article.url}</a>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+
+            document.getElementById('live-clock').innerText = `Loaded ${data.total_headlines} Headlines from ${selectedDate}`;
+
+        } catch (err) {
+            container.innerHTML = `<p style="text-align:center; color: #ff4b2b;">${err.message}. Check if VEDA has run today.</p>`;
+        }
+    }
+
+    // Event listener for date change
+    document.getElementById('datePicker').addEventListener('change', (e) => {
+        fetchNews(e.target.value);
+    });
+
+    // Initial load
+    fetchNews(today);
+</script>
+
+</body>
+</html>
