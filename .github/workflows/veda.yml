@@ -2,7 +2,8 @@ name: VEDA Pan-India Generator
 
 on:
   schedule:
-    - cron: '30 * * * *' 
+    # Runs at minute 0 UTC, which equals minute 30 IST (e.g., 18:30 IST)
+    - cron: '0 * * * *' 
   workflow_dispatch:     # Allows you to trigger it manually via a button
 
 permissions:
@@ -23,9 +24,10 @@ jobs:
       - name: Execute VEDA Pipeline
         run: python veda.py
 
-      - name: Generate Commit Timestamp
+      # This generates the exact YYYYMMDDHHMMSS format for the commit message in IST
+      - name: Generate Commit Timestamp (IST)
         id: time
-        run: echo "TS=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        run: echo "TS=$(TZ='Asia/Kolkata' date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
       # This commits the data using YOUR identity, triggering the green squares
       - name: Commit Hourly Data Update
