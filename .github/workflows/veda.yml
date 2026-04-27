@@ -1,0 +1,38 @@
+name: VEDA Pan-India Engine
+
+on:
+  schedule:
+    - cron: '30 * * * *' 
+  workflow_dispatch:     # Allows you to trigger it manually via a button
+
+permissions:
+  contents: write
+
+jobs:
+  run-veda-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Execute VEDA Pipeline
+        run: python veda.py
+
+      - name: Generate Commit Timestamp
+        id: time
+        run: echo "TS=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      # This commits the data using YOUR identity, triggering the green squares
+      - name: Commit Hourly Data Update
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: ${{ env.TS }}
+          commit_user_name: "ravikiranoffl"
+          commit_user_email: "171322216+ravikiranoffl@users.noreply.github.com"
+          commit_author: "ravikiranoffl <171322216+ravikiranoffl@users.noreply.github.com>"
+          file_pattern: "*/*.json"
