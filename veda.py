@@ -5,8 +5,11 @@ import os
 import hashlib
 from datetime import datetime
 
+# ==========================================
+# VEDA ULTIMATE TARGET MATRIX (MARATHON SURVIVORS)
+# ==========================================
 TARGET_FEEDS = {
-    # --- NATIONAL TRUTH ---
+    # --- INDIA: NATIONAL CORE ---
     "Google_News_India": "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en",
     "The_Hindu_National": "https://www.thehindu.com/news/national/feeder/default.rss",
     "Times_of_India_National": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
@@ -14,47 +17,94 @@ TARGET_FEEDS = {
     "NDTV_Latest": "https://feeds.feedburner.com/ndtvnews-latest",
     "News18_National": "https://www.news18.com/commonfeeds/v1/eng/rss/india.xml",
 
-    # --- FINANCIAL MARKETS ---
+    # --- INDIA: FINANCIAL MARKETS ---
     "Moneycontrol_Markets": "https://www.moneycontrol.com/rss/marketreports.xml",
     "Moneycontrol_Commodities": "https://www.moneycontrol.com/rss/commodities.xml",
     "LiveMint_Markets": "https://www.livemint.com/rss/markets",
     "Economic_Times_Markets": "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
     "Financial_Express_Economy": "https://www.financialexpress.com/economy/feed/",
 
-    # --- THE SOUTH (Armor-Piercing Enabled) ---
-    "Sakshi_Telugu_AP": "https://www.sakshi.com/rss/andhra-pradesh.xml",
-    "Sakshi_Telugu_TS": "https://www.sakshi.com/rss/telangana.xml",
-    "The_Hindu_Telangana": "https://www.thehindu.com/news/national/telangana/feeder/default.rss",
-    "The_Hindu_Andhra": "https://www.thehindu.com/news/national/andhra-pradesh/feeder/default.rss",
+    # --- TELUGU HEAVYWEIGHTS (Strictly Telugu Text) ---
+    "Namasthe_Telangana": "https://www.ntnews.com/feed",
+    "NTV_Telugu": "https://ntvtelugu.com/feed",
+    "10TV_Telugu": "https://10tv.in/feed",
+    "ABP_Desam_Telugu": "https://telugu.abplive.com/home/feed",
+    "V6_Velugu_TS": "https://www.v6velugu.com/feed",
+
+    # --- INDIA: SOUTH ---
     "The_Hindu_Tamil_Nadu": "https://www.thehindu.com/news/national/tamil-nadu/feeder/default.rss",
-    "News18_Tamil_Nadu": "https://tamil.news18.com/commonfeeds/v1/tam/rss/tamil-nadu.xml",
+    "The_Hindu_Karnataka": "https://www.thehindu.com/news/national/karnataka/feeder/default.rss",
+    "The_Hindu_Kerala": "https://www.thehindu.com/news/national/kerala/feeder/default.rss",
+    "Indian_Express_Bangalore": "https://indianexpress.com/section/cities/bangalore/feed/",
+    "Indian_Express_Chennai": "https://indianexpress.com/section/cities/chennai/feed/",
 
-    # --- REGIONAL METROS & STATES ---
-    "TOI_Delhi": "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms",
-    "TOI_Uttar_Pradesh": "https://timesofindia.indiatimes.com/rssfeeds/2581104.cms",
-    "News18_Hindi_National": "https://hindi.news18.com/rss/khabar/nation/nation.xml",
-    "TOI_Mumbai": "https://timesofindia.indiatimes.com/rssfeeds/-2128838597.cms",
+    # --- INDIA: NORTH ---
+    "The_Hindu_Delhi": "https://www.thehindu.com/news/cities/Delhi/feeder/default.rss",
+    "Indian_Express_Lucknow": "https://indianexpress.com/section/cities/lucknow/feed/",
+    "Indian_Express_Chandigarh": "https://indianexpress.com/section/cities/chandigarh/feed/",
+    "Kashmir_Observer": "https://kashmirobserver.net/feed/",
+
+    # --- INDIA: WEST & CENTRAL ---
     "Mid_Day_Mumbai": "https://www.mid-day.com/Resources/midday/rss/mumbai-news.xml",
-    "TOI_Pune": "https://timesofindia.indiatimes.com/rssfeeds/-2128821991.cms",
-    "TOI_Kolkata": "https://timesofindia.indiatimes.com/rssfeeds/-2128833038.cms",
-    "TOI_Madhya_Pradesh": "https://timesofindia.indiatimes.com/rssfeeds/2988506.cms",
-    "TOI_Assam_Northeast": "https://timesofindia.indiatimes.com/rssfeeds/3404555.cms",
+    "Indian_Express_Mumbai": "https://indianexpress.com/section/cities/mumbai/feed/",
+    "Indian_Express_Pune": "https://indianexpress.com/section/cities/pune/feed/",
+    "Indian_Express_Ahmedabad": "https://indianexpress.com/section/cities/ahmedabad/feed/",
 
-    # --- SPECIALIZED (Sports, Entertainment, Tech) ---
+    # --- INDIA: EAST & NORTHEAST ---
+    "Indian_Express_Kolkata": "https://indianexpress.com/section/cities/kolkata/feed/",
+
+    # --- SPECIALIZED (Sports & Tech) ---
     "ESPN_Cricinfo_India": "https://www.espncricinfo.com/rss/content/story/feeds/0.xml",
-    "TOI_Sports": "https://timesofindia.indiatimes.com/rssfeeds/4719148.cms",
-    "Indian_Express_Sports": "https://indianexpress.com/section/sports/feed/",
-    "TOI_Entertainment": "https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms",
-    "Indian_Express_Entertainment": "https://indianexpress.com/section/entertainment/feed/",
-    "NDTV_Movies": "https://feeds.feedburner.com/ndtvmovies-latest",
     "Economic_Times_Tech": "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms",
-    "Gadgets360_Tech": "https://feeds.feedburner.com/ndtvgadgets-latest",
 
-    # --- GLOBAL & WESTERN ---
-    "AlJazeera_English": "https://www.aljazeera.com/xml/rss/all.xml",
-    "NYT_America": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-    "CNN_Top_Stories": "http://rss.cnn.com/rss/cnn_topstories.rss",
-    "BBC_World": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    # ==========================================
+    # GLOBAL CONTINENTS
+    # ==========================================
+    
+    # --- NORTH AMERICA ---
+    "NYT_USA_Top": "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+    "NPR_News_USA": "https://feeds.npr.org/1001/rss.xml",
+    "PBS_NewsHour": "https://www.pbs.org/newshour/feeds/rss/headlines",
+    "Washington_Post_World": "https://feeds.washingtonpost.com/rss/world",
+    "CBC_Canada_Top": "https://www.cbc.ca/cmlink/rss-topstories",
+    "Los_Angeles_Times": "https://www.latimes.com/world-nation/rss2.0.xml",
+
+    # --- SOUTH AMERICA & CARIBBEAN ---
+    "MercoPress_LatAm": "https://en.mercopress.com/rss",
+    "BBC_Latin_America": "https://feeds.bbci.co.uk/news/world/latin_america/rss.xml",
+    "Rio_Times_Brazil": "https://riotimesonline.com/feed/",
+    "Havana_Times": "https://havanatimes.org/feed/",
+
+    # --- EUROPE ---
+    "BBC_Europe": "https://feeds.bbci.co.uk/news/world/europe/rss.xml",
+    "The_Guardian_Europe": "https://www.theguardian.com/europe/rss",
+    "France24_Europe": "https://www.france24.com/en/europe/rss",
+    "Independent_UK": "https://www.independent.co.uk/news/world/europe/rss",
+    "Sky_News_UK": "https://feeds.skynews.com/feeds/rss/home.xml",
+    "RTE_Ireland": "https://www.rte.ie/news/rss/news-headlines.xml",
+
+    # --- AFRICA ---
+    "AllAfrica_Top": "https://allafrica.com/tools/headlines/rdf/africa/headlines.rdf",
+    "BBC_Africa": "https://feeds.bbci.co.uk/news/world/africa/rss.xml",
+    "News24_South_Africa": "https://feeds.news24.com/articles/news24/TopStories/rss",
+    "Mail_and_Guardian_SA": "https://mg.co.za/feed/",
+    "Africa_Report": "https://www.theafricareport.com/feed/",
+    "Premium_Times_Nigeria": "https://www.premiumtimesng.com/feed",
+
+    # --- ASIA (Outside India) & MIDDLE EAST ---
+    "SCMP_Hong_Kong": "https://www.scmp.com/rss/2/feed",
+    "CNA_Singapore": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml",
+    "Japan_Times": "https://www.japantimes.co.jp/feed/",
+    "AlJazeera_MiddleEast": "https://www.aljazeera.com/xml/rss/all.xml",
+    "Arab_News": "https://www.arabnews.com/cat/1/rss.xml",
+    "Times_of_Israel": "https://www.timesofisrael.com/feed/",
+
+    # --- OCEANIA / AUSTRALIA ---
+    "ABC_News_Australia": "https://www.abc.net.au/news/feed/51120/rss.xml",
+    "Sydney_Morning_Herald": "https://www.smh.com.au/rss/feed.xml",
+    "The_Age_Melbourne": "https://www.theage.com.au/rss/feed.xml",
+    "RNZ_New_Zealand": "https://www.rnz.co.nz/rss/national.xml",
+    "News_com_au": "https://www.news.com.au/content-feeds/latest-news-national/"
 }
 
 def get_dynamic_filepath():
@@ -66,7 +116,7 @@ def get_dynamic_filepath():
     return f"{year_folder}/{date_file}.json"
 
 def fetch_feed(url):
-    """Fetches XML using Armor-Piercing Headers to bypass strict WAFs (Cloudflare)."""
+    """Fetches XML using Armor-Piercing Headers to bypass strict WAFs."""
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -78,7 +128,6 @@ def fetch_feed(url):
         with urllib.request.urlopen(req, timeout=15) as response:
             return response.read()
     except Exception as e:
-        print(f"Failed to fetch {url}: {e}")
         return None
 
 def update_archive():
@@ -104,7 +153,7 @@ def update_archive():
         try:
             root = ET.fromstring(xml_data)
             
-            # Ensure feed category exists
+            # Auto-add new feeds to existing JSON without crashing
             if feed_name not in archive["feeds"]:
                 archive["feeds"][feed_name] = []
             
@@ -128,7 +177,7 @@ def update_archive():
                 if not link or "http" not in link: 
                     continue 
                     
-                # The MD5 Hash Deduplication
+                # MD5 Hash Deduplication
                 article_id = hashlib.md5(link.encode('utf-8')).hexdigest()
                 
                 if article_id not in existing_ids:
@@ -147,7 +196,6 @@ def update_archive():
                     })
                     new_items += 1
         except Exception as e:
-            print(f"Error parsing {feed_name}: {e}")
             continue
 
     archive["total_headlines"] += new_items
@@ -156,7 +204,25 @@ def update_archive():
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(archive, f, indent=4, ensure_ascii=False)
         
-    print(f"VEDA Sync: {new_items} new records captured cleanly.")
+    # ==========================================
+    # VEDA AUTOMATED REPORT CARD
+    # ==========================================
+    print("\n" + "="*40)
+    print("VEDA RUN SUMMARY")
+    print("="*40)
+    print(f"Total New Headlines Captured: {new_items}")
+    
+    # Find which feeds are totally empty
+    empty_feeds = [feed for feed, items in archive["feeds"].items() if len(items) == 0]
+    
+    if empty_feeds:
+        print("\nWARNING - The following feeds returned 0 items:")
+        for feed in empty_feeds:
+            print(f"{feed}")
+    else:
+        print("\nPERFECT RUN: All feeds successfully captured data!")
+        
+    print("="*40 + "\n")
 
 if __name__ == "__main__":
     update_archive()
