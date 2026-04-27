@@ -18,7 +18,7 @@
             --border: rgba(255, 255, 255, 0.08);
             --text-main: #f0f0f0;
             --text-muted: #8892b0;
-            
+
             color-scheme: dark;
         }
 
@@ -92,7 +92,7 @@
         }
 
         #searchInput::placeholder { color: var(--text-muted); transition: color 0.3s; }
-        
+
         #searchInput:focus {
             outline: none;
             border-color: var(--accent);
@@ -135,7 +135,7 @@
         /* CUSTOM DROPDOWN UI */
         .custom-dropdown {
             position: relative;
-            min-width: 240px;
+            min-width: 200px;
             font-size: 0.95rem;
         }
 
@@ -175,7 +175,7 @@
             top: calc(100% + 10px);
             left: 0;
             width: 100%;
-            background: rgba(10, 10, 15, 0.7);
+            background: rgba(10, 10, 15, 0.85);
             border: 1px solid var(--border);
             border-radius: 14px;
             backdrop-filter: blur(20px);
@@ -210,20 +210,12 @@
             opacity: 1;
         }
 
-        /* Staggered animation for dropdown items */
-        .custom-dropdown.active .dropdown-option:nth-child(1) { transition-delay: 0.05s; }
-        .custom-dropdown.active .dropdown-option:nth-child(2) { transition-delay: 0.1s; }
-        .custom-dropdown.active .dropdown-option:nth-child(3) { transition-delay: 0.15s; }
-        .custom-dropdown.active .dropdown-option:nth-child(4) { transition-delay: 0.2s; }
-        .custom-dropdown.active .dropdown-option:nth-child(5) { transition-delay: 0.25s; }
-
         .dropdown-option:hover {
             color: var(--accent);
             background: var(--surface-hover);
-            padding-left: 30px; /* Slight indent on hover */
+            padding-left: 30px; 
         }
 
-        /* Scrollbar for dropdowns */
         .dropdown-options::-webkit-scrollbar { width: 6px; }
         .dropdown-options::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
 
@@ -231,7 +223,6 @@
         #news-grid {
             display: grid;
             gap: clamp(1.5rem, 2vw, 2.5rem);
-            /* Base Mobile Layout */
             grid-template-columns: 1fr; 
         }
 
@@ -247,6 +238,12 @@
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
             transform: translateY(30px) scale(0.98);
+        }
+
+        /* Pinned Breaking News Highlight */
+        .card.pinned-latest {
+            border-color: var(--accent);
+            box-shadow: inset 0 0 20px var(--accent-glow);
         }
 
         .card.visible {
@@ -329,30 +326,13 @@
         }
 
         /* --- RESPONSIVE SHAPE-SHIFTING --- */
-        
-        /* TABLET (Medium Devices) */
-        @media (min-width: 768px) {
-            #news-grid { grid-template-columns: repeat(2, 1fr); }
-            .filters-wrapper { gap: 25px; }
-        }
-
-        /* DESKTOP (Large Devices) */
-        @media (min-width: 1024px) {
-            #news-grid { grid-template-columns: repeat(3, 1fr); }
-            .custom-dropdown { min-width: 260px; }
-        }
-
-        /* ULTRA WIDE (Extra Large) */
-        @media (min-width: 1600px) {
-            #news-grid { grid-template-columns: repeat(4, 1fr); }
-            .container { max-width: 1800px; }
-        }
-
-        /* MOBILE EXTREME (Extra Small) */
+        @media (min-width: 768px) { #news-grid { grid-template-columns: repeat(2, 1fr); } .filters-wrapper { gap: 25px; } }
+        @media (min-width: 1024px) { #news-grid { grid-template-columns: repeat(3, 1fr); } .custom-dropdown.channel { min-width: 260px; } }
+        @media (min-width: 1600px) { #news-grid { grid-template-columns: repeat(4, 1fr); } .container { max-width: 1800px; } }
         @media (max-width: 500px) {
             .filters-wrapper { flex-direction: column; width: 100%; }
             .date-picker, .custom-dropdown { width: 100%; box-sizing: border-box; }
-            #searchInput { border-radius: 16px; } /* Blockier on mobile */
+            #searchInput { border-radius: 16px; } 
             .card { border-radius: 16px; }
         }
 
@@ -374,22 +354,27 @@
     </div>
 
     <div class="filters-wrapper">
-        <input type="date" id="datePicker" class="date-picker">
-        
-        <!-- Custom Channel Dropdown -->
-        <div class="custom-dropdown" id="channelDropdown">
+        <input type="date" id="datePicker" class="date-picker" min="2026-04-27">
+
+        <div class="custom-dropdown channel" id="channelDropdown">
             <div class="dropdown-selected" id="channelSelected">Global Matrix (All)</div>
             <div class="dropdown-options" id="channelOptions">
                 <div class="dropdown-option" data-value="all">Global Matrix (All)</div>
             </div>
         </div>
 
-        <!-- Custom Theme Dropdown -->
+        <div class="custom-dropdown" id="limitDropdown">
+            <div class="dropdown-selected" id="limitSelected">Show 100 Intel</div>
+            <div class="dropdown-options" id="limitOptions">
+                <div class="dropdown-option" data-value="100">Show 100 Intel</div>
+                <div class="dropdown-option" data-value="500">Show 500 Intel</div>
+                <div class="dropdown-option" data-value="all">Show All Archives</div>
+            </div>
+        </div>
+
         <div class="custom-dropdown" id="themeDropdown">
             <div class="dropdown-selected" id="themeSelected">Select Theme</div>
-            <div class="dropdown-options" id="themeOptions">
-                <!-- Injected via JS -->
-            </div>
+            <div class="dropdown-options" id="themeOptions"></div>
         </div>
     </div>
 
@@ -408,7 +393,7 @@
     };
 
     const themeNames = Object.keys(themes);
-    
+
     function applyTheme(themeName) {
         const theme = themes[themeName];
         if(!theme) return;
@@ -420,9 +405,7 @@
         document.getElementById('themeSelected').innerText = themeName;
     }
 
-    // 🎲 Random Theme on Load
-    const randomTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
-    applyTheme(randomTheme);
+    applyTheme(themeNames[Math.floor(Math.random() * themeNames.length)]);
 
     // --- 2. CUSTOM DROPDOWN LOGIC ---
     function setupDropdown(dropdownId, selectedId, optionsId, onChangeCallback) {
@@ -430,34 +413,28 @@
         const selected = document.getElementById(selectedId);
         const optionsContainer = document.getElementById(optionsId);
 
-        // Toggle Open/Close
         selected.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Close others
             document.querySelectorAll('.custom-dropdown').forEach(d => {
                 if(d !== dropdown) d.classList.remove('active');
             });
             dropdown.classList.toggle('active');
         });
 
-        // Handle Option Click
         optionsContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('dropdown-option')) {
                 const value = e.target.getAttribute('data-value');
-                const text = e.target.innerText;
-                selected.innerText = text;
+                selected.innerText = e.target.innerText;
                 dropdown.classList.remove('active');
-                if (onChangeCallback) onChangeCallback(value, text);
+                if (onChangeCallback) onChangeCallback(value);
             }
         });
     }
 
-    // Close dropdowns when clicking outside
     document.addEventListener('click', () => {
         document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
     });
 
-    // Populate Theme Dropdown
     const themeOptionsContainer = document.getElementById('themeOptions');
     themeNames.forEach(themeName => {
         const opt = document.createElement('div');
@@ -467,83 +444,76 @@
         themeOptionsContainer.appendChild(opt);
     });
 
-    // Init Dropdowns
     setupDropdown('themeDropdown', 'themeSelected', 'themeOptions', (val) => applyTheme(val));
-    
-    // Channel dropdown requires a global variable to track selection for omni-search
+
     let currentChannelFilter = 'all';
     setupDropdown('channelDropdown', 'channelSelected', 'channelOptions', (val) => {
         currentChannelFilter = val;
         filterAndRender();
     });
 
+    let currentLimitFilter = 100;
+    setupDropdown('limitDropdown', 'limitSelected', 'limitOptions', (val) => {
+        currentLimitFilter = val === 'all' ? Infinity : parseInt(val, 10);
+        filterAndRender();
+    });
 
-    // --- 3. DYNAMIC TYPING PLACEHOLDER ENGINE ---
+
+    // --- 3. DYNAMIC TYPING ENGINE ---
     const searchInput = document.getElementById('searchInput');
-    const suggestions = [
-        'Analyze "The Hindu"...',
-        'Extract "Global Economy"...',
-        'Scan for "Markets"...',
-        'Intercept "Telugu News"...',
-        'Decode "Technology"...',
-        'Monitor "Sports"...'
-    ];
+    const suggestions = ['Analyze "The Hindu"...', 'Extract "Global Economy"...', 'Scan for "Markets"...', 'Intercept "Telugu News"...', 'Decode "Technology"...'];
     suggestions.sort(() => Math.random() - 0.5);
 
-    let suggestionIndex = 0; let charIndex = 0; let isDeleting = false; let typingTimer;
+    let suggestionIndex = 0, charIndex = 0, isDeleting = false, typingTimer;
 
     function typePlaceholder() {
-        if (document.activeElement === searchInput) {
-            searchInput.placeholder = "Query global matrix...";
-            clearTimeout(typingTimer);
-            return;
-        }
+        if (document.activeElement === searchInput) { searchInput.placeholder = "Query global matrix..."; clearTimeout(typingTimer); return; }
         const currentWord = suggestions[suggestionIndex];
-        if (isDeleting) charIndex--; else charIndex++;
-        
+        isDeleting ? charIndex-- : charIndex++;
         searchInput.placeholder = currentWord.substring(0, charIndex) + "|";
         let typingSpeed = isDeleting ? 30 : 80;
 
-        if (!isDeleting && charIndex === currentWord.length) {
-            typingSpeed = 2500; isDeleting = true;
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false; suggestionIndex = (suggestionIndex + 1) % suggestions.length; typingSpeed = 500;
-        }
+        if (!isDeleting && charIndex === currentWord.length) { typingSpeed = 2500; isDeleting = true; } 
+        else if (isDeleting && charIndex === 0) { isDeleting = false; suggestionIndex = (suggestionIndex + 1) % suggestions.length; typingSpeed = 500; }
         typingTimer = setTimeout(typePlaceholder, typingSpeed);
     }
     typePlaceholder();
 
-    searchInput.addEventListener('focus', () => {
-        clearTimeout(typingTimer); searchInput.placeholder = "Query global matrix...";
-    });
-    searchInput.addEventListener('blur', () => {
-        if (searchInput.value.trim() === '') typePlaceholder();
-    });
+    searchInput.addEventListener('focus', () => { clearTimeout(typingTimer); searchInput.placeholder = "Query global matrix..."; });
+    searchInput.addEventListener('blur', () => { if (searchInput.value.trim() === '') typePlaceholder(); });
+    searchInput.addEventListener('input', () => filterAndRender());
 
-    // --- 4. DATA ENGINE & OMNI-SEARCH ---
+    // --- 4. DATA ENGINE, SORTING & SHUFFLING ---
     let rawData = [];
     const grid = document.getElementById('news-grid');
     const datePicker = document.getElementById('datePicker');
-    datePicker.value = new Date().toISOString().split('T')[0];
+
+    // INITIALIZE DATE PICKER (Dynamic Today, Block < 2026-04-27)
+    const today = new Date();
+    // Shift to IST timezone offset (+5:30) to perfectly align with cron logs
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istTime = new Date(today.getTime() + istOffset);
+    const todayStr = istTime.toISOString().split('T')[0];
+    
+    datePicker.value = todayStr;
+    datePicker.max = todayStr; // Block Future
+    datePicker.addEventListener('change', (e) => init(e.target.value));
 
     async function init(date) {
         grid.innerHTML = '<p style="text-align:center; opacity:0.5; width:100%;">Establishing Secure Connection to VEDA Archive...</p>';
         const year = date.split('-')[0];
-        
+
         try {
             const res = await fetch(`${year}/${date}.json`);
             if (!res.ok) throw new Error("Intelligence not found for this temporal coordinate.");
             const data = await res.json();
-            
+
             rawData = [];
             Object.keys(data.feeds).forEach(source => {
                 data.feeds[source].forEach(item => {
                     rawData.push({ ...item, source });
                 });
             });
-
-            // 🎲 SHUFFLE NEWS
-            rawData.sort(() => Math.random() - 0.5);
 
             populateChannels(Object.keys(data.feeds));
             filterAndRender();
@@ -554,9 +524,7 @@
 
     function populateChannels(sources) {
         const container = document.getElementById('channelOptions');
-        // Reset container keeping the 'All' option
         container.innerHTML = '<div class="dropdown-option" data-value="all">Global Matrix (All)</div>';
-        
         sources.sort().forEach(s => {
             const opt = document.createElement('div');
             opt.className = 'dropdown-option';
@@ -564,57 +532,73 @@
             opt.innerText = s.replace(/_/g, ' ');
             container.appendChild(opt);
         });
-        // Reset Selection state
-        document.getElementById('channelSelected').innerText = "Global Matrix (All)";
+        document.getElementById('channelSelected').innerText = 'Global Matrix (All)';
         currentChannelFilter = 'all';
     }
 
     function filterAndRender() {
-        const searchTerm = searchInput.value.toLowerCase();
-        
-        const filtered = rawData.filter(item => {
-            const matchesSearch = 
-                item.title.toLowerCase().includes(searchTerm) || 
-                item.source.toLowerCase().replace(/_/g, ' ').includes(searchTerm) ||
-                (item.published_at && item.published_at.toLowerCase().includes(searchTerm));
-                
-            const matchesSource = currentChannelFilter === 'all' || item.source === currentChannelFilter;
-            return matchesSearch && matchesSource;
+        const query = searchInput.value.toLowerCase();
+        let filtered = rawData.filter(item => {
+            const matchChannel = currentChannelFilter === 'all' || item.source === currentChannelFilter;
+            const matchQuery = item.title.toLowerCase().includes(query) || item.source.toLowerCase().includes(query);
+            return matchChannel && matchQuery;
         });
 
-        render(filtered);
-    }
-
-    function render(items) {
-        grid.innerHTML = '';
-        if (items.length === 0) {
-            grid.innerHTML = '<p style="text-align:center; width:100%;">No data matches current query parameters.</p>';
+        if (filtered.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; opacity:0.5; width:100%;">No intelligence matches your parameters.</p>';
             return;
         }
 
-        items.forEach((item, i) => {
+        // 1. Sort by Published Time (Newest First = Hot Dated)
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.published_at).getTime() || 0;
+            const dateB = new Date(b.published_at).getTime() || 0;
+            return dateB - dateA;
+        });
+
+        // 2. Extract Absolute Newest Article to Pin it
+        let pinnedLatest = filtered.shift();
+
+        // 3. Slice to Limit (Minus 1 for the pinned article)
+        let sliceCount = currentLimitFilter === Infinity ? filtered.length : currentLimitFilter - 1;
+        filtered = filtered.slice(0, sliceCount);
+
+        // 4. Shuffle the Remaining Slice (Fisher-Yates)
+        for (let i = filtered.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+        }
+
+        // 5. Re-Add the Pinned Newest Article to the Absolute Top
+        if(pinnedLatest) filtered.unshift(pinnedLatest);
+
+        // RENDER DOM
+        grid.innerHTML = '';
+        filtered.forEach((item, index) => {
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
+            
+            const formatSource = item.source.replace(/_/g, ' ');
+            const dateStr = item.published_at !== "N/A" ? new Date(item.published_at).toLocaleString() : 'Recent';
+
             card.innerHTML = `
-                <div class="card-tag">${item.source.replace(/_/g, ' ')}</div>
-                <div class="card-title">${item.title}</div>
+                <div class="card-tag">${index === 0 ? '🔥 BREAKING REAL-TIME' : formatSource}</div>
+                <h3 class="card-title">${item.title}</h3>
                 <div class="card-footer">
-                    <span class="timestamp">${item.published_at.split(' ').slice(0,4).join(' ')}</span>
-                    <a href="${item.url}" target="_blank" class="read-btn">Access Log</a>
+                    <span class="timestamp">${dateStr}</span>
+                    <a href="${item.url}" target="_blank" class="read-btn">Access &rarr;</a>
                 </div>
             `;
             grid.appendChild(card);
             
-            // Staggered cinematic entrance
-            setTimeout(() => card.classList.add('visible'), i * 40); 
+            // Pop-in animation
+            setTimeout(() => card.classList.add('visible'), 50 * index);
         });
     }
 
-    searchInput.addEventListener('input', filterAndRender);
-    datePicker.addEventListener('change', (e) => init(e.target.value));
-
+    // Trigger Initial Load
     init(datePicker.value);
-</script>
 
+</script>
 </body>
 </html>
