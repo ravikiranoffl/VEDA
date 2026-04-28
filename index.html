@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Fallback variables, dynamically overwritten by JS */
             --bg-base: #0b0c10;
             --bg-grad1: #1f2833;
             --bg-grad2: #0b0c10;
@@ -20,6 +21,7 @@
             color-scheme: dark;
         }
 
+        /* --- CORE STYLES --- */
         body {
             margin: 0;
             background-color: var(--bg-base);
@@ -42,6 +44,7 @@
             box-sizing: border-box;
         }
 
+        /* --- HEADER --- */
         header {
             text-align: center;
             margin-bottom: 3rem;
@@ -60,6 +63,7 @@
             transition: background 1s ease;
         }
 
+        /* --- SEARCH BAR --- */
         .search-container {
             position: relative;
             width: clamp(280px, 60%, 800px);
@@ -95,6 +99,7 @@
             background: var(--surface-hover);
         }
 
+        /* --- DYNAMIC FILTERS & CUSTOM DROPDOWNS --- */
         .filters-wrapper {
             display: flex;
             justify-content: center;
@@ -126,6 +131,7 @@
             outline: none;
         }
 
+        /* CUSTOM DROPDOWN UI */
         .custom-dropdown {
             position: relative;
             min-width: 200px;
@@ -212,6 +218,7 @@
         .dropdown-options::-webkit-scrollbar { width: 6px; }
         .dropdown-options::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
 
+        /* --- DYNAMIC NEWS GRID --- */
         #news-grid {
             display: grid;
             gap: clamp(1.5rem, 2vw, 2.5rem);
@@ -289,6 +296,8 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .read-btn::before {
@@ -316,6 +325,37 @@
             color: var(--text-muted);
         }
 
+        /* --- DEEP ARCHIVE MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: var(--bg-base); border: 1px solid var(--accent);
+            width: 90%; max-width: 800px; max-height: 85vh; border-radius: 20px;
+            padding: 30px; overflow-y: auto; position: relative;
+            box-shadow: 0 0 40px var(--accent-glow);
+            transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .close-modal {
+            position: absolute; top: 20px; right: 20px;
+            background: none; border: none; color: var(--text-muted);
+            font-size: 24px; cursor: pointer; transition: color 0.2s;
+        }
+        .close-modal:hover { color: var(--accent); }
+
+        .modal-text {
+            color: var(--text-main); line-height: 1.8; font-size: 1.1rem;
+            white-space: pre-wrap; /* Preserves paragraphs */
+        }
+
+        /* --- RESPONSIVE SHAPE-SHIFTING --- */
         @media (min-width: 768px) { #news-grid { grid-template-columns: repeat(2, 1fr); } .filters-wrapper { gap: 25px; } }
         @media (min-width: 1024px) { #news-grid { grid-template-columns: repeat(3, 1fr); } .custom-dropdown.channel { min-width: 260px; } }
         @media (min-width: 1600px) { #news-grid { grid-template-columns: repeat(4, 1fr); } .container { max-width: 1800px; } }
@@ -324,6 +364,7 @@
             .date-picker, .custom-dropdown { width: 100%; box-sizing: border-box; }
             #searchInput { border-radius: 16px; } 
             .card { border-radius: 16px; }
+            .modal-content { width: 95%; padding: 20px; }
         }
 
         @keyframes fadeInDown {
@@ -368,6 +409,16 @@
     </div>
 
     <div id="news-grid"></div>
+</div>
+
+<div class="modal-overlay" id="deepModal">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal()">×</button>
+        <h2 id="modalTitle" style="color: var(--accent); margin-top:0; padding-right: 30px;">Accessing Deep Archive...</h2>
+        <div id="modalBody" class="modal-text">
+            <p style="opacity:0.5; text-align:center;">Establishing uplink to HEDA...</p>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -482,7 +533,7 @@
     const grid = document.getElementById('news-grid');
     const datePicker = document.getElementById('datePicker');
 
-    // INITIALIZE DATE PICKER (Dynamic Today, Block < 2026-04-27)
+    // INITIALIZE DATE PICKER (Dynamic Today)
     const today = new Date();
     const istOffset = 5.5 * 60 * 60 * 1000;
     const istTime = new Date(today.getTime() + istOffset);
@@ -542,33 +593,34 @@
             return;
         }
 
-        // 1. Strict Chronological Sort (Newest First, Oldest Last)
-        // Since the backend already sorts the JSON array strictly, we just enforce it globally here across all feeds.
+        // Strict Chronological Sort
         filtered.sort((a, b) => {
             const dateA = new Date(a.published_at).getTime() || 0;
             const dateB = new Date(b.published_at).getTime() || 0;
             return dateB - dateA;
         });
 
-        // 2. Slice to User Limit (100 or 250 Maximum)
+        // Slice to User Limit
         filtered = filtered.slice(0, currentLimitFilter);
 
         // RENDER DOM
         grid.innerHTML = '';
         filtered.forEach((item, index) => {
             const card = document.createElement('div');
-            // The absolute newest item globally gets the 'pinned-latest' styling
             card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
             
             const formatSource = item.source.replace(/_/g, ' ');
             const dateStr = item.published_at !== "N/A" ? new Date(item.published_at).toLocaleString() : 'Recent';
+
+            // Clean title to avoid breaking HTML attributes
+            const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
             card.innerHTML = `
                 <div class="card-tag">${index === 0 ? '🔥 BREAKING REAL-TIME' : formatSource}</div>
                 <h3 class="card-title">${item.title}</h3>
                 <div class="card-footer">
                     <span class="timestamp">${dateStr}</span>
-                    <a href="${item.url}" target="_blank" class="read-btn">Access &rarr;</a>
+                    <button onclick="openDeepArchive('${item.id}', '${safeTitle}', '${item.url}', '${datePicker.value}')" class="read-btn">Deep Scan &rarr;</button>
                 </div>
             `;
             grid.appendChild(card);
@@ -577,6 +629,68 @@
             setTimeout(() => card.classList.add('visible'), 30 * index);
         });
     }
+
+    // --- 5. HEDA UPLINK & MODAL LOGIC ---
+    let cachedDeepArchive = null;
+    let cachedArchiveDate = null;
+
+    async function openDeepArchive(articleId, title, originalUrl, dateStr) {
+        const modal = document.getElementById('deepModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        modalTitle.innerText = title;
+        modalBody.innerHTML = '<p style="opacity:0.5; text-align:center;">Establishing uplink to HEDA Vault...</p>';
+        modal.classList.add('active');
+
+        // Fetch the 30MB file from Hugging Face only once per session
+        if (cachedArchiveDate !== dateStr || !cachedDeepArchive) {
+            try {
+                // Connects directly to ravikiranoffl/HEDA
+                const hfUrl = `https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}-deep.json`;
+                const res = await fetch(hfUrl);
+                if (!res.ok) throw new Error("Archive missing");
+                cachedDeepArchive = await res.json();
+                cachedArchiveDate = dateStr;
+            } catch (e) {
+                modalBody.innerHTML = `
+                    <p style="color:#ff4d4d; text-align:center;">Deep Archive unavailable for this coordinate.</p>
+                    <div style="text-align:center; margin-top:20px;">
+                        <a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block;">Open Source Node &rarr;</a>
+                    </div>
+                `;
+                return;
+            }
+        }
+
+        // Display the specific article
+        const deepText = cachedDeepArchive[articleId];
+        if (deepText) {
+            modalBody.innerText = deepText;
+            modalBody.innerHTML += `
+                <br><br>
+                <div style="text-align:center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                    <a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block;">View Original Source</a>
+                </div>
+            `;
+        } else {
+            modalBody.innerHTML = `
+                <p style="color:#ff4d4d; text-align:center;">Extraction failed during sweep. Node may be encrypted.</p>
+                <div style="text-align:center; margin-top:20px;">
+                    <a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block;">Open Source Node &rarr;</a>
+                </div>
+            `;
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('deepModal').classList.remove('active');
+    }
+
+    // Close modal when clicking the dark overlay outside the box
+    document.getElementById('deepModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
 
     // Trigger Initial Load
     init(datePicker.value);
