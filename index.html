@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Fallback variables, dynamically overwritten by JS */
             --bg-base: #0b0c10;
             --bg-grad1: #1f2833;
             --bg-grad2: #0b0c10;
@@ -18,11 +17,9 @@
             --border: rgba(255, 255, 255, 0.08);
             --text-main: #f0f0f0;
             --text-muted: #8892b0;
-
             color-scheme: dark;
         }
 
-        /* --- CORE STYLES --- */
         body {
             margin: 0;
             background-color: var(--bg-base);
@@ -45,7 +42,6 @@
             box-sizing: border-box;
         }
 
-        /* --- HEADER --- */
         header {
             text-align: center;
             margin-bottom: 3rem;
@@ -64,7 +60,6 @@
             transition: background 1s ease;
         }
 
-        /* --- SEARCH BAR --- */
         .search-container {
             position: relative;
             width: clamp(280px, 60%, 800px);
@@ -100,7 +95,6 @@
             background: var(--surface-hover);
         }
 
-        /* --- DYNAMIC FILTERS & CUSTOM DROPDOWNS --- */
         .filters-wrapper {
             display: flex;
             justify-content: center;
@@ -132,7 +126,6 @@
             outline: none;
         }
 
-        /* CUSTOM DROPDOWN UI */
         .custom-dropdown {
             position: relative;
             min-width: 200px;
@@ -219,7 +212,6 @@
         .dropdown-options::-webkit-scrollbar { width: 6px; }
         .dropdown-options::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
 
-        /* --- DYNAMIC NEWS GRID --- */
         #news-grid {
             display: grid;
             gap: clamp(1.5rem, 2vw, 2.5rem);
@@ -240,7 +232,6 @@
             transform: translateY(30px) scale(0.98);
         }
 
-        /* Pinned Breaking News Highlight */
         .card.pinned-latest {
             border-color: var(--accent);
             box-shadow: inset 0 0 20px var(--accent-glow);
@@ -325,7 +316,6 @@
             color: var(--text-muted);
         }
 
-        /* --- RESPONSIVE SHAPE-SHIFTING --- */
         @media (min-width: 768px) { #news-grid { grid-template-columns: repeat(2, 1fr); } .filters-wrapper { gap: 25px; } }
         @media (min-width: 1024px) { #news-grid { grid-template-columns: repeat(3, 1fr); } .custom-dropdown.channel { min-width: 260px; } }
         @media (min-width: 1600px) { #news-grid { grid-template-columns: repeat(4, 1fr); } .container { max-width: 1800px; } }
@@ -367,8 +357,7 @@
             <div class="dropdown-selected" id="limitSelected">Show 100 Intel</div>
             <div class="dropdown-options" id="limitOptions">
                 <div class="dropdown-option" data-value="100">Show 100 Intel</div>
-                <div class="dropdown-option" data-value="500">Show 500 Intel</div>
-                <div class="dropdown-option" data-value="all">Show All Archives</div>
+                <div class="dropdown-option" data-value="250">Show 250 Intel</div>
             </div>
         </div>
 
@@ -382,7 +371,7 @@
 </div>
 
 <script>
-    // --- 1. PREMIUM AUTHENTIC THEME ENGINE (Expanded to 12+) ---
+    // --- 1. PREMIUM AUTHENTIC THEME ENGINE ---
     const themes = {
         "Obsidian Pearl": { base: "#07080a", grad1: "#141821", grad2: "#07080a", accent: "#66fcf1", glow: "rgba(102, 252, 241, 0.25)" },
         "Sapphire Depth": { base: "#020914", grad1: "#0a192f", grad2: "#010409", accent: "#64ffda", glow: "rgba(100, 255, 218, 0.25)" },
@@ -460,10 +449,9 @@
 
     let currentLimitFilter = 100;
     setupDropdown('limitDropdown', 'limitSelected', 'limitOptions', (val) => {
-        currentLimitFilter = val === 'all' ? Infinity : parseInt(val, 10);
+        currentLimitFilter = parseInt(val, 10);
         filterAndRender();
     });
-
 
     // --- 3. DYNAMIC TYPING ENGINE ---
     const searchInput = document.getElementById('searchInput');
@@ -496,7 +484,6 @@
 
     // INITIALIZE DATE PICKER (Dynamic Today, Block < 2026-04-27)
     const today = new Date();
-    // Shift to IST timezone offset (+5:30) to perfectly align with cron logs
     const istOffset = 5.5 * 60 * 60 * 1000;
     const istTime = new Date(today.getTime() + istOffset);
     const todayStr = istTime.toISOString().split('T')[0];
@@ -556,25 +543,21 @@
         }
 
         // 1. Strict Chronological Sort (Newest First, Oldest Last)
+        // Since the backend already sorts the JSON array strictly, we just enforce it globally here across all feeds.
         filtered.sort((a, b) => {
             const dateA = new Date(a.published_at).getTime() || 0;
             const dateB = new Date(b.published_at).getTime() || 0;
-            
-            // If identical timestamps or both missing, randomize them locally to add variety without breaking chronology
-            if (dateA === dateB) return Math.random() - 0.5;
-            
             return dateB - dateA;
         });
 
-        // 2. Slice to User Limit
-        let sliceCount = currentLimitFilter === Infinity ? filtered.length : currentLimitFilter;
-        filtered = filtered.slice(0, sliceCount);
+        // 2. Slice to User Limit (100 or 250 Maximum)
+        filtered = filtered.slice(0, currentLimitFilter);
 
         // RENDER DOM
         grid.innerHTML = '';
         filtered.forEach((item, index) => {
             const card = document.createElement('div');
-            // The absolute newest item gets the 'pinned-latest' visual styling
+            // The absolute newest item globally gets the 'pinned-latest' styling
             card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
             
             const formatSource = item.source.replace(/_/g, ' ');
@@ -591,7 +574,7 @@
             grid.appendChild(card);
             
             // Pop-in animation
-            setTimeout(() => card.classList.add('visible'), 50 * index);
+            setTimeout(() => card.classList.add('visible'), 30 * index);
         });
     }
 
