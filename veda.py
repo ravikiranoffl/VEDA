@@ -177,7 +177,7 @@ def veda_engine():
     if new_for_deep and HF_TOKEN:
         deep_map = asyncio.run(process_deep_archive(new_for_deep))
         api = HfApi(token=HF_TOKEN)
-        deep_fn = f"data/{date_str}-deep.json"
+        deep_fn = f"data/{date_str}.json"
         
         try:
             d_path = hf_hub_download(repo_id=HF_REPO_ID, filename=deep_fn, repo_type="dataset")
