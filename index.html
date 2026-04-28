@@ -382,14 +382,20 @@
 </div>
 
 <script>
-    // --- 1. PREMIUM AUTHENTIC THEME ENGINE ---
+    // --- 1. PREMIUM AUTHENTIC THEME ENGINE (Expanded to 12+) ---
     const themes = {
         "Obsidian Pearl": { base: "#07080a", grad1: "#141821", grad2: "#07080a", accent: "#66fcf1", glow: "rgba(102, 252, 241, 0.25)" },
         "Sapphire Depth": { base: "#020914", grad1: "#0a192f", grad2: "#010409", accent: "#64ffda", glow: "rgba(100, 255, 218, 0.25)" },
         "Midnight Ember": { base: "#0d0202", grad1: "#260606", grad2: "#080101", accent: "#ff4d4d", glow: "rgba(255, 77, 77, 0.25)" },
         "Royal Amethyst": { base: "#0a0512", grad1: "#1f0f33", grad2: "#05020a", accent: "#c299ff", glow: "rgba(194, 153, 255, 0.25)" },
         "Gilded Carbon": { base: "#0a0a0a", grad1: "#1a1a1a", grad2: "#050505", accent: "#e6c200", glow: "rgba(230, 194, 0, 0.25)" },
-        "Emerald Frost": { base: "#010a08", grad1: "#02241d", grad2: "#000504", accent: "#00fa9a", glow: "rgba(0, 250, 154, 0.25)" }
+        "Emerald Frost": { base: "#010a08", grad1: "#02241d", grad2: "#000504", accent: "#00fa9a", glow: "rgba(0, 250, 154, 0.25)" },
+        "Neon Cyberpunk": { base: "#05000a", grad1: "#1a0029", grad2: "#05000a", accent: "#ff00e6", glow: "rgba(255, 0, 230, 0.25)" },
+        "Abyssal Trench": { base: "#000b18", grad1: "#001b3a", grad2: "#000b18", accent: "#00bfff", glow: "rgba(0, 191, 255, 0.25)" },
+        "Solar Flare": { base: "#0a0300", grad1: "#240a00", grad2: "#0a0300", accent: "#ff8c00", glow: "rgba(255, 140, 0, 0.25)" },
+        "Quantum Silver": { base: "#0f1115", grad1: "#1c2026", grad2: "#0f1115", accent: "#e2e8f0", glow: "rgba(226, 232, 240, 0.25)" },
+        "Toxic Matrix": { base: "#000a00", grad1: "#001a00", grad2: "#000a00", accent: "#39ff14", glow: "rgba(57, 255, 20, 0.25)" },
+        "Aurora Borealis": { base: "#010a14", grad1: "#031c26", grad2: "#010a14", accent: "#00ffcc", glow: "rgba(0, 255, 204, 0.25)" }
     };
 
     const themeNames = Object.keys(themes);
@@ -483,7 +489,7 @@
     searchInput.addEventListener('blur', () => { if (searchInput.value.trim() === '') typePlaceholder(); });
     searchInput.addEventListener('input', () => filterAndRender());
 
-    // --- 4. DATA ENGINE, SORTING & SHUFFLING ---
+    // --- 4. DATA ENGINE & STRICT CHRONOLOGICAL SORTING ---
     let rawData = [];
     const grid = document.getElementById('news-grid');
     const datePicker = document.getElementById('datePicker');
@@ -549,33 +555,26 @@
             return;
         }
 
-        // 1. Sort by Published Time (Newest First = Hot Dated)
+        // 1. Strict Chronological Sort (Newest First, Oldest Last)
         filtered.sort((a, b) => {
             const dateA = new Date(a.published_at).getTime() || 0;
             const dateB = new Date(b.published_at).getTime() || 0;
+            
+            // If identical timestamps or both missing, randomize them locally to add variety without breaking chronology
+            if (dateA === dateB) return Math.random() - 0.5;
+            
             return dateB - dateA;
         });
 
-        // 2. Extract Absolute Newest Article to Pin it
-        let pinnedLatest = filtered.shift();
-
-        // 3. Slice to Limit (Minus 1 for the pinned article)
-        let sliceCount = currentLimitFilter === Infinity ? filtered.length : currentLimitFilter - 1;
+        // 2. Slice to User Limit
+        let sliceCount = currentLimitFilter === Infinity ? filtered.length : currentLimitFilter;
         filtered = filtered.slice(0, sliceCount);
-
-        // 4. Shuffle the Remaining Slice (Fisher-Yates)
-        for (let i = filtered.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
-        }
-
-        // 5. Re-Add the Pinned Newest Article to the Absolute Top
-        if(pinnedLatest) filtered.unshift(pinnedLatest);
 
         // RENDER DOM
         grid.innerHTML = '';
         filtered.forEach((item, index) => {
             const card = document.createElement('div');
+            // The absolute newest item gets the 'pinned-latest' visual styling
             card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
             
             const formatSource = item.source.replace(/_/g, ' ');
