@@ -1,8 +1,6 @@
 
-<div align="center">
 
-# VEDA  
-**Vast Electronic Data Archive**
+# VEDA  (Vast Electronic Data Archive)
 
 *The Ultimate Autonomous OSINT Matrix*
 
@@ -224,4 +222,3 @@ in your browser to view the system locally.
 
 <i>End of Line — VEDA Core Architecture</i>
 
-</div>
