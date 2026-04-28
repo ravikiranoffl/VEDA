@@ -2,9 +2,9 @@ name: VEDA Pan-India Generator
 
 on:
   schedule:
-    # Runs at minute 0 UTC, which equals minute 30 IST (e.g., 18:30 IST)
-    - cron: '0 * * * *' 
-  workflow_dispatch:     # Allows you to trigger it manually via a button
+    # Runs every 2 hours at minute 0 (00:30, 02:30, 04:30... IST)
+    - cron: '0 */2 * * *' 
+  workflow_dispatch: 
 
 permissions:
   contents: write
@@ -19,17 +19,22 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install aiohttp trafilatura huggingface_hub
 
       - name: Execute VEDA Pipeline
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }} 
         run: python veda.py
 
-      # This generates the exact YYYYMMDDHHMMSS format for the commit message in IST
       - name: Generate Commit Timestamp (IST)
         id: time
         run: echo "TS=$(TZ='Asia/Kolkata' date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
-      # This commits the data using YOUR identity, triggering the green squares
       - name: Commit Hourly Data Update
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
