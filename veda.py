@@ -4,6 +4,8 @@ import json
 import os
 import hashlib
 from datetime import datetime, timezone, timedelta
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
+from email.utils import parsedate_to_datetime
 
 # ==========================================
 # VEDA ULTIMATE TARGET MATRIX 
@@ -107,6 +109,25 @@ def get_dynamic_filepath():
     os.makedirs(year_folder, exist_ok=True)
     return f"{year_folder}/{date_file}.json"
 
+def clean_url(raw_url):
+    """Strips useless marketing tags from URLs to save JSON space"""
+    try:
+        parsed = urlparse(raw_url)
+        clean_queries = [(k, v) for k, v in parse_qsl(parsed.query) if not k.startswith('utm_')]
+        clean_query_string = urlencode(clean_queries)
+        return urlunparse(parsed._replace(query=clean_query_string))
+    except Exception:
+        return raw_url
+
+def parse_pubdate_for_sorting(date_str):
+    """Converts string dates to strict Python Datetimes for backend sorting"""
+    try:
+        if not date_str or date_str == "N/A":
+            return datetime.min.replace(tzinfo=timezone.utc)
+        return parsedate_to_datetime(date_str)
+    except Exception:
+        return datetime.min.replace(tzinfo=timezone.utc)
+
 def fetch_feed(url):
     try:
         headers = {
@@ -132,10 +153,10 @@ def update_archive():
         archive = {
             "date": get_ist_time().strftime("%Y-%m-%d"),
             "total_headlines": 0,
-            "feeds": {} # Start completely empty!
+            "feeds": {} 
         }
 
-    # 2. Load Telemetry File (status.json)
+    # 2. Load Telemetry File
     status_filepath = "status.json"
     if os.path.exists(status_filepath):
         with open(status_filepath, 'r', encoding='utf-8') as f:
@@ -144,25 +165,23 @@ def update_archive():
         telemetry = []
 
     new_items_total = 0
-    current_run_status = {} # Will hold 1 or 0 for each feed
+    current_run_status = {} 
 
     for feed_name, url in TARGET_FEEDS.items():
         xml_data = fetch_feed(url)
 
         if not xml_data: 
-            current_run_status[feed_name] = 0 # 0 = Dead/Empty
+            current_run_status[feed_name] = 0 
             continue
 
         try:
             root = ET.fromstring(xml_data)
-
-            # Check if feed actually has articles
             items = root.findall('.//item') or root.findall('.//{http://www.w3.org/2005/Atom}entry')
             if len(items) == 0:
-                current_run_status[feed_name] = 0 # 0 = Alive, but Zero News
+                current_run_status[feed_name] = 0 
                 continue
 
-            current_run_status[feed_name] = 1 # 1 = Success! News Found.
+            current_run_status[feed_name] = 1 
 
             if feed_name not in archive["feeds"]:
                 archive["feeds"][feed_name] = []
@@ -184,6 +203,7 @@ def update_archive():
                 if not link or "http" not in link: 
                     continue 
 
+                link = clean_url(link) # Scrub the tracking bloat
                 article_id = hashlib.md5(link.encode('utf-8')).hexdigest()
 
                 if article_id not in existing_ids:
@@ -202,35 +222,37 @@ def update_archive():
                     })
                     new_items_total += 1
 
+            # --- THE CRITICAL FIX: SORT & CAP AT 250 ---
+            # 1. Sort the feed newest-to-oldest mathematically
+            archive["feeds"][feed_name].sort(key=lambda x: parse_pubdate_for_sorting(x["published_at"]), reverse=True)
+            # 2. Aggressively slice the array to max 250 items
+            archive["feeds"][feed_name] = archive["feeds"][feed_name][:250]
+
         except Exception:
-            current_run_status[feed_name] = 0 # 0 = Fake HTML / XML Crash
+            current_run_status[feed_name] = 0 
             continue
 
-    archive["total_headlines"] += new_items_total
-
-    # ZERO-WASTE CLEANUP: Remove any feeds that still ended up with 0 items
+    # Recalculate total after slicing
+    archive["total_headlines"] = sum(len(items) for items in archive["feeds"].values())
     archive["feeds"] = {k: v for k, v in archive["feeds"].items() if len(v) > 0}
 
-    # Save the clean Daily Data
+    # Save MINIFIED Data (No Pretty Printing = ~20% Smaller)
     with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(archive, f, indent=4, ensure_ascii=False)
+        json.dump(archive, f, separators=(',', ':'), ensure_ascii=False)
 
-    # --- SAVE TELEMETRY (status.json) ---
-    # Log this exact run with a timestamp
+    # --- SAVE TELEMETRY ---
     telemetry_entry = {
         "run_time_ist": get_ist_time().strftime("%Y-%m-%d %H:%M:%S"),
         "status": current_run_status
     }
     telemetry.append(telemetry_entry)
-
-    # Keep only the last 100 runs so the file doesn't crash your editor
     telemetry = telemetry[-100:] 
 
     with open(status_filepath, 'w', encoding='utf-8') as f:
-        json.dump(telemetry, f, indent=4, ensure_ascii=False)
+        json.dump(telemetry, f, indent=4, ensure_ascii=False) # Keep telemetry pretty
 
-    print(f"\nVEDA Sync Complete: {new_items_total} new items.")
-    print("Telemetry logged to status.json")
+    print(f"\nVEDA Sync Complete: {new_items_total} new items processed.")
+    print("Matrix successfully minified, sorted, and capped at 250.")
 
 if __name__ == "__main__":
     update_archive()
