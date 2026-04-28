@@ -1,5 +1,5 @@
 
-# VEDA: Virtual Intelligence & Data Archive
+# VEDA: Vast Electronic Data Archive
 ### The Ultimate Autonomous OSINT Matrix
 ![License](https://img.shields.io/badge/License-MIT-emerald.svg?style=for-the-badge)
 ![Engine](https://img.shields.io/badge/Engine-Python_3.12-blue.svg?style=for-the-badge)
@@ -7,7 +7,7 @@
 ![Automation](https://img.shields.io/badge/Automation-GitHub_Actions-black.svg?style=for-the-badge&logo=github-actions)
 ---
 ## The Vision: What is VEDA?
-VEDA (Virtual Intelligence & Data Archive) is a fully autonomous, serverless Open-Source Intelligence (OSINT) aggregator. It acts as a permanent, immutable record of global history as it unfolds. 
+VEDA (Vast Electronic Data Archive) is a fully autonomous, serverless Open-Source Intelligence (OSINT) aggregator. It acts as a permanent, immutable record of global history as it unfolds. 
 Every day, the VEDA engine wakes up, stealthily sweeps over 30 top-tier global and regional news syndicates (from the New York Times to regional Telugu heavyweights), extracts the raw data, deduplicates it, and permanently freezes it into a lightweight JSON archive. 
 In an era of fleeting digital information, stealth-edits, and paywalls, VEDA ensures that every significant global and regional shift is captured, organized, and archived in a searchable format forever.
 ---
