@@ -2,8 +2,9 @@ name: VEDA Pan-India Generator
 
 on:
   schedule:
-    # Runs every 2 hours at minute 0 (00:30, 02:30, 04:30... IST)
-    - cron: '0 */2 * * *' 
+    # Bypasses the GitHub global queue by running at an off-peak minute
+    # UTC: 00:14, 02:14, 04:14... -> IST: 05:44, 07:44, 09:44...
+    - cron: '14 */2 * * *' 
   workflow_dispatch: 
 
 permissions:
