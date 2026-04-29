@@ -6,17 +6,31 @@ import hashlib
 import asyncio
 import aiohttp
 import trafilatura
+import random
 from datetime import datetime, timezone, timedelta
-from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
-from email.utils import parsedate_to_datetime
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode, quote
 from huggingface_hub import HfApi, hf_hub_download
 
-# CONFIGURATION
+# ==========================================
+# SECURE CONFIGURATION
+# ==========================================
 HF_REPO_ID = "ravikiranoffl/HEDA"
 HF_TOKEN = os.environ.get("HF_TOKEN")
+SCRAPERAPI_KEY = os.environ.get("SCRAPERAPI_KEY") # Optional: Add to GitHub Secrets for ultimate stealth
+
+# Realistic Browser Camouflage (Fallback if ScraperAPI is off)
+REAL_BROWSER_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Upgrade-Insecure-Requests': '1'
+}
 
 TARGET_FEEDS = {
-     # --- INDIA: NATIONAL CORE ---
+    # --- INDIA: NATIONAL CORE ---
     "Google_News_India": "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en",
     "The_Hindu_National": "https://www.thehindu.com/news/national/feeder/default.rss",
     "Times_of_India_National": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
@@ -38,35 +52,27 @@ TARGET_FEEDS = {
     "ABP_Desam_Telugu": "https://telugu.abplive.com/home/feed",
     "V6_Velugu_TS": "https://www.v6velugu.com/feed",
 
-    # --- INDIA: SOUTH ---
+    # --- INDIA: REGIONAL ---
     "The_Hindu_Tamil_Nadu": "https://www.thehindu.com/news/national/tamil-nadu/feeder/default.rss",
     "The_Hindu_Karnataka": "https://www.thehindu.com/news/national/karnataka/feeder/default.rss",
     "The_Hindu_Kerala": "https://www.thehindu.com/news/national/kerala/feeder/default.rss",
     "Indian_Express_Bangalore": "https://indianexpress.com/section/cities/bangalore/feed/",
     "Indian_Express_Chennai": "https://indianexpress.com/section/cities/chennai/feed/",
-
-    # --- INDIA: NORTH ---
     "The_Hindu_Delhi": "https://www.thehindu.com/news/cities/Delhi/feeder/default.rss",
     "Indian_Express_Lucknow": "https://indianexpress.com/section/cities/lucknow/feed/",
     "Indian_Express_Chandigarh": "https://indianexpress.com/section/cities/chandigarh/feed/",
     "Kashmir_Observer": "https://kashmirobserver.net/feed/",
-
-    # --- INDIA: WEST & CENTRAL ---
     "Mid_Day_Mumbai": "https://www.mid-day.com/Resources/midday/rss/mumbai-news.xml",
     "Indian_Express_Mumbai": "https://indianexpress.com/section/cities/mumbai/feed/",
     "Indian_Express_Pune": "https://indianexpress.com/section/cities/pune/feed/",
     "Indian_Express_Ahmedabad": "https://indianexpress.com/section/cities/ahmedabad/feed/",
-
-    # --- INDIA: EAST & NORTHEAST ---
     "Indian_Express_Kolkata": "https://indianexpress.com/section/cities/kolkata/feed/",
 
     # --- SPECIALIZED ---
     "ESPN_Cricinfo_India": "https://www.espncricinfo.com/rss/content/story/feeds/0.xml",
     "Economic_Times_Tech": "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms",
 
-    # ==========================================
-    # GLOBAL CONTINENTS
-    # ==========================================
+    # --- GLOBAL ---
     "NYT_USA_Top": "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
     "NPR_News_USA": "https://feeds.npr.org/1001/rss.xml",
     "PBS_NewsHour": "https://www.pbs.org/newshour/feeds/rss/headlines",
@@ -110,22 +116,76 @@ def clean_url(url):
     qd = [q for q in parse_qsl(parsed.query) if not q[0].startswith('utm_')]
     return urlunparse(parsed._replace(query=urlencode(qd)))
 
+# ==========================================
+# THE DEEP CLEANER (GARBAGE FILTER)
+# ==========================================
+def clean_text(raw_text):
+    if not raw_text:
+        return None
+        
+    junk_triggers = [
+        "also read", "read more", "related articles", 
+        "related news", "click here", "watch video",
+        "advertisement", "subscribe to our newsletter",
+        "for more updates", "download our app"
+    ]
+    
+    cleaned_lines = []
+    for line in raw_text.split('\n'):
+        clean_line = line.strip()
+        if not clean_line:
+            continue
+            
+        line_lower = clean_line.lower()
+        is_junk = any(line_lower.startswith(trigger) or line_lower == trigger for trigger in junk_triggers)
+        
+        if not is_junk:
+            cleaned_lines.append(clean_line)
+            
+    return '\n\n'.join(cleaned_lines)
+
+# ==========================================
+# ASYMMETRIC STEALTH EXTRACTION
+# ==========================================
 async def fetch_full_text(session, url, art_id, sem):
     async with sem:
+        target_url = url
+        
+        # Deploy ScraperAPI if Key exists
+        if SCRAPERAPI_KEY:
+            target_url = f"http://api.scraperapi.com?api_key={SCRAPERAPI_KEY}&url={quote(url)}"
+
         try:
-            async with session.get(url, timeout=15) as resp:
+            async with session.get(target_url, timeout=20) as resp:
                 html = await resp.text()
-                content = trafilatura.extract(html)
-                await asyncio.sleep(1) 
-                return art_id, content
-        except: return art_id, None
+                raw_text = trafilatura.extract(html)
+                
+                # Apply Deep Cleaner
+                clean_content = clean_text(raw_text)
+                
+                # WAF Catch & Release
+                if clean_content:
+                    forbidden_phrases = ["Error 403 Forbidden", "Varnish cache server", "Cloudflare", "Enable JavaScript and cookies"]
+                    if any(phrase in clean_content for phrase in forbidden_phrases):
+                        return art_id, None
+                
+                # Human Mimicry Jitter (Random sleep 1.5s to 4.5s)
+                await asyncio.sleep(random.uniform(1.5, 4.5))
+                return art_id, clean_content
+        except Exception:
+            return art_id, None
 
 async def process_deep_archive(new_articles):
-    sem = asyncio.Semaphore(5)
-    async with aiohttp.ClientSession(headers={'User-Agent': 'VEDA-Bot/2.0'}) as session:
+    sem = asyncio.Semaphore(4) # Polite concurrency limit
+    headers = None if SCRAPERAPI_KEY else REAL_BROWSER_HEADERS
+    
+    async with aiohttp.ClientSession(headers=headers) as session:
         tasks = [fetch_full_text(session, a['url'], a['id'], sem) for a in new_articles]
         return dict(await asyncio.gather(*tasks))
 
+# ==========================================
+# MASTER ENGINE
+# ==========================================
 def veda_engine():
     now = get_ist_time()
     date_str = now.strftime("%Y-%m-%d")
@@ -133,20 +193,25 @@ def veda_engine():
     os.makedirs(folder, exist_ok=True)
     
     idx_path = f"{folder}/{date_str}.json"
-    archive = json.load(open(idx_path)) if os.path.exists(idx_path) else {"date":date_str, "feeds":{}}
+    archive = json.load(open(idx_path)) if os.path.exists(idx_path) else {"date": date_str, "feeds": {}}
     
     new_for_deep = []
     status = {}
 
+    print(f"[{now.strftime('%H:%M:%S')}] Commencing Matrix Sweep...")
+
+    # Phase 1: Lightweight RSS Ingestion
     for name, url in TARGET_FEEDS.items():
         try:
-            req = urllib.request.Request(url, headers={'User-Agent': 'VEDA-Bot'})
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=10) as resp:
                 root = ET.fromstring(resp.read())
                 items = root.findall('.//item') or root.findall('.//{http://www.w3.org/2005/Atom}entry')
-                if not items: status[name]=0; continue
+                if not items: 
+                    status[name] = 0
+                    continue
                 
-                status[name]=1
+                status[name] = 1
                 if name not in archive["feeds"]: archive["feeds"][name] = []
                 uids = {a["id"] for a in archive["feeds"][name]}
 
@@ -156,38 +221,46 @@ def veda_engine():
                     if aid not in uids:
                         title = it.find('title').text
                         pdt = it.find('pubDate').text if it.find('pubDate') is not None else "N/A"
-                        obj = {"id":aid, "title":title, "url":link, "published_at":pdt}
+                        obj = {"id": aid, "title": title, "url": link, "published_at": pdt}
                         archive["feeds"][name].append(obj)
                         new_for_deep.append(obj)
                 
-                archive["feeds"][name].sort(key=lambda x: x.get('published_at'), reverse=True)
+                archive["feeds"][name].sort(key=lambda x: x.get('published_at', ''), reverse=True)
                 archive["feeds"][name] = archive["feeds"][name][:250]
-        except: status[name]=0
+        except Exception as e:
+            status[name] = 0
 
-    # Save Grid Index (Minified)
+    # Save Lightweight Grid Index to GitHub
     json.dump(archive, open(idx_path, 'w'), separators=(',', ':'))
     
-    # Update Status
+    # Save Status Telemetry
     st_path = "status.json"
     st_data = json.load(open(st_path)) if os.path.exists(st_path) else []
     st_data.append({"run_time_ist": now.strftime("%Y-%m-%d %H:%M:%S"), "status": status})
-    json.dump(st_data[-100:], open(st_path, 'w'), indent=4)
+    json.dump(st_data[-150:], open(st_path, 'w'), indent=4) # Keep last 150 sweeps
 
-    # DEEP ARCHIVE (HEDA)
+    # Phase 2: HEDA Deep Archive (Hugging Face)
     if new_for_deep and HF_TOKEN:
+        print(f"[{now.strftime('%H:%M:%S')}] Executing Deep Extraction on {len(new_for_deep)} new nodes...")
         deep_map = asyncio.run(process_deep_archive(new_for_deep))
+        
         api = HfApi(token=HF_TOKEN)
         deep_fn = f"data/{date_str}.json"
         
         try:
             d_path = hf_hub_download(repo_id=HF_REPO_ID, filename=deep_fn, repo_type="dataset")
             current_deep = json.load(open(d_path))
-        except: current_deep = {}
+        except Exception:
+            current_deep = {}
         
         current_deep.update({k: v for k, v in deep_map.items() if v})
+        
         tmp_p = f"/tmp/{date_str}.json"
-        json.dump(current_deep, open(tmp_p, 'w'), separators=(',', ':'))
+        json.dump(current_deep, open(tmp_p, 'w', encoding='utf-8'), separators=(',', ':'), ensure_ascii=False)
+        
+        print(f"[{now.strftime('%H:%M:%S')}] Beaming payload to Hugging Face Vault...")
         api.upload_file(path_or_fileobj=tmp_p, path_in_repo=deep_fn, repo_id=HF_REPO_ID, repo_type="dataset")
+        print(f"[{now.strftime('%H:%M:%S')}] Matrix Sweep Complete.")
 
 if __name__ == "__main__":
     veda_engine()
