@@ -647,7 +647,7 @@
         if (cachedArchiveDate !== dateStr || !cachedDeepArchive) {
             try {
                 // Connects directly to ravikiranoffl/HEDA
-                const hfUrl = `https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}-deep.json`;
+                const hfUrl = `https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`;
                 const res = await fetch(hfUrl);
                 if (!res.ok) throw new Error("Archive missing");
                 cachedDeepArchive = await res.json();
