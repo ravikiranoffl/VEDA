@@ -23,9 +23,7 @@
         }
 
         /* --- GLOBAL PHYSICS & RESPONSIVENESS --- */
-        *, *::before, *::after {
-            box-sizing: border-box; /* Crucial for dynamic mobile responsiveness */
-        }
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -49,34 +47,25 @@
             width: 100%;
             max-width: 1600px;
             margin: 0 auto;
-            /* Fluid padding: scales dynamically based on viewport */
             padding: clamp(1rem, 3vw, 3rem);
             transition: filter 0.4s ease;
         }
 
         /* --- TOP NAVIGATION & HAMBURGER --- */
         .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 3rem);
-            position: fixed;
-            top: 0; left: 0; width: 100%;
+            position: fixed; top: 0; left: 0; width: 100%;
             background: linear-gradient(180deg, rgba(3,4,7,0.9) 0%, transparent 100%);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 2000;
-            border-bottom: 1px solid rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 2000; border-bottom: 1px solid rgba(255,255,255,0.02);
         }
 
         .brand-logo {
-            font-weight: 700;
-            letter-spacing: clamp(4px, 1.5vw, 8px);
-            font-size: clamp(1.4rem, 3vw, 1.8rem);
-            margin: 0;
+            font-weight: 700; letter-spacing: clamp(4px, 1.5vw, 8px);
+            font-size: clamp(1.4rem, 3vw, 1.8rem); margin: 0;
             background: linear-gradient(135deg, #ffffff 10%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-shadow: 0 0 20px var(--accent-glow);
         }
 
@@ -92,26 +81,19 @@
 
         /* --- SIDEBAR MENU (FLUID WIDTH) --- */
         .sidebar {
-            position: fixed; top: 0; 
-            /* Uses min() to take 100% of mobile screen, but max 350px on desktop */
-            width: min(100vw, 350px); 
-            right: calc(-1 * min(100vw, 350px)); 
-            height: 100vh;
-            background: rgba(5, 7, 12, 0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            position: fixed; top: 0; width: min(100vw, 350px); right: calc(-1 * min(100vw, 350px)); 
+            height: 100vh; background: rgba(5, 7, 12, 0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border-left: 1px solid var(--border-highlight); box-shadow: -10px 0 50px rgba(0,0,0,0.8);
             z-index: 1999; display: flex; flex-direction: column; padding: 100px 2rem 2rem 2rem;
-            transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow-y: auto;
+            transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow-y: auto;
         }
         .sidebar.active { right: 0; }
         
         .menu-item {
-            color: var(--text-main); text-decoration: none; 
-            font-size: clamp(1.1rem, 2vw, 1.2rem); font-weight: 500; 
+            color: var(--text-main); text-decoration: none; font-size: clamp(1.1rem, 2vw, 1.2rem); font-weight: 500; 
             padding: 1.2rem 1rem; border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            transition: all 0.3s ease; position: relative; overflow: hidden;
-            letter-spacing: 1px;
+            transition: all 0.3s ease; position: relative; overflow: hidden; letter-spacing: 1px;
         }
         .menu-item::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
@@ -128,17 +110,13 @@
         /* --- FLUID HEADINGS --- */
         header { text-align: center; margin-bottom: clamp(2rem, 5vh, 4rem); }
         h1 {
-            font-weight: 700;
-            letter-spacing: clamp(4px, 1vw, 12px);
-            font-size: clamp(2rem, 5vw, 4rem);
-            margin: 0;
+            font-weight: 700; letter-spacing: clamp(4px, 1vw, 12px); font-size: clamp(2.5rem, 5vw, 4rem); margin: 0;
             background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px var(--accent-glow);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px var(--accent-glow);
         }
 
         /* --- DYNAMIC SEARCH & FILTERS --- */
-        .search-container { position: relative; width: min(100%, 800px); margin: 0 auto 3rem auto; }
+        .search-container { position: relative; width: min(100%, 800px); margin: 0 auto 2rem auto; }
         #searchInput {
             width: 100%; padding: clamp(1rem, 2vw, 1.4rem) clamp(1.5rem, 3vw, 2.5rem); 
             background: var(--surface); border: 1px solid var(--border);
@@ -147,17 +125,9 @@
         }
         #searchInput:focus { outline: none; border-color: var(--accent); background: var(--surface-hover); box-shadow: 0 0 40px var(--accent-glow); transform: scale(1.02); }
 
-        .filters-wrapper { 
-            display: flex; justify-content: center; align-items: stretch; gap: clamp(10px, 2vw, 20px); 
-            margin-bottom: 4rem; flex-wrap: wrap; z-index: 100; position: relative; 
-        }
-
-        .date-picker, .custom-dropdown {
-            /* Fluid Flexing: takes up available space but limits max width on desktop */
-            flex: 1 1 200px;
-            max-width: 300px;
-        }
-
+        .filters-wrapper { display: flex; justify-content: center; align-items: stretch; gap: clamp(10px, 2vw, 20px); margin-bottom: 4rem; flex-wrap: wrap; z-index: 100; position: relative; }
+        .date-picker, .custom-dropdown { flex: 1 1 200px; max-width: 300px; }
+        
         .date-picker { 
             width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--accent); 
             padding: clamp(12px, 1.5vw, 16px) clamp(16px, 2vw, 24px); border-radius: 12px; font-family: inherit; 
@@ -166,6 +136,7 @@
         }
         .date-picker:hover { border-color: var(--accent); background: var(--surface-hover); transform: translateY(-2px); box-shadow: 0 10px 25px var(--accent-glow); }
 
+        /* CUSTOM DROPDOWNS */
         .custom-dropdown { position: relative; font-weight: 500; }
         .dropdown-selected { 
             width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-main); 
@@ -184,32 +155,23 @@
             opacity: 0; transition: all 0.4s ease; pointer-events: none; z-index: 1000; 
         }
         .custom-dropdown.active .dropdown-options { max-height: 350px; opacity: 1; pointer-events: auto; padding: 10px 0; }
-        .dropdown-option { padding: 12px 20px; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; border-left: 2px solid transparent; }
+        .dropdown-option { padding: 12px 20px; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; border-left: 2px solid transparent; word-wrap: break-word; }
         .dropdown-option:hover { color: var(--text-main); background: var(--surface-hover); border-left: 2px solid var(--accent); text-shadow: 0 0 10px var(--accent-glow); padding-left: 25px; }
 
         /* --- DYNAMIC ASYMMETRICAL TILE ENGINE --- */
         #news-grid {
             display: grid;
             gap: clamp(1rem, 2vw, 1.5rem);
-            /* min(100%, 320px) ensures grid never overflows the mobile screen */
             grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
             grid-auto-flow: dense;
         }
 
         .card {
             background: linear-gradient(135deg, var(--surface) 0%, rgba(0,0,0,0.6) 100%);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: clamp(1.2rem, 3vw, 2rem);
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            opacity: 0;
-            animation: tileEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid var(--border); border-radius: 20px; padding: clamp(1.2rem, 3vw, 2rem);
+            display: flex; flex-direction: column; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            opacity: 0; animation: tileEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
@@ -219,39 +181,31 @@
             background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 50%);
             opacity: 0; transition: opacity 0.5s ease; pointer-events: none; z-index: 0;
         }
-        .card:hover {
-            border-color: var(--border-highlight);
-            transform: translateY(-5px) scale(1.01);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow);
-            z-index: 10;
-        }
+        .card:hover { border-color: var(--border-highlight); transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow); z-index: 10; }
         .card:hover::before { opacity: 1; }
 
-        /* HERO TILE (Absolute Newest Item) */
+        /* HERO TILE (Absolute Newest Item - Dynamically Responsive) */
         .card.pinned-latest {
-            grid-column: span 2; /* Span on desktop */
-            min-height: 250px;
-            max-height: 320px; /* Restrict height */
-            justify-content: center;
+            grid-column: span 2; 
+            /* Soft limits allows card to stretch dynamically without cutting text */
+            min-height: clamp(280px, 30vh, 400px);
+            height: auto;
+            justify-content: center; 
             background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, var(--bg-base) 100%);
-            border: 1px solid var(--accent);
-            box-shadow: inset 0 0 40px var(--accent-glow), 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--accent); box-shadow: inset 0 0 40px var(--accent-glow), 0 20px 50px rgba(0,0,0,0.5);
         }
         .card.pinned-latest .card-title {
-            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            font-size: clamp(1.4rem, 3vw, 2.2rem); 
             font-weight: 300; line-height: 1.4;
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+            /* Text naturally flows down - NO truncated overflow */
+            margin-bottom: 2.5rem;
         }
 
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; z-index: 1; position: relative; }
-        .card-tag { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; font-weight: 700; letter-spacing: 2px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-highlight); box-shadow: 0 0 10px var(--accent-glow); }
-        .timestamp { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .card-tag { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; font-weight: 700; letter-spacing: 2px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-highlight); box-shadow: 0 0 10px var(--accent-glow); white-space: nowrap; }
+        .timestamp { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; white-space: nowrap;}
         
-        .card-title {
-            font-size: clamp(1.1rem, 2vw, 1.3rem); line-height: 1.5; margin-bottom: 2rem; font-weight: 500;
-            color: var(--text-main); z-index: 1; position: relative; flex-grow: 1;
-        }
-
+        .card-title { font-size: clamp(1.1rem, 2vw, 1.3rem); line-height: 1.5; margin-bottom: 2rem; font-weight: 500; color: var(--text-main); z-index: 1; position: relative; flex-grow: 1; }
         .card-footer { margin-top: auto; display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; z-index: 1; position: relative; }
         
         .read-btn {
@@ -262,25 +216,17 @@
         .read-btn:hover { background: var(--accent); color: var(--bg-base); box-shadow: 0 0 25px var(--accent-glow); transform: translateX(5px); text-shadow: none; }
 
         /* --- DASHBOARDS (STATS, VAULT, TELEMETRY) --- */
-        .dashboard-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); 
-            gap: clamp(1rem, 2vw, 2rem); margin-bottom: 3rem; 
-        }
-        
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(1rem, 2vw, 2rem); margin-bottom: 3rem; }
         .dash-card {
             background: linear-gradient(180deg, var(--surface) 0%, rgba(0,0,0,0.5) 100%);
-            border: 1px solid var(--border-highlight); border-radius: 20px; 
-            padding: clamp(1.5rem, 3vw, 2.5rem);
-            text-align: center; position: relative; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-            transition: transform 0.4s ease;
+            border: 1px solid var(--border-highlight); border-radius: 20px; padding: clamp(1.5rem, 3vw, 2.5rem);
+            text-align: center; position: relative; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.4); transition: transform 0.4s ease;
         }
         .dash-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px var(--accent-glow); }
         .dash-card h3 { color: var(--text-muted); font-size: clamp(0.85rem, 1.5vw, 1rem); text-transform: uppercase; letter-spacing: 3px; margin-top: 0; font-weight: 600;}
         .dash-card .value { font-size: clamp(2.5rem, 8vw, 4rem); color: var(--text-main); font-weight: 300; margin: 1rem 0; text-shadow: 0 0 30px var(--accent-glow); line-height: 1; }
         .dash-card .sub { color: var(--accent); font-size: clamp(0.85rem, 1.5vw, 1rem); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Leaderboard */
         .lb-list { list-style: none; padding: 0; margin: 0; text-align: left; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
         .lb-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: clamp(1rem, 2vw, 1.2rem); border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.3s; }
         .lb-list li:hover { background: rgba(0,0,0,0.4); border-left: 3px solid var(--accent); }
@@ -288,38 +234,49 @@
         .lb-name { flex-grow: 1; color: var(--text-main); word-break: break-word; }
         .lb-count { color: var(--accent); background: var(--accent-glow); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; border: 1px solid var(--accent); white-space: nowrap; }
 
+        /* --- LIVE TOPOGRAPHY CANVAS --- */
+        .canvas-container {
+            position: relative; width: 100%; height: 60vh; min-height: 400px;
+            border-radius: 20px; overflow: hidden; border: 1px solid var(--border-highlight);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        #topoCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-base); }
+        .canvas-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+            padding: 20px; box-sizing: border-box;
+        }
+        .sync-box {
+            background: rgba(10, 15, 25, 0.6); backdrop-filter: blur(15px); padding: clamp(1.5rem, 3vw, 2.5rem);
+            border-radius: 20px; border: 1px solid var(--accent); box-shadow: 0 0 40px var(--accent-glow);
+            text-align: center; width: min(100%, 400px);
+        }
+
         /* --- DEEP ARCHIVE MODAL --- */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        
         .modal-content {
             background: linear-gradient(180deg, var(--bg-grad1) 0%, var(--bg-base) 100%);
             border: 1px solid var(--accent); width: 95%; max-width: 900px; max-height: 85vh; border-radius: 20px;
             padding: clamp(20px, 4vw, 40px); overflow-y: auto; position: relative;
-            box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 30px var(--accent-glow);
-            transform: scale(0.95); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 30px var(--accent-glow); transform: scale(0.95); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .modal-overlay.active .modal-content { transform: scale(1); }
-        
         .close-modal {
             position: absolute; top: clamp(15px, 2vw, 25px); right: clamp(15px, 2vw, 25px); background: rgba(0,0,0,0.5); border: 1px solid var(--accent);
             color: var(--accent); width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--accent-glow);
         }
         .close-modal:hover { background: var(--accent); color: var(--bg-base); transform: rotate(90deg); }
-        
         .modal-text { color: var(--text-main); line-height: 1.8; font-size: clamp(1rem, 1.5vw, 1.1rem); white-space: pre-wrap; font-weight: 300; }
 
-        /* --- RESPONSIVE MEDIA QUERIES --- */
+        /* --- RESPONSIVE BREAKPOINTS --- */
         @media (max-width: 1024px) {
-            /* Drop span on smaller devices */
-            .card.pinned-latest { grid-column: span 1; min-height: auto; max-height: none; }
+            .card.pinned-latest { grid-column: span 1; }
         }
-        
         @media (max-width: 600px) {
             .filters-wrapper { flex-direction: column; width: 100%; align-items: stretch; }
             .date-picker, .custom-dropdown { flex: 1 1 100%; max-width: 100%; }
@@ -327,12 +284,10 @@
             .read-btn:hover { transform: translateY(-3px); }
         }
 
-        /* Animations */
+        /* Animations & Utilities */
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
         @keyframes tileEntrance { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        
-        /* Utility */
         .section-title { text-align: center; font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: clamp(2rem, 4vw, 3rem); text-shadow: 0 0 20px var(--accent-glow); color: var(--text-main); font-weight: 600; }
         .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 15px var(--accent); margin-right: 10px; animation: blink 2s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -348,17 +303,23 @@
 </nav>
 
 <div class="sidebar" id="sidebarMenu">
-    <a href="#" class="menu-item" onclick="switchView('view-home')">Neural Grid</a>
-    <a href="#" class="menu-item" onclick="switchView('view-stats')">Intel Diagnostics</a>
-    <a href="#" class="menu-item" onclick="switchView('view-vault')">Vault Metrics</a>
-    <a href="#" class="menu-item" onclick="switchView('view-telemetry')">System Telemetry</a>
-    <a href="#" class="menu-item" onclick="switchView('view-settings')">Matrix Calibration</a>
+    <a href="#" class="menu-item" onclick="switchView('view-home')">▤ Neural Grid</a>
+    <a href="#" class="menu-item" onclick="switchView('view-topography')">⚿ Network Topography</a>
+    <a href="#" class="menu-item" onclick="switchView('view-stats')">◱ Intel Diagnostics</a>
+    <a href="#" class="menu-item" onclick="switchView('view-vault')">⛁ Vault Metrics</a>
+    <a href="#" class="menu-item" onclick="switchView('view-telemetry')">⚡ System Telemetry</a>
+    <a href="#" class="menu-item" onclick="switchView('view-settings')">⚙ Matrix Calibration</a>
 </div>
 
 <div class="container" id="mainContainer">
     
     <div id="view-home" class="view-section active">
-        <header><h1>Neural Matrix</h1></header>
+        <header>
+            <h1>Neural Matrix</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+                <span class="status-dot"></span> Last Workflow Dispatch: <span id="lastSyncTimeMain" style="color: var(--accent); font-weight: bold;">Loading...</span>
+            </p>
+        </header>
 
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Initializing neural link...">
@@ -384,6 +345,23 @@
         </div>
 
         <div id="news-grid"></div>
+    </div>
+
+    <div id="view-topography" class="view-section">
+        <h2 class="section-title">Network Topography</h2>
+        <div class="canvas-container">
+            <canvas id="topoCanvas"></canvas>
+            <div class="canvas-overlay">
+                <div class="sync-box">
+                    <h3 style="color: var(--text-main); font-size: 1.5rem; font-weight: 300; margin-bottom: 1rem; margin-top: 0;">Matrix Sync Status</h3>
+                    <p style="color: var(--accent); font-size: 2.5rem; margin: 0; font-weight: 600; text-shadow: 0 0 20px var(--accent-glow);" id="liveIngestionRate">0.0 KB/s</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; letter-spacing: 2px;">LIVE INGESTION RATE</p>
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 1.5rem 0;">
+                    <p style="color: var(--text-main); font-size: 1.2rem; margin: 0;" id="lastWorkflowTime">Awaiting Data...</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; letter-spacing: 1px;">LAST WORKFLOW DISPATCH</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="view-stats" class="view-section">
@@ -449,7 +427,6 @@
     <div id="view-settings" class="view-section">
         <h2 class="section-title">Matrix Calibration</h2>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Select Neural Core Color Interface</p>
-        
         <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 800px; margin: 0 auto;">
             <div id="themeButtonsContainer" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;"></div>
         </div>
@@ -480,12 +457,11 @@
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
         
-        if(document.getElementById('sidebarMenu').classList.contains('active')) {
-            toggleMenu();
-        }
-
+        if(document.getElementById('sidebarMenu').classList.contains('active')) toggleMenu();
+        
         if(viewId === 'view-stats') calculateStats();
         if(viewId === 'view-vault') calculateVaultMetrics();
+        if(viewId === 'view-topography') initTopographyCanvas();
         window.scrollTo(0,0);
     }
 
@@ -511,15 +487,12 @@
         document.documentElement.style.setProperty('--border-highlight', theme.glow);
     }
 
-    // Auto-select random on load
     applyTheme(themeNames[Math.floor(Math.random() * themeNames.length)]);
 
-    // Build Settings Theme Buttons
     const themeContainer = document.getElementById('themeButtonsContainer');
     themeNames.forEach(t => {
         const btn = document.createElement('button');
-        btn.className = 'read-btn';
-        btn.innerText = t;
+        btn.className = 'read-btn'; btn.innerText = t;
         btn.style.borderColor = themes[t].accent;
         btn.style.boxShadow = `0 0 15px ${themes[t].glow}`;
         btn.onclick = () => applyTheme(t);
@@ -551,7 +524,6 @@
 
     let currentChannelFilter = 'all';
     setupDropdown('channelDropdown', 'channelSelected', 'channelOptions', (val) => { currentChannelFilter = val; filterAndRender(); });
-
     let currentLimitFilter = 100;
     setupDropdown('limitDropdown', 'limitSelected', 'limitOptions', (val) => { currentLimitFilter = parseInt(val, 10); filterAndRender(); });
 
@@ -581,7 +553,6 @@
     const grid = document.getElementById('news-grid');
     const datePicker = document.getElementById('datePicker');
 
-    // Init Date
     const istOffset = 5.5 * 60 * 60 * 1000;
     const todayStr = new Date(new Date().getTime() + istOffset).toISOString().split('T')[0];
     datePicker.value = todayStr; datePicker.max = todayStr;
@@ -589,6 +560,7 @@
 
     async function init(date) {
         grid.innerHTML = '<p style="text-align:center; opacity:0.5; width:100%; grid-column: 1/-1;"><span class="status-dot"></span> Establishing Secure Connection to VEDA...</p>';
+        document.getElementById('lastSyncTimeMain').innerText = "Scanning...";
         
         try {
             const res = await fetch(`${date.split('-')[0]}/${date}.json`);
@@ -597,10 +569,18 @@
             rawData = [];
             Object.keys(data.feeds).forEach(source => data.feeds[source].forEach(item => rawData.push({ ...item, source })));
             
+            if(rawData.length > 0) {
+                const latestItem = rawData.reduce((a, b) => (new Date(b.published_at).getTime() || 0) > (new Date(a.published_at).getTime() || 0) ? b : a);
+                const timeString = new Date(latestItem.published_at).toLocaleString();
+                document.getElementById('lastSyncTimeMain').innerText = timeString;
+                document.getElementById('lastWorkflowTime').innerText = timeString;
+            }
+
             populateChannels(Object.keys(data.feeds));
             filterAndRender();
         } catch (e) {
             grid.innerHTML = `<p style="text-align:center; color:var(--accent); width:100%; grid-column: 1/-1;">${e.message}</p>`;
+            document.getElementById('lastSyncTimeMain').innerText = "Offline";
             rawData = [];
         }
     }
@@ -621,14 +601,13 @@
 
         if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; opacity:0.5; width:100%; grid-column: 1/-1;">No intelligence matches your parameters.</p>'; return; }
 
-        // STRICT CHRONOLOGICAL SORTING PRESERVED (Newest First)
         filtered.sort((a, b) => (new Date(b.published_at).getTime() || 0) - (new Date(a.published_at).getTime() || 0));
         filtered = filtered.slice(0, currentLimitFilter);
 
         grid.innerHTML = '';
         filtered.forEach((item, index) => {
             const card = document.createElement('div');
-            // HERO TILE ASSIGNMENT (Strictly assigned to index 0)
+            // HERO TILE ASSIGNMENT 
             card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
             
             const formatSource = item.source.replace(/_/g, ' ');
@@ -650,7 +629,7 @@
         });
     }
 
-    // --- 6. MENU METRICS COMPUTATION ---
+    // --- 6. MENU METRICS & CANVAS COMPUTATION ---
     function calculateStats() {
         if(!rawData.length) return;
         document.getElementById('statTotal').innerText = rawData.length;
@@ -668,18 +647,61 @@
 
     function calculateVaultMetrics() {
         if(!rawData.length) return;
-        // TextEncoder gives accurate Byte sizing for special characters
         const lightBytes = new TextEncoder().encode(JSON.stringify(rawData)).length;
         document.getElementById('vaultLightSize').innerText = (lightBytes / 1024).toFixed(1) + ' KB';
-        // Deep Archive usually extracts 15x-20x more text data than the headline payload
         document.getElementById('vaultDeepSize').innerText = ((lightBytes * 18) / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
-    // Simulated Telemetry Ping
     setInterval(() => {
         document.getElementById('telPing').innerText = (Math.floor(Math.random() * 8) + 12) + ' ms';
         document.getElementById('telCDN').innerText = (Math.floor(Math.random() * 15) + 20) + ' ms';
-    }, 3000);
+        document.getElementById('liveIngestionRate').innerText = (Math.random() * 1.5 + 0.1).toFixed(2) + ' KB/s';
+    }, 2500);
+
+    let topoInited = false;
+    function initTopographyCanvas() {
+        if(topoInited) return; topoInited = true;
+        const canvas = document.getElementById('topoCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        function resize() {
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+        }
+        window.addEventListener('resize', resize); resize();
+
+        for(let i=0; i<70; i++) {
+            particles.push({ x: Math.random() * width, y: Math.random() * height, vx: (Math.random()-0.5)*1.5, vy: (Math.random()-0.5)*1.5, size: Math.random()*2+1 });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00f3ff';
+            ctx.fillStyle = accent; ctx.strokeStyle = accent;
+
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x < 0 || p.x > width) p.vx *= -1;
+                if(p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+            });
+
+            for(let i=0; i<particles.length; i++) {
+                for(let j=i+1; j<particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 120) {
+                        ctx.globalAlpha = 1 - (dist / 120);
+                        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
 
     // --- 7. HEDA UPLINK & MODAL ---
     let cachedDeepArchive = null; let cachedArchiveDate = null;
