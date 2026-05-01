@@ -36,14 +36,12 @@ TARGET_FEEDS = {
     "Times_of_India_National": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
     "Indian_Express_National": "https://indianexpress.com/section/india/feed/",
     "NDTV_Latest": "https://feeds.feedburner.com/ndtvnews-latest",
-    "News18_National": "https://www.news18.com/commonfeeds/v1/eng/rss/india.xml",
 
     # --- INDIA: FINANCIAL MARKETS ---
     "Moneycontrol_Markets": "https://www.moneycontrol.com/rss/marketreports.xml",
     "Moneycontrol_Commodities": "https://www.moneycontrol.com/rss/commodities.xml",
     "LiveMint_Markets": "https://www.livemint.com/rss/markets",
     "Economic_Times_Markets": "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
-    "Financial_Express_Economy": "https://www.financialexpress.com/economy/feed/",
 
     # --- TELUGU HEAVYWEIGHTS ---
     "Namasthe_Telangana": "https://www.ntnews.com/feed",
