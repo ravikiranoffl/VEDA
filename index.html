@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VEDA | Neural Matrix</title>
+    <title>VEDA | Premium Intelligence Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -60,10 +60,10 @@
         .container {
             width: 100%; max-width: 1600px; margin: 0 auto;
             padding: clamp(90px, 12vh, 120px) clamp(1rem, 4vw, 3rem) clamp(2rem, 5vh, 4rem);
-            transition: filter 0.4s ease; position: relative; z-index: 1;
+            position: relative; z-index: 1; transition: filter 0.4s ease;
         }
 
-        /* --- GLASS NAVIGATION OVERRIDE --- */
+        /* --- GLASS NAVIGATION --- */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: clamp(0.8rem, 2vw, 1.5rem) clamp(1rem, 4vw, 3rem);
@@ -98,7 +98,7 @@
             border-left: 1px solid var(--border-highlight); box-shadow: -15px 0 60px rgba(0,0,0,0.9);
             z-index: 2002; display: flex; flex-direction: column; 
             padding: clamp(30px, 5vh, 50px) clamp(1.5rem, 4vw, 2.5rem) 2rem;
-            transition: right 0.6s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto;
+            transition: right 0.6s cubic-bezier(0.19, 1, 0.22, 1); overflow-x: hidden; overflow-y: auto;
         }
         .sidebar.active { right: 0; }
         
@@ -106,11 +106,11 @@
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 2rem; width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
         }
-        /* Refined Seamless IST Clock */
         .live-clock {
             font-size: clamp(1.2rem, 3vw, 1.4rem); font-weight: 800; color: var(--accent);
             letter-spacing: 2px; text-shadow: 0 0 15px var(--accent-glow); font-family: inherit;
             border: none; outline: none; background: transparent; padding: 0; margin: 0;
+            white-space: nowrap;
         }
         .close-btn {
             font-size: 1.8rem; font-weight: 300; color: var(--text-muted); cursor: pointer;
@@ -136,11 +136,12 @@
         .view-section { display: none; animation: popIn 0.8s cubic-bezier(0.19, 1, 0.22, 1); width: 100%; }
         .view-section.active { display: block; }
         header { text-align: center; margin-bottom: clamp(2rem, 5vh, 4rem); width: 100%; }
-        /* Professional Medium Header Size */
+        /* Medium Header Size */
         h1 {
             font-weight: 800; letter-spacing: clamp(2px, 1vw, 6px); font-size: clamp(1.8rem, 3vw, 2.5rem); margin: 0; line-height: 1.2;
             background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px var(--accent-glow);
+            word-wrap: break-word;
         }
 
         /* --- FILTERS & STRICT DD/MM/YYYY OVERRIDE --- */
@@ -154,7 +155,7 @@
         #searchInput:focus { outline: none; border-color: var(--accent); background: rgba(15, 25, 40, 0.8); box-shadow: 0 0 40px var(--accent-glow), inset 0 0 15px var(--accent-glow); transform: scale(1.02); }
 
         .filters-wrapper { display: flex; justify-content: center; align-items: stretch; gap: clamp(10px, 2vw, 20px); margin-bottom: clamp(2rem, 5vh, 4rem); flex-wrap: wrap; z-index: 100; position: relative; width: 100%; }
-        .date-picker, .custom-dropdown { flex: 1 1 clamp(150px, 30%, 300px); max-width: 100%; }
+        .date-picker, .custom-dropdown { flex: 1 1 clamp(150px, 30%, 300px); max-width: 100%; min-width: 0; }
         
         .date-picker { 
             width: 100%; background: var(--surface); border: 1px solid var(--border); 
@@ -165,27 +166,27 @@
         .date-picker::-webkit-datetime-edit { color: transparent; }
         .date-picker::after {
             content: attr(data-date); position: absolute; left: clamp(14px, 3vw, 24px); top: 50%;
-            transform: translateY(-50%); color: var(--accent); pointer-events: none; font-weight: 700;
+            transform: translateY(-50%); color: var(--accent); pointer-events: none; font-weight: 700; white-space: nowrap;
         }
         ::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(1); opacity: 0.7; }
 
         .custom-dropdown { position: relative; font-weight: 600; }
         .dropdown-selected { 
-            width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-main); padding: clamp(12px, 2.5vw, 18px) clamp(14px, 3vw, 24px); border-radius: 12px; cursor: pointer; backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; font-size: clamp(0.85rem, 2vw, 1rem); transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.4); 
+            width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-main); padding: clamp(12px, 2.5vw, 18px) clamp(14px, 3vw, 24px); border-radius: 12px; cursor: pointer; backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; font-size: clamp(0.85rem, 2vw, 1rem); transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.4); word-wrap: break-word; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
         }
         .dropdown-selected:hover { border-color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); box-shadow: 0 15px 30px var(--accent-glow); transform: translateY(-3px); }
-        .dropdown-selected::after { content: '▼'; font-size: 0.7em; color: var(--accent); transition: transform 0.4s ease; }
+        .dropdown-selected::after { content: '▼'; font-size: 0.7em; color: var(--accent); transition: transform 0.4s ease; margin-left: 10px; }
         .custom-dropdown.active .dropdown-selected::after { transform: rotate(-180deg); }
         
         .dropdown-options { 
-            position: absolute; top: calc(100% + 10px); left: 0; width: 100%; background: rgba(5,7,12,0.98); border: 1px solid var(--border-highlight); border-radius: 12px; backdrop-filter: blur(35px); box-shadow: 0 25px 50px rgba(0,0,0,0.9); max-height: 0; overflow-y: auto; opacity: 0; transition: all 0.4s ease; pointer-events: none; z-index: 1000; transform: translateY(-10px);
+            position: absolute; top: calc(100% + 10px); left: 0; width: 100%; background: rgba(5,7,12,0.98); border: 1px solid var(--border-highlight); border-radius: 12px; backdrop-filter: blur(35px); box-shadow: 0 25px 50px rgba(0,0,0,0.9); max-height: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; transition: all 0.4s ease; pointer-events: none; z-index: 1000; transform: translateY(-10px);
         }
         .custom-dropdown.active .dropdown-options { max-height: 350px; opacity: 1; pointer-events: auto; padding: 10px 0; transform: translateY(0); }
-        .dropdown-option { padding: 14px 20px; color: var(--text-muted); font-size: clamp(0.85rem, 2vw, 1rem); cursor: pointer; transition: all 0.2s ease; border-left: 3px solid transparent; }
+        .dropdown-option { padding: 14px 20px; color: var(--text-muted); font-size: clamp(0.85rem, 2vw, 1rem); cursor: pointer; transition: all 0.2s ease; border-left: 3px solid transparent; word-break: break-word; }
         .dropdown-option:hover { color: var(--text-main); background: rgba(255,255,255,0.05); border-left: 3px solid var(--accent); text-shadow: 0 0 15px var(--accent-glow); padding-left: 25px; }
 
         /* --- DYNAMIC ASYMMETRICAL TILE ENGINE --- */
-        #news-grid { display: grid; gap: clamp(1rem, 3vw, 2rem); grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); grid-auto-flow: dense; width: 100%; }
+        #news-grid { display: grid; gap: clamp(1rem, 3vw, 2rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); width: 100%; }
 
         .card {
             background: linear-gradient(145deg, rgba(20,25,35,0.6) 0%, rgba(5,10,15,0.8) 100%);
@@ -194,6 +195,7 @@
             position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.02);
             opacity: 0; animation: tileEntrance 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
             transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease; width: 100%;
+            word-wrap: break-word; min-width: 0;
         }
         .card::after {
             content: ''; position: absolute; top: 0; left: -150%; width: 50%; height: 100%;
@@ -210,23 +212,25 @@
         .card:hover::before { opacity: 0.8; }
 
         .card.pinned-latest {
-            grid-column: span 2; min-height: clamp(250px, 30vh, 450px); height: auto; justify-content: center; 
+            grid-column: 1 / -1; min-height: clamp(250px, 30vh, 450px); height: auto; justify-content: center; 
             background: linear-gradient(135deg, rgba(30,40,60,0.5) 0%, rgba(5,10,15,0.9) 100%);
             border: 1px solid var(--accent); box-shadow: inset 0 0 60px var(--accent-glow), 0 25px 60px rgba(0,0,0,0.7);
         }
-        .card.pinned-latest .card-title { font-size: clamp(1.3rem, 5vw, 2.5rem); font-weight: 300; line-height: 1.4; margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+        @media (min-width: 992px) { .card.pinned-latest { grid-column: span 2; } }
 
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; z-index: 1; position: relative; }
-        .card-tag { font-size: clamp(0.65rem, 2vw, 0.75rem); color: var(--accent); text-transform: uppercase; font-weight: 800; letter-spacing: 2px; background: rgba(0,0,0,0.8); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-        .timestamp { font-size: clamp(0.75rem, 2vw, 0.85rem); color: var(--text-muted); font-weight: 600; }
+        .card.pinned-latest .card-title { font-size: clamp(1.3rem, 4vw, 2.2rem); font-weight: 400; line-height: 1.4; margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; z-index: 1; position: relative; width: 100%; min-width: 0; }
+        .card-tag { font-size: clamp(0.65rem, 2vw, 0.75rem); color: var(--accent); text-transform: uppercase; font-weight: 800; letter-spacing: 2px; background: rgba(0,0,0,0.8); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--accent); box-shadow: 0 0 15px var(--accent-glow); word-break: break-word; }
+        .timestamp { font-size: clamp(0.75rem, 2vw, 0.85rem); color: var(--text-muted); font-weight: 600; word-break: break-word; }
         
-        .card-title { font-size: clamp(1.1rem, 4vw, 1.4rem); line-height: 1.6; margin-bottom: 2rem; font-weight: 500; color: var(--text-main); z-index: 1; position: relative; flex-grow: 1; }
-        .card-footer { margin-top: auto; display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; z-index: 1; position: relative; }
+        .card-title { font-size: clamp(1.1rem, 3vw, 1.3rem); line-height: 1.6; margin-bottom: 2rem; font-weight: 500; color: var(--text-main); z-index: 1; position: relative; flex-grow: 1; word-break: break-word; }
+        .card-footer { margin-top: auto; display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; z-index: 1; position: relative; width: 100%; }
         
         .read-btn {
             color: var(--accent); text-decoration: none; font-size: clamp(0.7rem, 2vw, 0.85rem); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
             padding: clamp(10px, 3vw, 14px) clamp(16px, 4vw, 28px); border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--accent);
-            transition: all 0.4s ease; cursor: pointer; font-family: inherit; text-shadow: 0 0 10px var(--accent-glow); text-align: center;
+            transition: all 0.4s ease; cursor: pointer; font-family: inherit; text-shadow: 0 0 10px var(--accent-glow); text-align: center; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
         }
         .read-btn:hover { background: var(--accent); color: var(--bg-base); box-shadow: 0 0 30px var(--accent-glow); transform: translateX(5px); text-shadow: none; }
 
@@ -235,7 +239,7 @@
             font-size: clamp(0.65rem, 2vw, 0.8rem); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
             padding: clamp(12px, 3vw, 18px) clamp(12px, 3vw, 25px); border-radius: 12px; cursor: pointer; transition: all 0.4s ease; 
             color: #fff; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
-            border: 1px solid transparent; flex: 1 1 calc(20% - 20px); min-width: 140px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); text-align: center;
+            border: 1px solid transparent; flex: 1 1 calc(20% - 20px); min-width: 140px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); text-align: center; word-break: break-word;
         }
         .theme-btn::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
@@ -250,15 +254,15 @@
         .dash-card {
             background: linear-gradient(180deg, var(--surface) 0%, rgba(0,0,0,0.8) 100%);
             border: 1px solid var(--border-highlight); border-radius: 20px; padding: clamp(1.5rem, 4vw, 3rem);
-            text-align: center; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); transition: transform 0.4s ease; width: 100%;
+            text-align: center; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); transition: transform 0.4s ease; width: 100%; word-break: break-word;
         }
         .dash-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 30px 60px var(--accent-glow); border-color: var(--accent); }
         .dash-card h3 { color: var(--text-muted); font-size: clamp(0.8rem, 2.5vw, 1.1rem); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; font-weight: 700;}
-        .dash-card .value { font-size: clamp(2rem, 10vw, 4.5rem); color: var(--text-main); font-weight: 300; margin: 1rem 0; text-shadow: 0 0 30px var(--accent-glow); line-height: 1; word-break: break-word; }
+        .dash-card .value { font-size: clamp(2rem, 8vw, 4rem); color: var(--text-main); font-weight: 300; margin: 1rem 0; text-shadow: 0 0 30px var(--accent-glow); line-height: 1; word-break: break-word; }
         .dash-card .sub { color: var(--accent); font-size: clamp(0.75rem, 2vw, 1rem); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
 
-        .lb-list { list-style: none; padding: 0; margin: 0; background: rgba(10,15,25,0.7); border-radius: 20px; border: 1px solid var(--border-highlight); overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); backdrop-filter: blur(20px); width: 100%; }
-        .lb-list li { display: flex; justify-content: space-between; align-items: center; padding: clamp(1rem, 3vw, 2rem); border-bottom: 1px solid rgba(255,255,255,0.03); transition: all 0.3s; gap: 10px; flex-wrap: wrap; }
+        .lb-list { list-style: none; padding: 0; margin: 0; background: rgba(10,15,25,0.7); border-radius: 20px; border: 1px solid var(--border-highlight); overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); backdrop-filter: blur(20px); width: 100%; word-break: break-word; }
+        .lb-list li { display: flex; justify-content: space-between; align-items: center; padding: clamp(1rem, 3vw, 2rem); border-bottom: 1px solid rgba(255,255,255,0.03); transition: all 0.3s; gap: 10px; flex-wrap: wrap; width: 100%; min-width: 0;}
         .lb-list li:hover { background: rgba(0,0,0,0.8); border-left: 4px solid var(--accent); padding-left: clamp(1.2rem, 3.5vw, 2.5rem); box-shadow: inset 20px 0 30px -20px var(--accent-glow); }
 
         /* --- NODE HEALTH UI RESTORED PURE CSS --- */
@@ -266,24 +270,25 @@
         .health-node { 
             background: linear-gradient(90deg, rgba(10,15,25,0.9) 0%, rgba(0,0,0,0.7) 100%); 
             border: 1px solid var(--border); border-radius: 16px; padding: clamp(1.2rem, 3vw, 1.8rem); 
-            cursor: pointer; transition: all 0.4s ease; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; width: 100%;
+            cursor: pointer; transition: all 0.4s ease; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; width: 100%; min-width: 0;
         }
         .health-node:hover { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); background: var(--surface-hover); transform: translateX(8px); }
-        .node-header { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;}
-        .node-title { font-weight: 700; font-size: clamp(1rem, 3vw, 1.2rem); color: var(--text-main); letter-spacing: 2px; text-transform: uppercase;}
-        .node-tag { padding: 6px 12px; border-radius: 8px; font-size: clamp(0.7rem, 2vw, 0.85rem); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .node-header { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; min-width: 0;}
+        .node-title { font-weight: 700; font-size: clamp(1rem, 3vw, 1.2rem); color: var(--text-main); letter-spacing: 2px; text-transform: uppercase; word-break: break-word; flex: 1 1 auto;}
+        .node-tag { padding: 6px 12px; border-radius: 8px; font-size: clamp(0.7rem, 2vw, 0.85rem); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;}
         
         .progress-track { width: 100%; height: 8px; background: rgba(0,0,0,0.6); border-radius: 10px; overflow: hidden; margin-top: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.9); }
         .progress-fill { height: 100%; transition: width 1.5s ease; }
 
-        .node-details { max-height: 0; overflow: hidden; transition: all 0.5s ease; opacity: 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-top: 1px solid var(--border); margin-top: 0; padding-top: 0; transform: translateY(-10px); }
-        .health-node.active .node-details { max-height: 400px; opacity: 1; margin-top: 15px; padding-top: 15px; transform: translateY(0); }
+        .node-details { max-height: 0; overflow: hidden; transition: all 0.5s ease; opacity: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; border-top: 1px solid var(--border); margin-top: 0; padding-top: 0; transform: translateY(-10px); width: 100%; }
+        .health-node.active .node-details { max-height: 500px; opacity: 1; margin-top: 15px; padding-top: 15px; transform: translateY(0); }
+        .node-details span { word-break: break-word; width: 100%; text-align: left !important; max-width: 100% !important; }
 
         /* --- GLASS TOPOGRAPHY ANIMATION --- */
         .glass-radar-container {
             position: relative; width: 100%; height: clamp(400px, 50vh, 600px); border-radius: 24px; overflow: hidden; border: 1px solid var(--border-highlight);
             box-shadow: 0 20px 60px rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, rgba(10,20,30,0.8), rgba(0,0,0,1)); padding: 1rem;
+            background: radial-gradient(circle at center, rgba(10,20,30,0.8), rgba(0,0,0,1)); padding: 1rem; min-width: 0;
         }
         .radar-ring { position: absolute; border-radius: 50%; border: 2px solid var(--accent); box-shadow: 0 0 30px var(--accent-glow), inset 0 0 30px var(--accent-glow); opacity: 0; animation: radarPulse 6s cubic-bezier(0.19, 1, 0.22, 1) infinite; }
         .radar-ring.d1 { animation-delay: 0s; } .radar-ring.d2 { animation-delay: 2s; } .radar-ring.d3 { animation-delay: 4s; }
@@ -293,7 +298,7 @@
             background: linear-gradient(135deg, rgba(10, 15, 25, 0.9) 0%, rgba(0,0,0,0.95) 100%); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             padding: clamp(1.5rem, 5vw, 4rem); border-radius: 24px; border: 1px solid var(--accent); 
             box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,255,255,0.05); text-align: center; width: 100%; max-width: 550px; z-index: 10;
-            animation: floatBox 8s ease-in-out infinite;
+            animation: floatBox 8s ease-in-out infinite; word-break: break-word;
         }
         @keyframes floatBox { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
@@ -305,8 +310,8 @@
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content {
             background: linear-gradient(180deg, var(--bg-grad1) 0%, var(--bg-base) 100%); border: 1px solid var(--accent); width: 100%; max-width: 1000px; max-height: 90vh; border-radius: 20px;
-            padding: clamp(25px, 6vw, 60px); overflow-y: auto; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,1), inset 0 0 40px var(--accent-glow); 
-            transform: scale(0.95) translateY(20px); opacity: 0; transition: all 0.5s ease;
+            padding: clamp(25px, 6vw, 60px); overflow-x: hidden; overflow-y: auto; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,1), inset 0 0 40px var(--accent-glow); 
+            transform: scale(0.95) translateY(20px); opacity: 0; transition: all 0.5s ease; word-break: break-word;
         }
         .modal-overlay.active .modal-content { transform: scale(1) translateY(0); opacity: 1; }
         .close-modal {
@@ -316,14 +321,9 @@
         .close-modal:hover { background: var(--accent); color: var(--bg-base); transform: rotate(90deg) scale(1.1); }
 
         /* --- MEDIA QUERIES FOR ULTIMATE RESPONSIVENESS --- */
-        @media (max-width: 992px) {
-            .card.pinned-latest { grid-column: span 1; }
-        }
         @media (max-width: 768px) {
             .filters-wrapper { flex-direction: column; }
             .date-picker, .custom-dropdown { flex: 1 1 100%; width: 100%; max-width: 100%; }
-            .node-details { flex-direction: column; align-items: flex-start; }
-            .node-details > span { text-align: left !important; max-width: 100% !important; }
             .theme-btn { flex: 1 1 calc(50% - 15px); min-width: auto; }
             .read-btn { width: 100%; }
             .health-node:hover { transform: translateX(4px); }
@@ -335,9 +335,9 @@
         }
 
         /* Animations & Utilities */
-        @keyframes popIn { from { opacity: 0; transform: scale(0.98) translateY(20px); filter: blur(10px); } to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); } }
+        @keyframes popIn { from { opacity: 0; transform: translateY(20px); filter: blur(10px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
         @keyframes tileEntrance { from { opacity: 0; transform: translateY(40px) scale(0.9) rotateX(10deg); filter: blur(8px); } to { opacity: 1; transform: translateY(0) scale(1) rotateX(0deg); filter: blur(0); } }
-        .section-title { text-align: center; font-size: clamp(1.8rem, 6vw, 3.5rem); margin-bottom: clamp(2rem, 5vw, 4rem); text-shadow: 0 0 30px var(--accent-glow); color: var(--text-main); font-weight: 800; letter-spacing: clamp(2px, 1vw, 4px); text-transform: uppercase; }
+        .section-title { text-align: center; font-size: clamp(1.8rem, 5vw, 2.5rem); margin-bottom: clamp(2rem, 5vw, 4rem); text-shadow: 0 0 30px var(--accent-glow); color: var(--text-main); font-weight: 800; letter-spacing: clamp(2px, 1vw, 4px); text-transform: uppercase; }
         .status-dot { display: inline-block; width: clamp(8px, 2vw, 14px); height: clamp(8px, 2vw, 14px); border-radius: 50%; background: var(--accent); box-shadow: 0 0 20px var(--accent); margin-right: 10px; animation: blink 2s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.2); } }
     </style>
@@ -360,7 +360,7 @@
 
 <div class="sidebar" id="sidebarMenu">
     
-    <!-- Seamless Sidebar Header with Live Clock & Dynamic Close Button -->
+    <!-- Seamless Sidebar Header with Live 24H Clock & Dynamic Close Button -->
     <div class="sidebar-header">
         <div id="liveClock" class="live-clock"></div>
         <div class="close-btn" onclick="toggleMenu()">&#10005;</div>
@@ -381,7 +381,7 @@
         <header>
             <h1>NEURAL MATRIX</h1>
             <p style="color: var(--text-muted); font-size: clamp(0.85rem, 2.5vw, 1.1rem); margin-top: 1.5rem; text-transform: uppercase; letter-spacing: clamp(1px, 1vw, 4px); font-weight: 600;">
-                <span class="status-dot"></span> Last Workflow Dispatch: <br class="mobile-break"><span id="lastSyncTimeMain" style="color: var(--accent); font-weight: 800; text-shadow: 0 0 15px var(--accent-glow);">Loading...</span>
+                <span class="status-dot"></span> Last Workflow Dispatch: <br class="mobile-break"><span id="lastSyncTimeMain" style="color: var(--accent); font-weight: 800; text-shadow: 0 0 15px var(--accent-glow); word-break: break-word;">Loading...</span>
             </p>
         </header>
         <style>@media(min-width: 600px){.mobile-break{display:none;}}</style>
@@ -420,7 +420,7 @@
                 <p style="color: var(--accent); font-size: clamp(2.5rem, 8vw, 4rem); margin: 0; font-weight: 800; text-shadow: 0 0 40px var(--accent-glow);" id="liveIngestionRate">0.0 KB/s</p>
                 <p style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 1.1rem); letter-spacing: clamp(2px, 1vw, 4px); margin-top: 15px; font-weight: 700;">LIVE INGESTION RATE</p>
                 <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
-                <p style="color: var(--text-main); font-size: clamp(1.1rem, 3vw, 1.5rem); margin: 0; font-weight: 600;" id="lastWorkflowTime">Awaiting Data...</p>
+                <p style="color: var(--text-main); font-size: clamp(1.1rem, 3vw, 1.5rem); margin: 0; font-weight: 600; word-break: break-word;" id="lastWorkflowTime">Awaiting Data...</p>
                 <p style="color: var(--text-muted); font-size: clamp(0.7rem, 2vw, 0.9rem); letter-spacing: clamp(1px, 1vw, 3px); margin-top: 10px; font-weight: 700;">LAST WORKFLOW DISPATCH</p>
             </div>
         </div>
@@ -536,7 +536,7 @@
         document.getElementById('hamburgerBtn').classList.toggle('active');
         const container = document.getElementById('mainContainer');
         container.style.filter = document.getElementById('sidebarMenu').classList.contains('active') ? 'blur(10px) brightness(0.5)' : 'none';
-        container.style.transform = document.getElementById('sidebarMenu').classList.contains('active') ? 'scale(0.97)' : 'scale(1)';
+        // Maintained pure stillness: no scale transform on container.
     }
 
     function switchView(viewId) {
@@ -555,7 +555,7 @@
         if(!clockEl) return;
         const now = new Date();
         const optionsTime = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        clockEl.innerHTML = now.toLocaleTimeString('en-US', optionsTime) + ' IST';
+        clockEl.innerHTML = now.toLocaleTimeString('en-US', optionsTime);
     }
     setInterval(updateClock, 1000);
     updateClock();
@@ -579,40 +579,29 @@
 
     // --- 3. PREMIUM THEME ENGINE (26 UNIQUE THEMES) ---
     const themes = {
-        // Cyans & Blues
         "Cyber Cyan": { base: "#020508", grad1: "#06111a", grad2: "#010204", accent: "#00f3ff", glow: "rgba(0, 243, 255, 0.4)", text: "#e6fdff" },
         "Cobalt Protocol": { base: "#010205", grad1: "#04081c", grad2: "#01010a", accent: "#2d5bff", glow: "rgba(45, 91, 255, 0.4)", text: "#e6ecff" },
         "Ice Node": { base: "#020608", grad1: "#071822", grad2: "#010305", accent: "#00b3ff", glow: "rgba(0, 179, 255, 0.4)", text: "#e6f7ff" },
         "Sapphire Core": { base: "#00030a", grad1: "#001033", grad2: "#000105", accent: "#0044ff", glow: "rgba(0, 68, 255, 0.4)", text: "#e6edff" },
         "Deep Ocean": { base: "#010306", grad1: "#030d1c", grad2: "#000103", accent: "#0066ff", glow: "rgba(0, 102, 255, 0.4)", text: "#e6f0ff" },
-        
-        // Greens & Teals
         "Acid Rain": { base: "#030602", grad1: "#0a1708", grad2: "#010301", accent: "#39ff14", glow: "rgba(57, 255, 20, 0.4)", text: "#efffe6" },
         "Matrix Mint": { base: "#020805", grad1: "#051a11", grad2: "#010503", accent: "#00ffa3", glow: "rgba(0, 255, 163, 0.4)", text: "#e6fff4" },
         "Bio-Hazard": { base: "#050601", grad1: "#141a02", grad2: "#030400", accent: "#bfff00", glow: "rgba(191, 255, 0, 0.4)", text: "#f6ffe6" },
         "Emerald City": { base: "#010502", grad1: "#031a0a", grad2: "#010301", accent: "#00ff66", glow: "rgba(0, 255, 102, 0.4)", text: "#e6ffef" },
-        
-        // Purples, Violets & Magentas
         "Deep Amethyst": { base: "#040108", grad1: "#1b0a3a", grad2: "#080310", accent: "#aa44ff", glow: "rgba(170, 68, 255, 0.4)", text: "#f0e6ff" },
         "Neon Synth": { base: "#070106", grad1: "#1f031b", grad2: "#0a0008", accent: "#ff00d4", glow: "rgba(255, 0, 212, 0.4)", text: "#ffe6fa" },
         "Ultraviolet": { base: "#020108", grad1: "#0a0422", grad2: "#010005", accent: "#7000ff", glow: "rgba(112, 0, 255, 0.4)", text: "#ebe6ff" },
         "Galactic Lilac": { base: "#050308", grad1: "#160a24", grad2: "#020103", accent: "#d400ff", glow: "rgba(212, 0, 255, 0.4)", text: "#f8e6ff" },
         "Vaporwave": { base: "#040206", grad1: "#130822", grad2: "#020104", accent: "#ff00ff", glow: "rgba(255, 0, 255, 0.4)", text: "#ffe6ff" },
-
-        // Reds, Pinks & Oranges
         "Blood Moon": { base: "#080202", grad1: "#1a0404", grad2: "#040101", accent: "#ff2a2a", glow: "rgba(255, 42, 42, 0.4)", text: "#ffe6e6" },
         "Solar Flare": { base: "#080301", grad1: "#1f0902", grad2: "#050100", accent: "#ff5e00", glow: "rgba(255, 94, 0, 0.4)", text: "#ffece6" },
         "Crimson Forge": { base: "#050102", grad1: "#170205", grad2: "#040001", accent: "#ff004c", glow: "rgba(255, 0, 76, 0.4)", text: "#ffe6ee" },
         "Crimson Rose": { base: "#080103", grad1: "#1f020c", grad2: "#050002", accent: "#ff006a", glow: "rgba(255, 0, 106, 0.4)", text: "#ffe6f0" },
         "Autumn Blaze": { base: "#080200", grad1: "#1f0600", grad2: "#050100", accent: "#ff3c00", glow: "rgba(255, 60, 0, 0.4)", text: "#ffe9e6" },
         "Toxic Peach": { base: "#080403", grad1: "#1a0b07", grad2: "#050101", accent: "#ff7b59", glow: "rgba(255, 123, 89, 0.4)", text: "#ffece6" },
-
-        // Yellows & Golds
         "Reactor Yellow": { base: "#080701", grad1: "#1a1602", grad2: "#040300", accent: "#ffea00", glow: "rgba(255, 234, 0, 0.4)", text: "#fffce6" },
         "Imperial Gold": { base: "#080501", grad1: "#1f1202", grad2: "#050300", accent: "#ffb700", glow: "rgba(255, 183, 0, 0.4)", text: "#fff6e6" },
         "Amber Alert": { base: "#080400", grad1: "#1a0d00", grad2: "#050200", accent: "#ff9100", glow: "rgba(255, 145, 0, 0.4)", text: "#fff2e6" },
-
-        // Monochromes & Metals
         "Ghost Silver": { base: "#030303", grad1: "#111111", grad2: "#010101", accent: "#cfcfcf", glow: "rgba(207, 207, 207, 0.4)", text: "#ffffff" },
         "Carbon Fiber": { base: "#000000", grad1: "#0a0a0a", grad2: "#000000", accent: "#8c8c8c", glow: "rgba(140, 140, 140, 0.4)", text: "#e0e0e0" },
         "Tungsten Blue": { base: "#010203", grad1: "#040a12", grad2: "#000101", accent: "#6f91b5", glow: "rgba(111, 145, 181, 0.4)", text: "#e8eff5" }
@@ -713,10 +702,10 @@
 
     datePicker.value = todayStr; 
     datePicker.max = todayStr;
-    datePicker.setAttribute('data-date', formatStrictDate(todayStr));
+    datePicker.setAttribute('data-date', formatStrictDate(todayStr, false));
 
     datePicker.addEventListener('change', (e) => { 
-        datePicker.setAttribute('data-date', formatStrictDate(e.target.value));
+        datePicker.setAttribute('data-date', formatStrictDate(e.target.value, false));
         init(e.target.value); 
     });
 
@@ -849,8 +838,8 @@
             const card = document.createElement('div');
             card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
             const formatSource = item.source.replace(/_/g, ' ');
-            // Force strict DD/MM/YYYY inside the cards
-            const dateStr = item.published_at && item.published_at !== "N/A" ? formatStrictDate(item.published_at) : 'RECENT';
+            // Force strict DD/MM/YYYY HH:mm:ss inside the cards
+            const dateStr = item.published_at && item.published_at !== "N/A" ? formatStrictDate(item.published_at, true) : 'RECENT';
             const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
             card.innerHTML = `
