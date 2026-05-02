@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Theme Base (Dynamically Injected) */
+            /* Fallback Theme Variables (Overridden instantly via JS) */
             --bg-base: #030407;
             --bg-grad1: #0a111a;
             --bg-grad2: #020204;
@@ -20,7 +20,7 @@
             --text-main: #f8f9fa;
             --text-muted: #8b9bb4;
             
-            /* Global Status Codes */
+            /* Status Indicators */
             --stat-excellent: #00ffaa;
             --stat-warn: #ffcc00;
             --stat-dead: #ff3366;
@@ -90,27 +90,32 @@
         .hamburger.active span:nth-child(2) { opacity: 0; transform: translateX(20px); }
         .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        /* --- DYNAMIC SLIDING SIDEBAR & LIVE CLOCK --- */
+        /* --- DYNAMIC SLIDING SIDEBAR --- */
         .sidebar {
             position: fixed; top: 0; right: -100%; width: min(100%, 380px); height: 100vh; 
             background: linear-gradient(270deg, rgba(5, 7, 12, 0.98) 0%, rgba(5, 7, 12, 0.9) 100%);
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border-left: 1px solid var(--border-highlight); box-shadow: -15px 0 60px rgba(0,0,0,0.9);
             z-index: 2002; display: flex; flex-direction: column; 
-            padding: clamp(80px, 12vh, 100px) clamp(1.5rem, 4vw, 2.5rem) 2rem;
+            padding: clamp(30px, 5vh, 50px) clamp(1.5rem, 4vw, 2.5rem) 2rem;
             transition: right 0.6s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto;
         }
         .sidebar.active { right: 0; }
         
-        /* The Seamless Indian IST Clock */
-        .live-clock {
-            width: 100%; text-align: center;
-            font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 300; 
-            color: var(--accent); text-shadow: 0 0 30px var(--accent-glow);
-            letter-spacing: 2px; padding-bottom: 30px; margin-bottom: 10px;
-            font-family: inherit;
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2rem; width: 100%;
         }
-        .live-clock span { font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 700; letter-spacing: 4px; display: block; color: var(--text-muted); text-shadow: none; margin-top: 5px; }
+        .live-clock {
+            font-size: clamp(0.95rem, 3vw, 1.15rem); font-weight: 700; color: var(--accent);
+            letter-spacing: 2px; text-shadow: 0 0 15px var(--accent-glow);
+        }
+        .close-btn {
+            font-size: 1.8rem; font-weight: 300; color: var(--text-muted); cursor: pointer;
+            transition: all 0.4s ease; display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid transparent;
+        }
+        .close-btn:hover { color: var(--accent); transform: rotate(90deg); border-color: var(--accent); background: rgba(255,255,255,0.05); }
 
         .menu-item {
             color: var(--text-main); text-decoration: none; font-size: clamp(0.95rem, 3vw, 1.15rem); font-weight: 700; 
@@ -148,7 +153,6 @@
         .filters-wrapper { display: flex; justify-content: center; align-items: stretch; gap: clamp(10px, 2vw, 20px); margin-bottom: clamp(2rem, 5vh, 4rem); flex-wrap: wrap; z-index: 100; position: relative; width: 100%; }
         .date-picker, .custom-dropdown { flex: 1 1 clamp(150px, 30%, 300px); max-width: 100%; }
         
-        /* The Date Picker Override */
         .date-picker { 
             width: 100%; background: var(--surface); border: 1px solid var(--border); 
             padding: clamp(12px, 2.5vw, 18px) clamp(14px, 3vw, 24px); border-radius: 12px; font-family: inherit; font-size: clamp(0.85rem, 2vw, 1rem); font-weight: 700; backdrop-filter: blur(15px); cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.4); text-shadow: 0 0 10px var(--accent-glow); 
@@ -254,7 +258,7 @@
         .lb-list li { display: flex; justify-content: space-between; align-items: center; padding: clamp(1rem, 3vw, 2rem); border-bottom: 1px solid rgba(255,255,255,0.03); transition: all 0.3s; gap: 10px; flex-wrap: wrap; }
         .lb-list li:hover { background: rgba(0,0,0,0.8); border-left: 4px solid var(--accent); padding-left: clamp(1.2rem, 3.5vw, 2.5rem); box-shadow: inset 20px 0 30px -20px var(--accent-glow); }
 
-        /* --- NODE HEALTH UI RESTORED --- */
+        /* --- NODE HEALTH UI RESTORED PURE CSS --- */
         .health-grid { display: flex; flex-direction: column; gap: 15px; margin-bottom: 3rem; width: 100%; }
         .health-node { 
             background: linear-gradient(90deg, rgba(10,15,25,0.9) 0%, rgba(0,0,0,0.7) 100%); 
@@ -352,8 +356,12 @@
 </nav>
 
 <div class="sidebar" id="sidebarMenu">
-    <!-- SEAMLESS LIVE INDIAN CLOCK -->
-    <div id="liveClock" class="live-clock"></div>
+    
+    <!-- Seamless Sidebar Header with Live Clock & Dynamic Close Button -->
+    <div class="sidebar-header">
+        <div id="liveClock" class="live-clock"></div>
+        <div class="close-btn" onclick="toggleMenu()">&#10005;</div>
+    </div>
 
     <a href="#" class="menu-item" onclick="switchView('view-home')">Neural Grid</a>
     <a href="#" class="menu-item" onclick="switchView('view-topography')">Network Topography</a>
@@ -542,13 +550,9 @@
     function updateClock() {
         const clockEl = document.getElementById('liveClock');
         if(!clockEl) return;
-        
         const now = new Date();
-        const optionsTime = { timeZone: 'Asia/Kolkata', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        const timeString = now.toLocaleTimeString('en-US', optionsTime);
-        
-        // Formats like: 09:57:32 PM IST
-        clockEl.innerHTML = `${timeString} <span>IST</span>`;
+        const optionsTime = { timeZone: 'Asia/Kolkata', hour12: true, hour: '2-digit', minute: '2-digit' };
+        clockEl.innerHTML = now.toLocaleTimeString('en-US', optionsTime) + ' IST';
     }
     setInterval(updateClock, 1000);
     updateClock();
