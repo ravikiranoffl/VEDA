@@ -90,7 +90,7 @@
         .hamburger.active span:nth-child(2) { opacity: 0; transform: translateX(20px); }
         .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        /* --- DYNAMIC SLIDING SIDEBAR --- */
+        /* --- DYNAMIC SLIDING SIDEBAR & LIVE CLOCK --- */
         .sidebar {
             position: fixed; top: 0; right: -100%; width: min(100%, 380px); height: 100vh; 
             background: linear-gradient(270deg, rgba(5, 7, 12, 0.98) 0%, rgba(5, 7, 12, 0.9) 100%);
@@ -104,11 +104,13 @@
         
         .sidebar-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 2rem; width: 100%;
+            margin-bottom: 2rem; width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
         }
+        /* Refined Seamless IST Clock */
         .live-clock {
-            font-size: clamp(0.95rem, 3vw, 1.15rem); font-weight: 700; color: var(--accent);
-            letter-spacing: 2px; text-shadow: 0 0 15px var(--accent-glow);
+            font-size: clamp(1.2rem, 3vw, 1.4rem); font-weight: 800; color: var(--accent);
+            letter-spacing: 2px; text-shadow: 0 0 15px var(--accent-glow); font-family: inherit;
+            border: none; outline: none; background: transparent; padding: 0; margin: 0;
         }
         .close-btn {
             font-size: 1.8rem; font-weight: 300; color: var(--text-muted); cursor: pointer;
@@ -134,13 +136,14 @@
         .view-section { display: none; animation: popIn 0.8s cubic-bezier(0.19, 1, 0.22, 1); width: 100%; }
         .view-section.active { display: block; }
         header { text-align: center; margin-bottom: clamp(2rem, 5vh, 4rem); width: 100%; }
+        /* Professional Medium Header Size */
         h1 {
-            font-weight: 800; letter-spacing: clamp(2px, 2vw, 12px); font-size: clamp(2rem, 8vw, 4.5rem); margin: 0; line-height: 1.2;
+            font-weight: 800; letter-spacing: clamp(2px, 1vw, 6px); font-size: clamp(1.8rem, 3vw, 2.5rem); margin: 0; line-height: 1.2;
             background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px var(--accent-glow);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px var(--accent-glow);
         }
 
-        /* --- FILTERS & UNIVERSAL DATE FORMAT HACK --- */
+        /* --- FILTERS & STRICT DD/MM/YYYY OVERRIDE --- */
         .search-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto 2rem auto; }
         #searchInput {
             width: 100%; padding: clamp(1rem, 3vw, 1.5rem) clamp(1.2rem, 4vw, 2.5rem); 
@@ -364,7 +367,7 @@
     </div>
 
     <a href="#" class="menu-item" onclick="switchView('view-home')">Neural Grid</a>
-    <a href="#" class="menu-item" onclick="switchView('view-topography')">Network Topography</a>
+    <a href="#" class="menu-item" onclick="switchView('view-topography')">Topology</a>
     <a href="#" class="menu-item" onclick="switchView('view-stats')">Intel Diagnostics</a>
     <a href="#" class="menu-item" onclick="switchView('view-health')">Node Health Status</a>
     <a href="#" class="menu-item" onclick="switchView('view-vault')">Vault Metrics</a>
@@ -406,7 +409,7 @@
     </div>
 
     <div id="view-topography" class="view-section">
-        <h2 class="section-title">Network Topography</h2>
+        <h2 class="section-title">Topology</h2>
         <div class="glass-radar-container">
             <div class="radar-ring d1"></div>
             <div class="radar-ring d2"></div>
@@ -546,16 +549,33 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- 2. LIVE SEAMLESS INDIAN CLOCK (IST) ---
+    // --- 2. LIVE SEAMLESS INDIAN CLOCK (IST) 24h FORMAT ---
     function updateClock() {
         const clockEl = document.getElementById('liveClock');
         if(!clockEl) return;
         const now = new Date();
-        const optionsTime = { timeZone: 'Asia/Kolkata', hour12: true, hour: '2-digit', minute: '2-digit' };
+        const optionsTime = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
         clockEl.innerHTML = now.toLocaleTimeString('en-US', optionsTime) + ' IST';
     }
     setInterval(updateClock, 1000);
     updateClock();
+
+    // --- UNIVERSAL STRICT DD/MM/YYYY FORMATTER ---
+    function formatStrictDate(dateString, includeTime = false) {
+        const d = new Date(dateString);
+        if (isNaN(d)) return "SELECT DATE";
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        let out = `${day}/${month}/${year}`;
+        if (includeTime) {
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            const ss = String(d.getSeconds()).padStart(2, '0');
+            out += ` ${hh}:${mm}:${ss}`;
+        }
+        return out;
+    }
 
     // --- 3. PREMIUM THEME ENGINE (26 UNIQUE THEMES) ---
     const themes = {
@@ -690,23 +710,13 @@
 
     const istOffset = 5.5 * 60 * 60 * 1000;
     const todayStr = new Date(new Date().getTime() + istOffset).toISOString().split('T')[0];
-    
-    // CUSTOM PREMIUM DATE FORMAT (e.g. 02 MAY 2026)
-    function formatPremiumDate(dateString) {
-        const d = new Date(dateString);
-        if (isNaN(d)) return "SELECT DATE";
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-        const year = d.getFullYear();
-        return `${day} ${month} ${year}`;
-    }
 
     datePicker.value = todayStr; 
     datePicker.max = todayStr;
-    datePicker.setAttribute('data-date', formatPremiumDate(todayStr));
+    datePicker.setAttribute('data-date', formatStrictDate(todayStr));
 
     datePicker.addEventListener('change', (e) => { 
-        datePicker.setAttribute('data-date', formatPremiumDate(e.target.value));
+        datePicker.setAttribute('data-date', formatStrictDate(e.target.value));
         init(e.target.value); 
     });
 
@@ -723,7 +733,8 @@
             
             if(rawData.length > 0) {
                 const latestItem = rawData.reduce((a, b) => (new Date(b.published_at).getTime() || 0) > (new Date(a.published_at).getTime() || 0) ? b : a);
-                const timeString = new Date(latestItem.published_at).toLocaleString();
+                // Strict DD/MM/YYYY formatting including 24H time for the last sync workflow
+                const timeString = formatStrictDate(latestItem.published_at, true);
                 document.getElementById('lastSyncTimeMain').innerText = timeString;
                 document.getElementById('lastWorkflowTime').innerText = timeString;
             }
@@ -838,7 +849,8 @@
             const card = document.createElement('div');
             card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
             const formatSource = item.source.replace(/_/g, ' ');
-            const dateStr = item.published_at !== "N/A" ? new Date(item.published_at).toLocaleString() : 'Recent';
+            // Force strict DD/MM/YYYY inside the cards
+            const dateStr = item.published_at && item.published_at !== "N/A" ? formatStrictDate(item.published_at) : 'RECENT';
             const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
             card.innerHTML = `
