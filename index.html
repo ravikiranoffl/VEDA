@@ -1,472 +1,642 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VEDA | Neural Matrix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Core Fonts & Telugu Fallback -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Mandali&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- ApexCharts Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Mandali&display=swap" rel="stylesheet">
+
     <style>
-        body, .card-title, .modal-text {
+        /* HTML-Level Overrides for Automatic Font Switching */
+        body,
+        .card-title,
+        .modal-text,
+        .live-clock,
+        .date-picker,
+        .read-btn,
+        input,
+        button,
+        select {
             font-family: 'Plus Jakarta Sans', 'Mandali', sans-serif !important;
         }
+
+        /* Timeline Native Adaptations */
+        .timeline-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .timeline-input {
+            background: rgba(10, 15, 25, 0.6);
+            border: 1px solid var(--border-highlight);
+            color: var(--text-main);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            font-family: inherit;
+        }
+
+        .timeline-input:focus,
+        .timeline-input:hover:not([readonly]) {
+            border-color: var(--accent);
+            box-shadow: 0 15px 30px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        select.timeline-input {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px top 50%;
+            background-size: 12px auto;
+        }
+
+        select.timeline-input option {
+            background: var(--bg-base);
+            color: var(--text-main);
+        }
+
+        .apexcharts-tooltip {
+            background: var(--bg-base) !important;
+            border: 1px solid var(--accent) !important;
+            box-shadow: 0 0 20px var(--accent-glow) !important;
+            color: var(--text-main) !important;
+        }
+
+        .apexcharts-tooltip-title {
+            background: rgba(0, 0, 0, 0.5) !important;
+            border-bottom: 1px solid var(--border) !important;
+            font-weight: 800 !important;
+        }
+
+        .apexcharts-text {
+            fill: var(--text-main) !important;
+        }
     </style>
-    
 </head>
+
 <body>
 
-<!-- Ambient Dynamic Background Elements -->
-<div class="ambient-engine">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-</div>
-
-<nav class="top-nav">
-    <h1 class="brand-logo">VEDA</h1>
-    <div class="hamburger" id="hamburgerBtn" onclick="toggleMenu()">
-        <span></span><span></span><span></span>
-    </div>
-</nav>
-
-<div class="sidebar" id="sidebarMenu">
-    
-    <!-- Seamless Sidebar Header with Live 24H Clock & Dynamic Close Button -->
-    <div class="sidebar-header">
-        <div id="liveClock" class="live-clock"></div>
-        <div class="close-btn" onclick="toggleMenu()">&#10005;</div>
+    <!-- Ambient Dynamic Background Elements -->
+    <div class="ambient-engine">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
-    <a href="#" class="menu-item" onclick="switchView('view-home')">Neural Grid</a>
-    <a href="#" class="menu-item" onclick="switchView('view-topography')">Topology</a>
-    <a href="#" class="menu-item" onclick="switchView('view-stats')">Intel Diagnostics</a>
-    <a href="#" class="menu-item" onclick="switchView('view-health')">Node Health Status</a>
-    <a href="#" class="menu-item" onclick="switchView('view-vault')">Vault Metrics</a>
-    <a href="#" class="menu-item" onclick="switchView('view-telemetry')">System Telemetry</a>
-    <a href="#" class="menu-item" onclick="switchView('view-settings')">Matrix Calibration</a>
-</div>
+    <nav class="top-nav">
+        <h1 class="brand-logo">VEDA</h1>
+        <div class="hamburger" id="hamburgerBtn" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
 
-<div class="container" id="mainContainer">
-    
-    <div id="view-home" class="view-section active">
-        <header>
-            <h1>NEURAL MATRIX</h1>
-            <p style="color: var(--text-muted); font-size: clamp(0.85rem, 2.5vw, 1.1rem); margin-top: 1.5rem; text-transform: uppercase; letter-spacing: clamp(1px, 1vw, 4px); font-weight: 600;">
-                <span class="status-dot"></span> Last Workflow Dispatch: <br class="mobile-break"><span id="lastSyncTimeMain" style="color: var(--accent); font-weight: 800; text-shadow: 0 0 15px var(--accent-glow); word-break: break-word;">Loading...</span>
-            </p>
-        </header>
-        <style>@media(min-width: 600px){.mobile-break{display:none;}}</style>
+    <div class="sidebar" id="sidebarMenu">
 
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Initializing neural link...">
+        <!-- Seamless Sidebar Header with Live 24H Clock & Dynamic Close Button -->
+        <div class="sidebar-header">
+            <div id="liveClock" class="live-clock"></div>
+            <div class="close-btn" onclick="toggleMenu()">&#10005;</div>
         </div>
 
-        <div class="filters-wrapper">
-            <input type="date" id="datePicker" class="date-picker" min="2026-04-27">
-            <div class="custom-dropdown channel" id="channelDropdown">
-                <div class="dropdown-selected" id="channelSelected">Global Matrix (All)</div>
-                <div class="dropdown-options" id="channelOptions"><div class="dropdown-option" data-value="all">Global Matrix (All)</div></div>
+        <a href="#" class="menu-item" onclick="switchView('view-home')">Neural Grid</a>
+        <a href="#" class="menu-item" onclick="switchView('view-topography')">Topology</a>
+        <a href="#" class="menu-item" onclick="switchView('view-stats')">Intel Diagnostics</a>
+        <a href="#" class="menu-item" onclick="switchView('view-health')">Node Health Status</a>
+        <a href="#" class="menu-item" onclick="switchView('view-vault')">Vault Metrics</a>
+
+        <!-- NEW MODULE MENU ITEM -->
+        <a href="#" class="menu-item" onclick="switchView('view-timeline')">Temporal Analytics</a>
+
+        <a href="#" class="menu-item" onclick="switchView('view-telemetry')">System Telemetry</a>
+        <a href="#" class="menu-item" onclick="switchView('view-settings')">Matrix Calibration</a>
+    </div>
+
+    <div class="container" id="mainContainer">
+
+        <!-- VIEW: HOME (Original) -->
+        <div id="view-home" class="view-section active">
+            <header>
+                <h1>NEURAL MATRIX</h1>
+                <p
+                    style="color: var(--text-muted); font-size: clamp(0.85rem, 2.5vw, 1.1rem); margin-top: 1.5rem; text-transform: uppercase; letter-spacing: clamp(1px, 1vw, 4px); font-weight: 600;">
+                    <span class="status-dot"></span> Last Workflow Dispatch: <br class="mobile-break"><span
+                        id="lastSyncTimeMain"
+                        style="color: var(--accent); font-weight: 800; text-shadow: 0 0 15px var(--accent-glow); word-break: break-word;">Loading...</span>
+                </p>
+            </header>
+            <style>
+                @media(min-width: 600px) {
+                    .mobile-break {
+                        display: none;
+                    }
+                }
+            </style>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Initializing neural link...">
             </div>
-            <div class="custom-dropdown" id="limitDropdown">
-                <div class="dropdown-selected" id="limitSelected">Show 100 Intel</div>
-                <div class="dropdown-options" id="limitOptions">
-                    <div class="dropdown-option" data-value="100">Show 100 Intel</div>
-                    <div class="dropdown-option" data-value="250">Show 250 Intel</div>
+
+            <div class="filters-wrapper">
+                <input type="date" id="datePicker" class="date-picker" min="2026-04-27">
+                <div class="custom-dropdown channel" id="channelDropdown">
+                    <div class="dropdown-selected" id="channelSelected">Global Matrix (All)</div>
+                    <div class="dropdown-options" id="channelOptions">
+                        <div class="dropdown-option" data-value="all">Global Matrix (All)</div>
+                    </div>
+                </div>
+                <div class="custom-dropdown" id="limitDropdown">
+                    <div class="dropdown-selected" id="limitSelected">Show 100 Intel</div>
+                    <div class="dropdown-options" id="limitOptions">
+                        <div class="dropdown-option" data-value="100">Show 100 Intel</div>
+                        <div class="dropdown-option" data-value="250">Show 250 Intel</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="news-grid"></div>
+        </div>
+
+        <!-- VIEW: TOPOLOGY (Original) -->
+        <div id="view-topography" class="view-section">
+            <h2 class="section-title">Topology</h2>
+            <div class="glass-radar-container">
+                <div class="radar-ring d1"></div>
+                <div class="radar-ring d2"></div>
+                <div class="radar-ring d3"></div>
+
+                <div class="sync-box">
+                    <h3
+                        style="color: var(--text-main); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 300; margin-bottom: 1.5rem; margin-top: 0; letter-spacing: 2px;">
+                        Matrix Sync Status</h3>
+                    <p style="color: var(--accent); font-size: clamp(2.5rem, 8vw, 4rem); margin: 0; font-weight: 800; text-shadow: 0 0 40px var(--accent-glow);"
+                        id="liveIngestionRate">0.0 KB/s</p>
+                    <p
+                        style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 1.1rem); letter-spacing: clamp(2px, 1vw, 4px); margin-top: 15px; font-weight: 700;">
+                        LIVE INGESTION RATE</p>
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
+                    <p style="color: var(--text-main); font-size: clamp(1.1rem, 3vw, 1.5rem); margin: 0; font-weight: 600; word-break: break-word;"
+                        id="lastWorkflowTime">Awaiting Data...</p>
+                    <p
+                        style="color: var(--text-muted); font-size: clamp(0.7rem, 2vw, 0.9rem); letter-spacing: clamp(1px, 1vw, 3px); margin-top: 10px; font-weight: 700;">
+                        LAST WORKFLOW DISPATCH</p>
                 </div>
             </div>
         </div>
 
-        <div id="news-grid"></div>
+        <!-- VIEW: DIAGNOSTICS (Original) -->
+        <div id="view-stats" class="view-section">
+            <h2 class="section-title">Diagnostics</h2>
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h3>Total Headlines</h3>
+                    <div class="value" id="statTotal">0</div>
+                    <div class="sub">Active Nodes Checked</div>
+                </div>
+                <div class="dash-card">
+                    <h3>Dominant Node</h3>
+                    <div class="value" id="statTopCount" style="font-size: clamp(2rem, 8vw, 3.5rem);">0</div>
+                    <div class="sub" id="statTopName">Initializing...</div>
+                </div>
+            </div>
+            <div style="max-width: 1000px; margin: 0 auto; width: 100%;">
+                <h3
+                    style="text-align: center; color: var(--accent); letter-spacing: clamp(2px, 1vw, 4px); margin-bottom: 2rem; text-transform: uppercase; font-size: clamp(1rem, 3vw, 1.3rem);">
+                    Node Activity Leaderboard</h3>
+                <ul class="lb-list" id="statLeaderboard"></ul>
+            </div>
+        </div>
+
+        <!-- VIEW: HEALTH (Original) -->
+        <div id="view-health" class="view-section">
+            <h2 class="section-title">Node Health Status</h2>
+            <div class="dashboard-grid" style="margin-bottom: 3rem;">
+                <div class="dash-card">
+                    <h3 style="color: var(--stat-excellent);">Stable Nodes</h3>
+                    <div class="value" id="healthStableCount">0</div>
+                    <div class="sub" style="color: var(--stat-excellent);">100% UPTIME</div>
+                </div>
+                <div class="dash-card">
+                    <h3 style="color: var(--stat-warn);">Intermittent</h3>
+                    <div class="value" id="healthWarnCount">0</div>
+                    <div class="sub" style="color: var(--stat-warn);">WAF BLOCKS DETECTED</div>
+                </div>
+                <div class="dash-card">
+                    <h3 style="color: var(--stat-dead);">Dead Nodes</h3>
+                    <div class="value" id="healthDeadCount">0</div>
+                    <div class="sub" style="color: var(--stat-dead);">RECOMMEND REMOVAL</div>
+                </div>
+            </div>
+            <div class="health-grid" id="nodeHealthContainer">
+                <p
+                    style="text-align:center; color: var(--text-muted); font-size: clamp(1rem, 3vw, 1.2rem); letter-spacing: 2px;">
+                    Analyzing telemetry logs...</p>
+            </div>
+        </div>
+
+        <!-- VIEW: VAULT (Original) -->
+        <div id="view-vault" class="view-section">
+            <h2 class="section-title">HEDA Vault Metrics</h2>
+            <div class="vault-grid">
+                <div class="dash-card vault-card">
+                    <h3>Light Archive Size</h3>
+                    <div class="value vault-value" id="vaultLightSize">0 KB</div>
+                    <div class="sub">GitHub Payload</div>
+                </div>
+                <div class="dash-card vault-card">
+                    <h3>Deep Archive Payload</h3>
+                    <div class="value vault-value" id="vaultDeepSize">Loading...</div>
+                    <div class="sub">Remote Content-Length</div>
+                </div>
+                <div class="dash-card vault-card">
+                    <h3>Extraction Status</h3>
+                    <div class="value vault-value status-value"><span class="status-dot"></span> SECURE</div>
+                    <div class="sub">LFS Storage Active</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- VIEW: TEMPORAL ANALYTICS DASHBOARD (NEW MODULE)         -->
+        <!-- ======================================================= -->
+        <div id="view-timeline" class="view-section">
+            <h2 class="section-title">Temporal Analytics</h2>
+            <p id="timelineStats"
+                style="text-align: center; color: var(--text-muted); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: -1.5rem; margin-bottom: 2rem;">
+                Awaiting Telemetry Sync...</p>
+
+            <div class="timeline-controls">
+                <input type="text" id="timelineSearch" class="timeline-input" placeholder="Search specific node..."
+                    onkeyup="filterTimeline()">
+
+                <select id="timelineSort" class="timeline-input" onchange="triggerTimelineRender()">
+                    <option value="worst">Critical Nodes</option>
+                    <option value="best">Stable Nodes</option>
+                    <option value="alpha">Alpha Order</option>
+                </select>
+
+                <div style="display: flex; gap: 10px; flex: 2; min-width: 300px; align-items: center;">
+                    <input type="text" id="timelineStartDisplay" class="timeline-input" readonly
+                        placeholder="Start Date" style="background: rgba(0,0,0,0.4);" title="Calculated Start Window">
+                    <span style="color: var(--accent); font-weight: 800;">&rarr;</span>
+                    <input type="date" id="timelineEndPicker" class="timeline-input" min="2026-04-27"
+                        onchange="applyTimelineWindow()">
+                </div>
+            </div>
+
+            <div id="timelineLoader"
+                style="text-align: center; padding: 60px; font-size: 1.2rem; font-weight: 800; letter-spacing: 3px; color: var(--accent); animation: blink 1.5s infinite;">
+                <span class="status-dot"></span> ESTABLISHING UPLINK TO ARCHIVE...
+            </div>
+
+            <div id="timelineDashboard" class="dashboard-grid"></div>
+        </div>
+        <!-- ======================================================= -->
+
+        <!-- VIEW: TELEMETRY (Original) -->
+        <div id="view-telemetry" class="view-section">
+            <h2 class="section-title">System Telemetry</h2>
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h3>Node Latency</h3>
+                    <div class="value" id="telPing">12 ms</div>
+                    <div class="sub">Local Uplink</div>
+                </div>
+                <div class="dash-card">
+                    <h3>HEDA CDN Routing</h3>
+                    <div class="value" id="telCDN">24 ms</div>
+                    <div class="sub">Global Edge Network</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 4rem; padding: 0 10px;">
+                <p
+                    style="color: var(--text-muted); font-weight: 700; letter-spacing: clamp(1px, 1vw, 3px); font-size: clamp(0.7rem, 2vw, 1rem); padding: 20px clamp(15px, 4vw, 40px); border: 1px solid var(--border-highlight); border-radius: 50px; display: inline-block; background: rgba(10,15,25,0.8); box-shadow: 0 10px 30px rgba(0,0,0,0.5); word-break: break-word;">
+                    ENGINE: Python 3.12 &nbsp;|&nbsp; UI: Glass SPA &nbsp;|&nbsp; DATA: Trafilatura NLP</p>
+            </div>
+        </div>
+
+        <!-- VIEW: SETTINGS (Original) -->
+        <div id="view-settings" class="view-section">
+            <h2 class="section-title">Matrix Calibration</h2>
+            <p
+                style="text-align: center; color: var(--text-muted); margin-bottom: clamp(2rem, 5vh, 4rem); font-size: clamp(0.9rem, 2.5vw, 1.2rem); letter-spacing: clamp(1px, 1vw, 3px); text-transform: uppercase; font-weight: 600;">
+                Select Neural Core Color Interface</p>
+            <div style="display: flex; flex-wrap: wrap; gap: clamp(10px, 2vw, 25px); justify-content: center; max-width: 1400px; margin: 0 auto; width: 100%;"
+                id="themeButtonsContainer">
+            </div>
+        </div>
+
     </div>
 
-    <div id="view-topography" class="view-section">
-        <h2 class="section-title">Topology</h2>
-        <div class="glass-radar-container">
-            <div class="radar-ring d1"></div>
-            <div class="radar-ring d2"></div>
-            <div class="radar-ring d3"></div>
-            
-            <div class="sync-box">
-                <h3 style="color: var(--text-main); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 300; margin-bottom: 1.5rem; margin-top: 0; letter-spacing: 2px;">Matrix Sync Status</h3>
-                <p style="color: var(--accent); font-size: clamp(2.5rem, 8vw, 4rem); margin: 0; font-weight: 800; text-shadow: 0 0 40px var(--accent-glow);" id="liveIngestionRate">0.0 KB/s</p>
-                <p style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 1.1rem); letter-spacing: clamp(2px, 1vw, 4px); margin-top: 15px; font-weight: 700;">LIVE INGESTION RATE</p>
-                <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
-                <p style="color: var(--text-main); font-size: clamp(1.1rem, 3vw, 1.5rem); margin: 0; font-weight: 600; word-break: break-word;" id="lastWorkflowTime">Awaiting Data...</p>
-                <p style="color: var(--text-muted); font-size: clamp(0.7rem, 2vw, 0.9rem); letter-spacing: clamp(1px, 1vw, 3px); margin-top: 10px; font-weight: 700;">LAST WORKFLOW DISPATCH</p>
+    <!-- DEEP ARCHIVE MODAL (Original) -->
+    <div class="modal-overlay" id="deepModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            <h2 id="modalTitle"
+                style="color: var(--accent); margin-top:0; padding-right: clamp(40px, 8vw, 60px); line-height: 1.4; font-size: clamp(1.4rem, 4vw, 2.5rem); font-weight: 700; text-shadow: 0 0 30px var(--accent-glow);">
+                Accessing Deep Archive...</h2>
+            <div id="modalBody" class="modal-text">
+                <p
+                    style="opacity:0.6; text-align:center; padding: clamp(30px, 5vw, 60px); font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; letter-spacing: 2px;">
+                    <span class="status-dot"></span> Establishing uplink to HEDA Vault...
+                </p>
             </div>
         </div>
     </div>
 
-    <div id="view-stats" class="view-section">
-        <h2 class="section-title">Diagnostics</h2>
-        <div class="dashboard-grid">
-            <div class="dash-card">
-                <h3>Total Headlines</h3>
-                <div class="value" id="statTotal">0</div>
-                <div class="sub">Active Nodes Checked</div>
-            </div>
-            <div class="dash-card">
-                <h3>Dominant Node</h3>
-                <div class="value" id="statTopCount" style="font-size: clamp(2rem, 8vw, 3.5rem);">0</div>
-                <div class="sub" id="statTopName">Initializing...</div>
-            </div>
-        </div>
-        <div style="max-width: 1000px; margin: 0 auto; width: 100%;">
-            <h3 style="text-align: center; color: var(--accent); letter-spacing: clamp(2px, 1vw, 4px); margin-bottom: 2rem; text-transform: uppercase; font-size: clamp(1rem, 3vw, 1.3rem);">Node Activity Leaderboard</h3>
-            <ul class="lb-list" id="statLeaderboard"></ul>
-        </div>
-    </div>
-
-    <div id="view-health" class="view-section">
-        <h2 class="section-title">Node Health Status</h2>
-        <div class="dashboard-grid" style="margin-bottom: 3rem;">
-            <div class="dash-card">
-                <h3 style="color: var(--stat-excellent);">Stable Nodes</h3>
-                <div class="value" id="healthStableCount">0</div>
-                <div class="sub" style="color: var(--stat-excellent);">100% UPTIME</div>
-            </div>
-            <div class="dash-card">
-                <h3 style="color: var(--stat-warn);">Intermittent</h3>
-                <div class="value" id="healthWarnCount">0</div>
-                <div class="sub" style="color: var(--stat-warn);">WAF BLOCKS DETECTED</div>
-            </div>
-            <div class="dash-card">
-                <h3 style="color: var(--stat-dead);">Dead Nodes</h3>
-                <div class="value" id="healthDeadCount">0</div>
-                <div class="sub" style="color: var(--stat-dead);">RECOMMEND REMOVAL</div>
-            </div>
-        </div>
-        <div class="health-grid" id="nodeHealthContainer">
-            <p style="text-align:center; color: var(--text-muted); font-size: clamp(1rem, 3vw, 1.2rem); letter-spacing: 2px;">Analyzing telemetry logs...</p>
-        </div>
-    </div>
-
-    <div id="view-vault" class="view-section">
-        <h2 class="section-title">HEDA Vault Metrics</h2>
-        <!-- Vault specific strict fluid grid -->
-        <div class="vault-grid">
-            <div class="dash-card vault-card">
-                <h3>Light Archive Size</h3>
-                <div class="value vault-value" id="vaultLightSize">0 KB</div>
-                <div class="sub">GitHub Payload</div>
-            </div>
-            <div class="dash-card vault-card">
-                <h3>Deep Archive Payload</h3>
-                <div class="value vault-value" id="vaultDeepSize">Loading...</div>
-                <div class="sub">Remote Content-Length</div>
-            </div>
-            <div class="dash-card vault-card">
-                <h3>Extraction Status</h3>
-                <div class="value vault-value status-value"><span class="status-dot"></span> SECURE</div>
-                <div class="sub">LFS Storage Active</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-telemetry" class="view-section">
-        <h2 class="section-title">System Telemetry</h2>
-        <div class="dashboard-grid">
-            <div class="dash-card">
-                <h3>Node Latency</h3>
-                <div class="value" id="telPing">12 ms</div>
-                <div class="sub">Local Uplink</div>
-            </div>
-            <div class="dash-card">
-                <h3>HEDA CDN Routing</h3>
-                <div class="value" id="telCDN">24 ms</div>
-                <div class="sub">Global Edge Network</div>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 4rem; padding: 0 10px;">
-            <p style="color: var(--text-muted); font-weight: 700; letter-spacing: clamp(1px, 1vw, 3px); font-size: clamp(0.7rem, 2vw, 1rem); padding: 20px clamp(15px, 4vw, 40px); border: 1px solid var(--border-highlight); border-radius: 50px; display: inline-block; background: rgba(10,15,25,0.8); box-shadow: 0 10px 30px rgba(0,0,0,0.5); word-break: break-word;">ENGINE: Python 3.12 &nbsp;|&nbsp; UI: Glass SPA &nbsp;|&nbsp; DATA: Trafilatura NLP</p>
-        </div>
-    </div>
-
-    <div id="view-settings" class="view-section">
-        <h2 class="section-title">Matrix Calibration</h2>
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: clamp(2rem, 5vh, 4rem); font-size: clamp(0.9rem, 2.5vw, 1.2rem); letter-spacing: clamp(1px, 1vw, 3px); text-transform: uppercase; font-weight: 600;">Select Neural Core Color Interface</p>
-        <div style="display: flex; flex-wrap: wrap; gap: clamp(10px, 2vw, 25px); justify-content: center; max-width: 1400px; margin: 0 auto; width: 100%;" id="themeButtonsContainer">
-            </div>
-    </div>
-
-</div>
-
-<div class="modal-overlay" id="deepModal">
-    <div class="modal-content">
-        <button class="close-modal" onclick="closeModal()">×</button>
-        <h2 id="modalTitle" style="color: var(--accent); margin-top:0; padding-right: clamp(40px, 8vw, 60px); line-height: 1.4; font-size: clamp(1.4rem, 4vw, 2.5rem); font-weight: 700; text-shadow: 0 0 30px var(--accent-glow);">Accessing Deep Archive...</h2>
-        <div id="modalBody" class="modal-text">
-            <p style="opacity:0.6; text-align:center; padding: clamp(30px, 5vw, 60px); font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; letter-spacing: 2px;"><span class="status-dot"></span> Establishing uplink to HEDA Vault...</p>
-        </div>
-    </div>
-</div>
-
-<script>
-    // --- 1. SPA ROUTING & MENU LOGIC ---
-    function toggleMenu() {
-        document.getElementById('sidebarMenu').classList.toggle('active');
-        document.getElementById('hamburgerBtn').classList.toggle('active');
-        const container = document.getElementById('mainContainer');
-        container.style.filter = document.getElementById('sidebarMenu').classList.contains('active') ? 'blur(10px) brightness(0.5)' : 'none';
-        // Maintained pure stillness: no scale transform on container.
-    }
-
-    function switchView(viewId) {
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        document.getElementById(viewId).classList.add('active');
-        if(document.getElementById('sidebarMenu').classList.contains('active')) toggleMenu();
-        
-        if(viewId === 'view-stats') calculateStats();
-        if(viewId === 'view-vault') calculateVaultMetrics();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // --- 2. LIVE SEAMLESS INDIAN CLOCK (IST) 24h FORMAT ---
-    function updateClock() {
-        const clockEl = document.getElementById('liveClock');
-        if(!clockEl) return;
-        const now = new Date();
-        const optionsTime = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        clockEl.innerHTML = now.toLocaleTimeString('en-US', optionsTime);
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // --- UNIVERSAL STRICT DD/MM/YYYY FORMATTER ---
-    function formatStrictDate(dateString, includeTime = false) {
-        const d = new Date(dateString);
-        if (isNaN(d)) return "SELECT DATE";
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        let out = `${day}/${month}/${year}`;
-        if (includeTime) {
-            const hh = String(d.getHours()).padStart(2, '0');
-            const mm = String(d.getMinutes()).padStart(2, '0');
-            const ss = String(d.getSeconds()).padStart(2, '0');
-            out += ` ${hh}:${mm}:${ss}`;
+    <script>
+        // --- 1. SPA ROUTING & MENU LOGIC (UPDATED WITH TIMELINE HOOK) ---
+        function toggleMenu() {
+            document.getElementById('sidebarMenu').classList.toggle('active');
+            document.getElementById('hamburgerBtn').classList.toggle('active');
+            const container = document.getElementById('mainContainer');
+            container.style.filter = document.getElementById('sidebarMenu').classList.contains('active') ? 'blur(10px) brightness(0.5)' : 'none';
         }
-        return out;
-    }
 
-    // --- 3. PREMIUM THEME ENGINE (26 UNIQUE THEMES) ---
-    const themes = {
-        "Cyber Cyan": { base: "#020508", grad1: "#06111a", grad2: "#010204", accent: "#00f3ff", glow: "rgba(0, 243, 255, 0.4)", text: "#e6fdff" },
-        "Cobalt Protocol": { base: "#010205", grad1: "#04081c", grad2: "#01010a", accent: "#2d5bff", glow: "rgba(45, 91, 255, 0.4)", text: "#e6ecff" },
-        "Ice Node": { base: "#020608", grad1: "#071822", grad2: "#010305", accent: "#00b3ff", glow: "rgba(0, 179, 255, 0.4)", text: "#e6f7ff" },
-        "Sapphire Core": { base: "#00030a", grad1: "#001033", grad2: "#000105", accent: "#0044ff", glow: "rgba(0, 68, 255, 0.4)", text: "#e6edff" },
-        "Deep Ocean": { base: "#010306", grad1: "#030d1c", grad2: "#000103", accent: "#0066ff", glow: "rgba(0, 102, 255, 0.4)", text: "#e6f0ff" },
-        "Acid Rain": { base: "#030602", grad1: "#0a1708", grad2: "#010301", accent: "#39ff14", glow: "rgba(57, 255, 20, 0.4)", text: "#efffe6" },
-        "Matrix Mint": { base: "#020805", grad1: "#051a11", grad2: "#010503", accent: "#00ffa3", glow: "rgba(0, 255, 163, 0.4)", text: "#e6fff4" },
-        "Bio-Hazard": { base: "#050601", grad1: "#141a02", grad2: "#030400", accent: "#bfff00", glow: "rgba(191, 255, 0, 0.4)", text: "#f6ffe6" },
-        "Emerald City": { base: "#010502", grad1: "#031a0a", grad2: "#010301", accent: "#00ff66", glow: "rgba(0, 255, 102, 0.4)", text: "#e6ffef" },
-        "Deep Amethyst": { base: "#040108", grad1: "#1b0a3a", grad2: "#080310", accent: "#aa44ff", glow: "rgba(170, 68, 255, 0.4)", text: "#f0e6ff" },
-        "Neon Synth": { base: "#070106", grad1: "#1f031b", grad2: "#0a0008", accent: "#ff00d4", glow: "rgba(255, 0, 212, 0.4)", text: "#ffe6fa" },
-        "Ultraviolet": { base: "#020108", grad1: "#0a0422", grad2: "#010005", accent: "#7000ff", glow: "rgba(112, 0, 255, 0.4)", text: "#ebe6ff" },
-        "Galactic Lilac": { base: "#050308", grad1: "#160a24", grad2: "#020103", accent: "#d400ff", glow: "rgba(212, 0, 255, 0.4)", text: "#f8e6ff" },
-        "Vaporwave": { base: "#040206", grad1: "#130822", grad2: "#020104", accent: "#ff00ff", glow: "rgba(255, 0, 255, 0.4)", text: "#ffe6ff" },
-        "Blood Moon": { base: "#080202", grad1: "#1a0404", grad2: "#040101", accent: "#ff2a2a", glow: "rgba(255, 42, 42, 0.4)", text: "#ffe6e6" },
-        "Solar Flare": { base: "#080301", grad1: "#1f0902", grad2: "#050100", accent: "#ff5e00", glow: "rgba(255, 94, 0, 0.4)", text: "#ffece6" },
-        "Crimson Forge": { base: "#050102", grad1: "#170205", grad2: "#040001", accent: "#ff004c", glow: "rgba(255, 0, 76, 0.4)", text: "#ffe6ee" },
-        "Crimson Rose": { base: "#080103", grad1: "#1f020c", grad2: "#050002", accent: "#ff006a", glow: "rgba(255, 0, 106, 0.4)", text: "#ffe6f0" },
-        "Autumn Blaze": { base: "#080200", grad1: "#1f0600", grad2: "#050100", accent: "#ff3c00", glow: "rgba(255, 60, 0, 0.4)", text: "#ffe9e6" },
-        "Toxic Peach": { base: "#080403", grad1: "#1a0b07", grad2: "#050101", accent: "#ff7b59", glow: "rgba(255, 123, 89, 0.4)", text: "#ffece6" },
-        "Reactor Yellow": { base: "#080701", grad1: "#1a1602", grad2: "#040300", accent: "#ffea00", glow: "rgba(255, 234, 0, 0.4)", text: "#fffce6" },
-        "Imperial Gold": { base: "#080501", grad1: "#1f1202", grad2: "#050300", accent: "#ffb700", glow: "rgba(255, 183, 0, 0.4)", text: "#fff6e6" },
-        "Amber Alert": { base: "#080400", grad1: "#1a0d00", grad2: "#050200", accent: "#ff9100", glow: "rgba(255, 145, 0, 0.4)", text: "#fff2e6" },
-        "Ghost Silver": { base: "#030303", grad1: "#111111", grad2: "#010101", accent: "#cfcfcf", glow: "rgba(207, 207, 207, 0.4)", text: "#ffffff" },
-        "Carbon Fiber": { base: "#000000", grad1: "#0a0a0a", grad2: "#000000", accent: "#8c8c8c", glow: "rgba(140, 140, 140, 0.4)", text: "#e0e0e0" },
-        "Tungsten Blue": { base: "#010203", grad1: "#040a12", grad2: "#000101", accent: "#6f91b5", glow: "rgba(111, 145, 181, 0.4)", text: "#e8eff5" }
-    };
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if (document.getElementById('sidebarMenu').classList.contains('active')) toggleMenu();
 
-    const themeNames = Object.keys(themes);
-    let currentTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
+            if (viewId === 'view-stats') calculateStats();
+            if (viewId === 'view-vault') calculateVaultMetrics();
 
-    function applyTheme(themeName) {
-        const theme = themes[themeName];
-        if(!theme) return;
-        document.documentElement.style.setProperty('--bg-base', theme.base);
-        document.documentElement.style.setProperty('--bg-grad1', theme.grad1);
-        document.documentElement.style.setProperty('--bg-grad2', theme.grad2);
-        document.documentElement.style.setProperty('--accent', theme.accent);
-        document.documentElement.style.setProperty('--accent-glow', theme.glow);
-        document.documentElement.style.setProperty('--border-highlight', theme.glow);
-        
-        document.querySelectorAll('.radar-ring').forEach(r => {
-            r.style.borderColor = theme.accent;
-            r.style.boxShadow = `0 0 30px ${theme.glow}, inset 0 0 30px ${theme.glow}`;
-        });
-    }
-
-    function highlightActiveTheme(selectedTheme) {
-        document.querySelectorAll('.theme-btn').forEach(b => {
-            if (b.innerText === selectedTheme) {
-                b.classList.add('active-theme');
-                b.style.border = `2px solid ${themes[selectedTheme].accent}`;
-                b.style.boxShadow = `0 15px 30px rgba(0,0,0,0.8), 0 0 25px ${themes[selectedTheme].glow}`;
-            } else {
-                b.classList.remove('active-theme');
-                b.style.border = `1px solid transparent`;
-                b.style.boxShadow = `0 5px 15px rgba(0,0,0,0.4)`;
+            // CRITICAL HOOK: Render timeline only when view is active to prevent SVG collapse
+            if (viewId === 'view-timeline') {
+                if (window.timelineAllDates && window.timelineAllDates.length === 0) fetchTimelineTelemetry();
             }
-        });
-    }
 
-    applyTheme(currentTheme);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-    const themeContainer = document.getElementById('themeButtonsContainer');
-    themeNames.forEach(t => {
-        const btn = document.createElement('button');
-        btn.className = 'theme-btn'; btn.innerText = t;
-        btn.style.background = `linear-gradient(135deg, ${themes[t].grad1}, ${themes[t].base})`;
-        btn.style.color = themes[t].text;
-        
-        btn.onclick = () => {
-            currentTheme = t;
-            applyTheme(t);
-            highlightActiveTheme(t);
+        // --- 2. LIVE SEAMLESS INDIAN CLOCK (IST) 24h FORMAT (Original) ---
+        function updateClock() {
+            const clockEl = document.getElementById('liveClock');
+            if (!clockEl) return;
+            const now = new Date();
+            const optionsTime = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            clockEl.innerHTML = now.toLocaleTimeString('en-US', optionsTime);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- UNIVERSAL STRICT DD/MM/YYYY FORMATTER (Original) ---
+        function formatStrictDate(dateString, includeTime = false) {
+            const d = new Date(dateString);
+            if (isNaN(d)) return "SELECT DATE";
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            let out = `${day}/${month}/${year}`;
+            if (includeTime) {
+                const hh = String(d.getHours()).padStart(2, '0');
+                const mm = String(d.getMinutes()).padStart(2, '0');
+                const ss = String(d.getSeconds()).padStart(2, '0');
+                out += ` ${hh}:${mm}:${ss}`;
+            }
+            return out;
+        }
+
+        // --- 3. PREMIUM THEME ENGINE (Original + Timeline Fix) ---
+        const themes = {
+            "Cyber Cyan": { base: "#020508", grad1: "#06111a", grad2: "#010204", accent: "#00f3ff", glow: "rgba(0, 243, 255, 0.4)", text: "#e6fdff" },
+            "Cobalt Protocol": { base: "#010205", grad1: "#04081c", grad2: "#01010a", accent: "#2d5bff", glow: "rgba(45, 91, 255, 0.4)", text: "#e6ecff" },
+            "Ice Node": { base: "#020608", grad1: "#071822", grad2: "#010305", accent: "#00b3ff", glow: "rgba(0, 179, 255, 0.4)", text: "#e6f7ff" },
+            "Sapphire Core": { base: "#00030a", grad1: "#001033", grad2: "#000105", accent: "#0044ff", glow: "rgba(0, 68, 255, 0.4)", text: "#e6edff" },
+            "Deep Ocean": { base: "#010306", grad1: "#030d1c", grad2: "#000103", accent: "#0066ff", glow: "rgba(0, 102, 255, 0.4)", text: "#e6f0ff" },
+            "Acid Rain": { base: "#030602", grad1: "#0a1708", grad2: "#010301", accent: "#39ff14", glow: "rgba(57, 255, 20, 0.4)", text: "#efffe6" },
+            "Matrix Mint": { base: "#020805", grad1: "#051a11", grad2: "#010503", accent: "#00ffa3", glow: "rgba(0, 255, 163, 0.4)", text: "#e6fff4" },
+            "Bio-Hazard": { base: "#050601", grad1: "#141a02", grad2: "#030400", accent: "#bfff00", glow: "rgba(191, 255, 0, 0.4)", text: "#f6ffe6" },
+            "Emerald City": { base: "#010502", grad1: "#031a0a", grad2: "#010301", accent: "#00ff66", glow: "rgba(0, 255, 102, 0.4)", text: "#e6ffef" },
+            "Deep Amethyst": { base: "#040108", grad1: "#1b0a3a", grad2: "#080310", accent: "#aa44ff", glow: "rgba(170, 68, 255, 0.4)", text: "#f0e6ff" },
+            "Neon Synth": { base: "#070106", grad1: "#1f031b", grad2: "#0a0008", accent: "#ff00d4", glow: "rgba(255, 0, 212, 0.4)", text: "#ffe6fa" },
+            "Ultraviolet": { base: "#020108", grad1: "#0a0422", grad2: "#010005", accent: "#7000ff", glow: "rgba(112, 0, 255, 0.4)", text: "#ebe6ff" },
+            "Galactic Lilac": { base: "#050308", grad1: "#160a24", grad2: "#020103", accent: "#d400ff", glow: "rgba(212, 0, 255, 0.4)", text: "#f8e6ff" },
+            "Vaporwave": { base: "#040206", grad1: "#130822", grad2: "#020104", accent: "#ff00ff", glow: "rgba(255, 0, 255, 0.4)", text: "#ffe6ff" },
+            "Blood Moon": { base: "#080202", grad1: "#1a0404", grad2: "#040101", accent: "#ff2a2a", glow: "rgba(255, 42, 42, 0.4)", text: "#ffe6e6" },
+            "Solar Flare": { base: "#080301", grad1: "#1f0902", grad2: "#050100", accent: "#ff5e00", glow: "rgba(255, 94, 0, 0.4)", text: "#ffece6" },
+            "Crimson Forge": { base: "#050102", grad1: "#170205", grad2: "#040001", accent: "#ff004c", glow: "rgba(255, 0, 76, 0.4)", text: "#ffe6ee" },
+            "Crimson Rose": { base: "#080103", grad1: "#1f020c", grad2: "#050002", accent: "#ff006a", glow: "rgba(255, 0, 106, 0.4)", text: "#ffe6f0" },
+            "Autumn Blaze": { base: "#080200", grad1: "#1f0600", grad2: "#050100", accent: "#ff3c00", glow: "rgba(255, 60, 0, 0.4)", text: "#ffe9e6" },
+            "Toxic Peach": { base: "#080403", grad1: "#1a0b07", grad2: "#050101", accent: "#ff7b59", glow: "rgba(255, 123, 89, 0.4)", text: "#ffece6" },
+            "Reactor Yellow": { base: "#080701", grad1: "#1a1602", grad2: "#040300", accent: "#ffea00", glow: "rgba(255, 234, 0, 0.4)", text: "#fffce6" },
+            "Imperial Gold": { base: "#080501", grad1: "#1f1202", grad2: "#050300", accent: "#ffb700", glow: "rgba(255, 183, 0, 0.4)", text: "#fff6e6" },
+            "Amber Alert": { base: "#080400", grad1: "#1a0d00", grad2: "#050200", accent: "#ff9100", glow: "rgba(255, 145, 0, 0.4)", text: "#fff2e6" },
+            "Ghost Silver": { base: "#030303", grad1: "#111111", grad2: "#010101", accent: "#cfcfcf", glow: "rgba(207, 207, 207, 0.4)", text: "#ffffff" },
+            "Carbon Fiber": { base: "#000000", grad1: "#0a0a0a", grad2: "#000000", accent: "#8c8c8c", glow: "rgba(140, 140, 140, 0.4)", text: "#e0e0e0" },
+            "Tungsten Blue": { base: "#010203", grad1: "#040a12", grad2: "#000101", accent: "#6f91b5", glow: "rgba(111, 145, 181, 0.4)", text: "#e8eff5" }
         };
-        themeContainer.appendChild(btn);
-    });
 
-    highlightActiveTheme(currentTheme);
+        const themeNames = Object.keys(themes);
+        let currentTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
 
-    // --- 4. DYNAMIC SEARCH & FILTERS ---
-    function setupDropdown(dropdownId, selectedId, optionsId, onChangeCallback) {
-        const dropdown = document.getElementById(dropdownId);
-        const selected = document.getElementById(selectedId);
-        const optionsContainer = document.getElementById(optionsId);
-        selected.addEventListener('click', (e) => { e.stopPropagation(); document.querySelectorAll('.custom-dropdown').forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); dropdown.classList.toggle('active'); });
-        optionsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('dropdown-option')) { selected.innerText = e.target.innerText; dropdown.classList.remove('active'); if (onChangeCallback) onChangeCallback(e.target.getAttribute('data-value')); } });
-    }
-    document.addEventListener('click', () => { document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active')); });
+        function applyTheme(themeName) {
+            const theme = themes[themeName];
+            if (!theme) return;
+            document.documentElement.style.setProperty('--bg-base', theme.base);
+            document.documentElement.style.setProperty('--bg-grad1', theme.grad1);
+            document.documentElement.style.setProperty('--bg-grad2', theme.grad2);
+            document.documentElement.style.setProperty('--accent', theme.accent);
+            document.documentElement.style.setProperty('--accent-glow', theme.glow);
+            document.documentElement.style.setProperty('--border-highlight', theme.glow);
 
-    let currentChannelFilter = 'all'; setupDropdown('channelDropdown', 'channelSelected', 'channelOptions', (val) => { currentChannelFilter = val; filterAndRender(); });
-    let currentLimitFilter = 100; setupDropdown('limitDropdown', 'limitSelected', 'limitOptions', (val) => { currentLimitFilter = parseInt(val, 10); filterAndRender(); });
+            document.querySelectorAll('.radar-ring').forEach(r => {
+                r.style.borderColor = theme.accent;
+                r.style.boxShadow = `0 0 30px ${theme.glow}, inset 0 0 30px ${theme.glow}`;
+            });
 
-    const searchInput = document.getElementById('searchInput');
-    const suggestions = ['Analyze "The Hindu"...', 'Extract "Global Economy"...', 'Scan for "Markets"...', 'Intercept "Tactical Alerts"...'];
-    suggestions.sort(() => Math.random() - 0.5);
-    let sugIdx = 0, charIdx = 0, isDel = false, typTmr;
-
-    function typePlaceholder() {
-        if (document.activeElement === searchInput) { searchInput.placeholder = "Query global matrix..."; clearTimeout(typTmr); return; }
-        const word = suggestions[sugIdx];
-        isDel ? charIdx-- : charIdx++; searchInput.placeholder = word.substring(0, charIdx) + "|";
-        let spd = isDel ? 40 : 100;
-        if (!isDel && charIdx === word.length) { spd = 2500; isDel = true; } else if (isDel && charIdx === 0) { isDel = false; sugIdx = (sugIdx + 1) % suggestions.length; spd = 600; }
-        typTmr = setTimeout(typePlaceholder, spd);
-    }
-    typePlaceholder();
-    searchInput.addEventListener('focus', () => { clearTimeout(typTmr); searchInput.placeholder = "Query global matrix..."; });
-    searchInput.addEventListener('blur', () => { if (searchInput.value.trim() === '') typePlaceholder(); });
-    searchInput.addEventListener('input', () => filterAndRender());
-
-    // --- 5. DATA ENGINE (RAW DATA + STATUS LOGS + UNIVERSAL DATE FORMAT) ---
-    let rawData = [];
-    let statusLogData = [];
-    const grid = document.getElementById('news-grid');
-    const datePicker = document.getElementById('datePicker');
-    let hfAccurateMb = "Loading...";
-
-    const istOffset = 5.5 * 60 * 60 * 1000;
-    const todayStr = new Date(new Date().getTime() + istOffset).toISOString().split('T')[0];
-
-    datePicker.value = todayStr; 
-    datePicker.max = todayStr;
-    datePicker.setAttribute('data-date', formatStrictDate(todayStr, false));
-
-    datePicker.addEventListener('change', (e) => { 
-        datePicker.setAttribute('data-date', formatStrictDate(e.target.value, false));
-        init(e.target.value); 
-    });
-
-    async function init(date) {
-        grid.innerHTML = '<p style="text-align:center; opacity:0.6; width:100%; grid-column: 1/-1; font-size:clamp(1rem,3vw,1.3rem); letter-spacing:2px; padding:clamp(20px,5vw,60px);"><span class="status-dot"></span> ESTABLISHING SECURE CONNECTION...</p>';
-        document.getElementById('lastSyncTimeMain').innerText = "Scanning...";
-        
-        try {
-            const res = await fetch(`${date.split('-')[0]}/${date}.json`);
-            if (!res.ok) throw new Error("Intelligence not found for this temporal coordinate.");
-            const data = await res.json();
-            rawData = [];
-            Object.keys(data.feeds).forEach(source => data.feeds[source].forEach(item => rawData.push({ ...item, source })));
-            
-            if(rawData.length > 0) {
-                const latestItem = rawData.reduce((a, b) => (new Date(b.published_at).getTime() || 0) > (new Date(a.published_at).getTime() || 0) ? b : a);
-                // Strict DD/MM/YYYY formatting including 24H time for the last sync workflow
-                const timeString = formatStrictDate(latestItem.published_at, true);
-                document.getElementById('lastSyncTimeMain').innerText = timeString;
-                document.getElementById('lastWorkflowTime').innerText = timeString;
+            // Smart re-render Timeline charts to match new accent color seamlessly
+            if (window.timelineActiveCharts && window.timelineActiveCharts.length > 0 && document.getElementById('view-timeline').classList.contains('active')) {
+                triggerTimelineRender();
             }
-
-            populateChannels(Object.keys(data.feeds));
-            filterAndRender();
-            fetchAccurateHFSize(date);
-            loadStatusLog();
-
-        } catch (e) {
-            grid.innerHTML = `<p style="text-align:center; color:var(--stat-dead); width:100%; grid-column: 1/-1; padding: clamp(20px, 5vw, 60px); font-size:clamp(1rem,3vw,1.4rem); font-weight: 700; border: 1px solid var(--stat-dead); border-radius: 20px; background: rgba(255,51,102,0.1); box-shadow: 0 0 40px rgba(255,51,102,0.2); letter-spacing: 2px;">${e.message.toUpperCase()}</p>`;
-            document.getElementById('lastSyncTimeMain').innerText = "OFFLINE";
-            rawData = [];
         }
-    }
 
-    async function fetchAccurateHFSize(dateStr) {
-        try {
-            const hfUrl = `https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`;
-            const headReq = await fetch(hfUrl, { method: 'HEAD' });
-            if(headReq.ok) {
-                const bytes = headReq.headers.get('content-length');
-                if(bytes) {
-                    hfAccurateMb = (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-                    document.getElementById('vaultDeepSize').innerText = hfAccurateMb;
+        function highlightActiveTheme(selectedTheme) {
+            document.querySelectorAll('.theme-btn').forEach(b => {
+                if (b.innerText === selectedTheme) {
+                    b.classList.add('active-theme');
+                    b.style.border = `2px solid ${themes[selectedTheme].accent}`;
+                    b.style.boxShadow = `0 15px 30px rgba(0,0,0,0.8), 0 0 25px ${themes[selectedTheme].glow}`;
+                } else {
+                    b.classList.remove('active-theme');
+                    b.style.border = `1px solid transparent`;
+                    b.style.boxShadow = `0 5px 15px rgba(0,0,0,0.4)`;
                 }
-            } else { hfAccurateMb = "Node Blocked"; document.getElementById('vaultDeepSize').innerText = hfAccurateMb; }
-        } catch(e) { hfAccurateMb = "CORS Blocked / Est."; }
-    }
+            });
+        }
 
-    async function loadStatusLog() {
-        try {
-            const res = await fetch('status.json');
-            if(res.ok) { statusLogData = await res.json(); renderNodeHealth(); }
-        } catch(e) { console.warn("status.json missing"); }
-    }
+        applyTheme(currentTheme);
 
-    // --- 6. NODE HEALTH STATUS ENGINE ---
-    function renderNodeHealth() {
-        if(!statusLogData || statusLogData.length === 0) return;
-        const nodeStats = {}; const totalRuns = statusLogData.length;
-        statusLogData.forEach(run => {
-            for(let [node, state] of Object.entries(run.status)) {
-                if(!nodeStats[node]) nodeStats[node] = { success: 0, fail: 0, reportsToday: 0 };
-                if(state === 1) nodeStats[node].success++; else nodeStats[node].fail++;
+        const themeContainer = document.getElementById('themeButtonsContainer');
+        themeNames.forEach(t => {
+            const btn = document.createElement('button');
+            btn.className = 'theme-btn'; btn.innerText = t;
+            btn.style.background = `linear-gradient(135deg, ${themes[t].grad1}, ${themes[t].base})`;
+            btn.style.color = themes[t].text;
+
+            btn.onclick = () => {
+                currentTheme = t;
+                applyTheme(t);
+                highlightActiveTheme(t);
+            };
+            themeContainer.appendChild(btn);
+        });
+
+        highlightActiveTheme(currentTheme);
+
+        // --- 4. DYNAMIC SEARCH & FILTERS (Original) ---
+        function setupDropdown(dropdownId, selectedId, optionsId, onChangeCallback) {
+            const dropdown = document.getElementById(dropdownId);
+            const selected = document.getElementById(selectedId);
+            const optionsContainer = document.getElementById(optionsId);
+            selected.addEventListener('click', (e) => { e.stopPropagation(); document.querySelectorAll('.custom-dropdown').forEach(d => { if (d !== dropdown) d.classList.remove('active'); }); dropdown.classList.toggle('active'); });
+            optionsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('dropdown-option')) { selected.innerText = e.target.innerText; dropdown.classList.remove('active'); if (onChangeCallback) onChangeCallback(e.target.getAttribute('data-value')); } });
+        }
+        document.addEventListener('click', () => { document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active')); });
+
+        let currentChannelFilter = 'all'; setupDropdown('channelDropdown', 'channelSelected', 'channelOptions', (val) => { currentChannelFilter = val; filterAndRender(); });
+        let currentLimitFilter = 100; setupDropdown('limitDropdown', 'limitSelected', 'limitOptions', (val) => { currentLimitFilter = parseInt(val, 10); filterAndRender(); });
+
+        const searchInput = document.getElementById('searchInput');
+        const suggestions = ['Analyze "The Hindu"...', 'Extract "Global Economy"...', 'Scan for "Markets"...', 'Intercept "Tactical Alerts"...'];
+        suggestions.sort(() => Math.random() - 0.5);
+        let sugIdx = 0, charIdx = 0, isDel = false, typTmr;
+
+        function typePlaceholder() {
+            if (document.activeElement === searchInput) { searchInput.placeholder = "Query global matrix..."; clearTimeout(typTmr); return; }
+            const word = suggestions[sugIdx];
+            isDel ? charIdx-- : charIdx++; searchInput.placeholder = word.substring(0, charIdx) + "|";
+            let spd = isDel ? 40 : 100;
+            if (!isDel && charIdx === word.length) { spd = 2500; isDel = true; } else if (isDel && charIdx === 0) { isDel = false; sugIdx = (sugIdx + 1) % suggestions.length; spd = 600; }
+            typTmr = setTimeout(typePlaceholder, spd);
+        }
+        typePlaceholder();
+        searchInput.addEventListener('focus', () => { clearTimeout(typTmr); searchInput.placeholder = "Query global matrix..."; });
+        searchInput.addEventListener('blur', () => { if (searchInput.value.trim() === '') typePlaceholder(); });
+        searchInput.addEventListener('input', () => filterAndRender());
+
+        // --- 5. DATA ENGINE (Original) ---
+        let rawData = [];
+        let statusLogData = [];
+        const grid = document.getElementById('news-grid');
+        const datePicker = document.getElementById('datePicker');
+        let hfAccurateMb = "Loading...";
+
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const todayStr = new Date(new Date().getTime() + istOffset).toISOString().split('T')[0];
+
+        datePicker.value = todayStr;
+        datePicker.max = todayStr;
+        datePicker.setAttribute('data-date', formatStrictDate(todayStr, false));
+
+        datePicker.addEventListener('change', (e) => {
+            datePicker.setAttribute('data-date', formatStrictDate(e.target.value, false));
+            init(e.target.value);
+        });
+
+        async function init(date) {
+            grid.innerHTML = '<p style="text-align:center; opacity:0.6; width:100%; grid-column: 1/-1; font-size:clamp(1rem,3vw,1.3rem); letter-spacing:2px; padding:clamp(20px,5vw,60px);"><span class="status-dot"></span> ESTABLISHING SECURE CONNECTION...</p>';
+            document.getElementById('lastSyncTimeMain').innerText = "Scanning...";
+
+            try {
+                const res = await fetch(`${date.split('-')[0]}/${date}.json`);
+                if (!res.ok) throw new Error("Intelligence not found for this temporal coordinate.");
+                const data = await res.json();
+                rawData = [];
+                Object.keys(data.feeds).forEach(source => data.feeds[source].forEach(item => rawData.push({ ...item, source })));
+
+                if (rawData.length > 0) {
+                    const latestItem = rawData.reduce((a, b) => (new Date(b.published_at).getTime() || 0) > (new Date(a.published_at).getTime() || 0) ? b : a);
+                    const timeString = formatStrictDate(latestItem.published_at, true);
+                    document.getElementById('lastSyncTimeMain').innerText = timeString;
+                    document.getElementById('lastWorkflowTime').innerText = timeString;
+                }
+
+                populateChannels(Object.keys(data.feeds));
+                filterAndRender();
+                fetchAccurateHFSize(date);
+                loadStatusLog();
+
+            } catch (e) {
+                grid.innerHTML = `<p style="text-align:center; color:var(--stat-dead); width:100%; grid-column: 1/-1; padding: clamp(20px, 5vw, 60px); font-size:clamp(1rem,3vw,1.4rem); font-weight: 700; border: 1px solid var(--stat-dead); border-radius: 20px; background: rgba(255,51,102,0.1); box-shadow: 0 0 40px rgba(255,51,102,0.2); letter-spacing: 2px;">${e.message.toUpperCase()}</p>`;
+                document.getElementById('lastSyncTimeMain').innerText = "OFFLINE";
+                rawData = [];
             }
-        });
-        rawData.forEach(item => { if(nodeStats[item.source]) nodeStats[item.source].reportsToday++; });
+        }
 
-        let stableC = 0, warnC = 0, deadC = 0;
-        const sortedNodes = Object.entries(nodeStats).sort((a,b) => {
-            let rateA = a[1].success / totalRuns; let rateB = b[1].success / totalRuns;
-            if(rateB !== rateA) return rateB - rateA; return b[1].reportsToday - a[1].reportsToday; 
-        });
+        async function fetchAccurateHFSize(dateStr) {
+            try {
+                const hfUrl = `https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`;
+                const headReq = await fetch(hfUrl, { method: 'HEAD' });
+                if (headReq.ok) {
+                    const bytes = headReq.headers.get('content-length');
+                    if (bytes) {
+                        hfAccurateMb = (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+                        document.getElementById('vaultDeepSize').innerText = hfAccurateMb;
+                    }
+                } else { hfAccurateMb = "Node Blocked"; document.getElementById('vaultDeepSize').innerText = hfAccurateMb; }
+            } catch (e) { hfAccurateMb = "CORS Blocked / Est."; }
+        }
 
-        const container = document.getElementById('nodeHealthContainer');
-        container.innerHTML = '';
+        async function loadStatusLog() {
+            try {
+                const res = await fetch('status.json');
+                if (res.ok) { statusLogData = await res.json(); renderNodeHealth(); }
+            } catch (e) { console.warn("status.json missing"); }
+        }
 
-        sortedNodes.forEach(([node, stats]) => {
-            let rate = (stats.success / totalRuns) * 100;
-            let statusColor = "var(--stat-excellent)", statusTag = "STABLE", recText = "Active and Operational.";
-            if(rate === 100) { stableC++; }
-            else if(rate > 0) { statusColor = "var(--stat-warn)"; statusTag = "INTERMITTENT"; warnC++; recText = "WAF blocks detected. Engine bypassing when possible."; } 
-            else { statusColor = "var(--stat-dead)"; statusTag = "DEAD NODE"; deadC++; recText = "Severe Firewall. Recommend deprecating node."; }
+        // --- 6. NODE HEALTH STATUS ENGINE (Original) ---
+        function renderNodeHealth() {
+            if (!statusLogData || statusLogData.length === 0) return;
+            const nodeStats = {}; const totalRuns = statusLogData.length;
+            statusLogData.forEach(run => {
+                for (let [node, state] of Object.entries(run.status)) {
+                    if (!nodeStats[node]) nodeStats[node] = { success: 0, fail: 0, reportsToday: 0 };
+                    if (state === 1) nodeStats[node].success++; else nodeStats[node].fail++;
+                }
+            });
+            rawData.forEach(item => { if (nodeStats[item.source]) nodeStats[item.source].reportsToday++; });
 
-            const cleanName = node.replace(/_/g, ' ');
-            const domNode = document.createElement('div');
-            domNode.className = 'health-node';
-            
-            domNode.innerHTML = `
+            let stableC = 0, warnC = 0, deadC = 0;
+            const sortedNodes = Object.entries(nodeStats).sort((a, b) => {
+                let rateA = a[1].success / totalRuns; let rateB = b[1].success / totalRuns;
+                if (rateB !== rateA) return rateB - rateA; return b[1].reportsToday - a[1].reportsToday;
+            });
+
+            const container = document.getElementById('nodeHealthContainer');
+            container.innerHTML = '';
+
+            sortedNodes.forEach(([node, stats]) => {
+                let rate = (stats.success / totalRuns) * 100;
+                let statusColor = "var(--stat-excellent)", statusTag = "STABLE", recText = "Active and Operational.";
+                if (rate === 100) { stableC++; }
+                else if (rate > 0) { statusColor = "var(--stat-warn)"; statusTag = "INTERMITTENT"; warnC++; recText = "WAF blocks detected. Engine bypassing when possible."; }
+                else { statusColor = "var(--stat-dead)"; statusTag = "DEAD NODE"; deadC++; recText = "Severe Firewall. Recommend deprecating node."; }
+
+                const cleanName = node.replace(/_/g, ' ');
+                const domNode = document.createElement('div');
+                domNode.className = 'health-node';
+
+                domNode.innerHTML = `
                 <div class="node-header" onclick="this.parentElement.classList.toggle('active')">
                     <span class="node-title">${cleanName}</span>
                     <span class="node-tag" style="color: ${statusColor}; border: 1px solid ${statusColor}; box-shadow: 0 0 20px ${statusColor}50;">
@@ -482,40 +652,39 @@
                     <span style="color: ${statusColor}; font-size: clamp(0.85rem, 2.5vw, 1rem); max-width: 100%; font-weight:700;">${recText}</span>
                 </div>
             `;
-            container.appendChild(domNode);
-        });
+                container.appendChild(domNode);
+            });
 
-        document.getElementById('healthStableCount').innerText = stableC;
-        document.getElementById('healthWarnCount').innerText = warnC;
-        document.getElementById('healthDeadCount').innerText = deadC;
-    }
+            document.getElementById('healthStableCount').innerText = stableC;
+            document.getElementById('healthWarnCount').innerText = warnC;
+            document.getElementById('healthDeadCount').innerText = deadC;
+        }
 
-    // --- 7. STANDARD RENDERING ---
-    function populateChannels(sources) {
-        const c = document.getElementById('channelOptions');
-        c.innerHTML = '<div class="dropdown-option" data-value="all">Global Matrix (All)</div>';
-        sources.sort().forEach(s => { const opt = document.createElement('div'); opt.className = 'dropdown-option'; opt.setAttribute('data-value', s); opt.innerText = s.replace(/_/g, ' '); c.appendChild(opt); });
-        document.getElementById('channelSelected').innerText = 'Global Matrix (All)'; currentChannelFilter = 'all';
-    }
+        // --- 7. STANDARD RENDERING (Original) ---
+        function populateChannels(sources) {
+            const c = document.getElementById('channelOptions');
+            c.innerHTML = '<div class="dropdown-option" data-value="all">Global Matrix (All)</div>';
+            sources.sort().forEach(s => { const opt = document.createElement('div'); opt.className = 'dropdown-option'; opt.setAttribute('data-value', s); opt.innerText = s.replace(/_/g, ' '); c.appendChild(opt); });
+            document.getElementById('channelSelected').innerText = 'Global Matrix (All)'; currentChannelFilter = 'all';
+        }
 
-    function filterAndRender() {
-        const query = searchInput.value.toLowerCase();
-        let filtered = rawData.filter(i => (currentChannelFilter === 'all' || i.source === currentChannelFilter) && (i.title.toLowerCase().includes(query) || i.source.toLowerCase().includes(query)));
-        if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; opacity:0.6; width:100%; grid-column: 1/-1; padding: clamp(20px,5vw,60px); font-size: clamp(1rem,3vw,1.4rem); font-weight:600; letter-spacing:2px;">NO INTELLIGENCE MATCHES PARAMETERS.</p>'; return; }
+        function filterAndRender() {
+            const query = searchInput.value.toLowerCase();
+            let filtered = rawData.filter(i => (currentChannelFilter === 'all' || i.source === currentChannelFilter) && (i.title.toLowerCase().includes(query) || i.source.toLowerCase().includes(query)));
+            if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; opacity:0.6; width:100%; grid-column: 1/-1; padding: clamp(20px,5vw,60px); font-size: clamp(1rem,3vw,1.4rem); font-weight:600; letter-spacing:2px;">NO INTELLIGENCE MATCHES PARAMETERS.</p>'; return; }
 
-        filtered.sort((a, b) => (new Date(b.published_at).getTime() || 0) - (new Date(a.published_at).getTime() || 0));
-        filtered = filtered.slice(0, currentLimitFilter);
+            filtered.sort((a, b) => (new Date(b.published_at).getTime() || 0) - (new Date(a.published_at).getTime() || 0));
+            filtered = filtered.slice(0, currentLimitFilter);
 
-        grid.innerHTML = '';
-        filtered.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
-            const formatSource = item.source.replace(/_/g, ' ');
-            // Force strict DD/MM/YYYY HH:mm:ss inside the cards
-            const dateStr = item.published_at && item.published_at !== "N/A" ? formatStrictDate(item.published_at, true) : 'RECENT';
-            const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            grid.innerHTML = '';
+            filtered.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `card ${index === 0 ? 'pinned-latest' : ''}`;
+                const formatSource = item.source.replace(/_/g, ' ');
+                const dateStr = item.published_at && item.published_at !== "N/A" ? formatStrictDate(item.published_at, true) : 'RECENT';
+                const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
-            card.innerHTML = `
+                card.innerHTML = `
                 <div class="card-header">
                     <span class="card-tag">${index === 0 ? '<span class="status-dot"></span> BREAKING REAL-TIME' : formatSource}</span>
                     <span class="timestamp">${dateStr}</span>
@@ -525,75 +694,221 @@
                     <button onclick="openDeepArchive('${item.id}', '${safeTitle}', '${item.url}', '${datePicker.value}')" class="read-btn">Deep Scan &rarr;</button>
                 </div>
             `;
-            grid.appendChild(card);
-            setTimeout(() => card.style.opacity = 1, 60 * index);
-        });
-    }
+                grid.appendChild(card);
+                setTimeout(() => card.style.opacity = 1, 60 * index);
+            });
+        }
 
-    // --- 8. METRICS COMPUTATION ---
-    function calculateStats() {
-        if(!rawData.length) return;
-        document.getElementById('statTotal').innerText = rawData.length;
-        const counts = {}; rawData.forEach(i => counts[i.source] = (counts[i.source] || 0) + 1);
-        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-        
-        document.getElementById('statTopName').innerText = sorted[0][0].replace(/_/g, ' ');
-        document.getElementById('statTopCount').innerText = sorted[0][1];
+        // --- 8. METRICS COMPUTATION (Original) ---
+        function calculateStats() {
+            if (!rawData.length) return;
+            document.getElementById('statTotal').innerText = rawData.length;
+            const counts = {}; rawData.forEach(i => counts[i.source] = (counts[i.source] || 0) + 1);
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 
-        const lb = document.getElementById('statLeaderboard'); lb.innerHTML = '';
-        sorted.slice(0,10).forEach(([s, c], i) => {
-            lb.innerHTML += `<li><span class="lb-rank" style="color:var(--text-muted); font-weight:800; font-size:clamp(1rem,2vw,1.2rem); width:clamp(20px,4vw,40px);">#${i + 1}</span><span class="lb-name" style="flex-grow:1; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:clamp(0.85rem,2vw,1rem); word-break:break-word;">${s.replace(/_/g, ' ')}</span><span class="lb-count" style="color:var(--accent); font-weight:800; font-size:clamp(1.2rem,3vw,1.5rem); text-shadow:0 0 15px var(--accent-glow);">${c}</span></li>`;
-        });
-    }
+            document.getElementById('statTopName').innerText = sorted[0][0].replace(/_/g, ' ');
+            document.getElementById('statTopCount').innerText = sorted[0][1];
 
-    function calculateVaultMetrics() {
-        if(!rawData.length) return;
-        const lightBytes = new TextEncoder().encode(JSON.stringify(rawData)).length;
-        document.getElementById('vaultLightSize').innerText = (lightBytes / 1024).toFixed(1) + ' KB';
-        if(hfAccurateMb === "Loading..." || hfAccurateMb === "CORS Blocked / Est.") {
-            document.getElementById('vaultDeepSize').innerText = ((lightBytes * 18) / (1024 * 1024)).toFixed(2) + ' MB (Est.)';
-        } else { document.getElementById('vaultDeepSize').innerText = hfAccurateMb; }
-    }
+            const lb = document.getElementById('statLeaderboard'); lb.innerHTML = '';
+            sorted.slice(0, 10).forEach(([s, c], i) => {
+                lb.innerHTML += `<li><span class="lb-rank" style="color:var(--text-muted); font-weight:800; font-size:clamp(1rem,2vw,1.2rem); width:clamp(20px,4vw,40px);">#${i + 1}</span><span class="lb-name" style="flex-grow:1; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:clamp(0.85rem,2vw,1rem); word-break:break-word;">${s.replace(/_/g, ' ')}</span><span class="lb-count" style="color:var(--accent); font-weight:800; font-size:clamp(1.2rem,3vw,1.5rem); text-shadow:0 0 15px var(--accent-glow);">${c}</span></li>`;
+            });
+        }
 
-    setInterval(() => {
-        document.getElementById('telPing').innerText = (Math.floor(Math.random() * 6) + 10) + ' ms';
-        document.getElementById('telCDN').innerText = (Math.floor(Math.random() * 10) + 18) + ' ms';
-        document.getElementById('liveIngestionRate').innerText = (Math.random() * 2.5 + 0.5).toFixed(2) + ' KB/s';
-    }, 2000);
+        function calculateVaultMetrics() {
+            if (!rawData.length) return;
+            const lightBytes = new TextEncoder().encode(JSON.stringify(rawData)).length;
+            document.getElementById('vaultLightSize').innerText = (lightBytes / 1024).toFixed(1) + ' KB';
+            if (hfAccurateMb === "Loading..." || hfAccurateMb === "CORS Blocked / Est.") {
+                document.getElementById('vaultDeepSize').innerText = ((lightBytes * 18) / (1024 * 1024)).toFixed(2) + ' MB (Est.)';
+            } else { document.getElementById('vaultDeepSize').innerText = hfAccurateMb; }
+        }
 
-    // --- 9. HEDA UPLINK & MODAL ---
-    let cachedDeepArchive = null; let cachedArchiveDate = null;
-    async function openDeepArchive(articleId, title, originalUrl, dateStr) {
-        const modal = document.getElementById('deepModal'), body = document.getElementById('modalBody');
-        document.getElementById('modalTitle').innerText = title;
-        body.innerHTML = '<p style="opacity:0.7; text-align:center; padding: clamp(30px,6vw,80px); font-size: clamp(1rem,3vw,1.4rem); font-weight: 700; letter-spacing: 3px;"><span class="status-dot"></span> ESTABLISHING UPLINK TO VAULT...</p>';
-        modal.classList.add('active');
+        setInterval(() => {
+            document.getElementById('telPing').innerText = (Math.floor(Math.random() * 6) + 10) + ' ms';
+            document.getElementById('telCDN').innerText = (Math.floor(Math.random() * 10) + 18) + ' ms';
+            document.getElementById('liveIngestionRate').innerText = (Math.random() * 2.5 + 0.5).toFixed(2) + ' KB/s';
+        }, 2000);
 
-        if (cachedArchiveDate !== dateStr || !cachedDeepArchive) {
-            try {
-                const res = await fetch(`https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`);
-                if (!res.ok) throw new Error("Archive missing");
-                cachedDeepArchive = await res.json(); cachedArchiveDate = dateStr;
-            } catch (e) {
-                body.innerHTML = `<p style="color:var(--stat-dead); text-align:center; font-size: clamp(1.1rem,3vw,1.4rem); font-weight: 800; padding: clamp(20px,5vw,40px); letter-spacing:2px;">VAULT NODE UNAVAILABLE.</p><div style="text-align:center; margin-top:30px;"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block; border-color:var(--stat-dead); color:var(--stat-dead); box-shadow: 0 0 25px rgba(255,51,102,0.4); padding: 18px clamp(20px,5vw,40px); font-size: clamp(0.9rem,2vw,1.1rem);">FORCE ORIGINAL SOURCE</a></div>`;
-                return;
+        // --- 9. HEDA UPLINK & MODAL (Original) ---
+        let cachedDeepArchive = null; let cachedArchiveDate = null;
+        async function openDeepArchive(articleId, title, originalUrl, dateStr) {
+            const modal = document.getElementById('deepModal'), body = document.getElementById('modalBody');
+            document.getElementById('modalTitle').innerText = title;
+            body.innerHTML = '<p style="opacity:0.7; text-align:center; padding: clamp(30px,6vw,80px); font-size: clamp(1rem,3vw,1.4rem); font-weight: 700; letter-spacing: 3px;"><span class="status-dot"></span> ESTABLISHING UPLINK TO VAULT...</p>';
+            modal.classList.add('active');
+
+            if (cachedArchiveDate !== dateStr || !cachedDeepArchive) {
+                try {
+                    const res = await fetch(`https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`);
+                    if (!res.ok) throw new Error("Archive missing");
+                    cachedDeepArchive = await res.json(); cachedArchiveDate = dateStr;
+                } catch (e) {
+                    body.innerHTML = `<p style="color:var(--stat-dead); text-align:center; font-size: clamp(1.1rem,3vw,1.4rem); font-weight: 800; padding: clamp(20px,5vw,40px); letter-spacing:2px;">VAULT NODE UNAVAILABLE.</p><div style="text-align:center; margin-top:30px;"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block; border-color:var(--stat-dead); color:var(--stat-dead); box-shadow: 0 0 25px rgba(255,51,102,0.4); padding: 18px clamp(20px,5vw,40px); font-size: clamp(0.9rem,2vw,1.1rem);">FORCE ORIGINAL SOURCE</a></div>`;
+                    return;
+                }
+            }
+
+            const txt = cachedDeepArchive[articleId];
+            if (txt) {
+                body.innerText = txt;
+                body.innerHTML += `<div style="text-align:center; margin-top: 60px; padding-top: 50px; border-top: 1px solid var(--border);"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block; padding: 18px clamp(20px,5vw,50px); font-size: clamp(0.9rem,2vw,1.1rem);">ACCESS WEB INTERFACE</a></div>`;
+            } else {
+                body.innerHTML = `<p style="color:var(--stat-dead); text-align:center; font-size: clamp(1.1rem,3vw,1.4rem); font-weight: 800; padding: clamp(20px,5vw,40px); letter-spacing:2px;">EXTRACTION FAILED. PAYLOAD ENCRYPTED.</p><div style="text-align:center; margin-top:30px;"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block; border-color:var(--stat-dead); color:var(--stat-dead); box-shadow: 0 0 25px rgba(255,51,102,0.4); padding: 18px clamp(20px,5vw,40px); font-size: clamp(0.9rem,2vw,1.1rem);">FORCE ORIGINAL SOURCE</a></div>`;
             }
         }
 
-        const txt = cachedDeepArchive[articleId];
-        if (txt) {
-            body.innerText = txt;
-            body.innerHTML += `<div style="text-align:center; margin-top: 60px; padding-top: 50px; border-top: 1px solid var(--border);"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block; padding: 18px clamp(20px,5vw,50px); font-size: clamp(0.9rem,2vw,1.1rem);">ACCESS WEB INTERFACE</a></div>`;
-        } else {
-            body.innerHTML = `<p style="color:var(--stat-dead); text-align:center; font-size: clamp(1.1rem,3vw,1.4rem); font-weight: 800; padding: clamp(20px,5vw,40px); letter-spacing:2px;">EXTRACTION FAILED. PAYLOAD ENCRYPTED.</p><div style="text-align:center; margin-top:30px;"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block; border-color:var(--stat-dead); color:var(--stat-dead); box-shadow: 0 0 25px rgba(255,51,102,0.4); padding: 18px clamp(20px,5vw,40px); font-size: clamp(0.9rem,2vw,1.1rem);">FORCE ORIGINAL SOURCE</a></div>`;
+        function closeModal() { document.getElementById('deepModal').classList.remove('active'); }
+        document.getElementById('deepModal').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+
+
+        // ============================================================================
+        // --- 10. ADVANCED TEMPORAL TELEMETRY ENGINE (NEW MODULE) ---
+        // ============================================================================
+        window.timelineAllDates = [];
+        window.timelineRawData = {};
+        window.timelineActiveCharts = [];
+        window.timelineCurrentDates = [];
+
+        async function fetchTimelineTelemetry() {
+            try {
+                const response = await fetch('status.json');
+                if (!response.ok) throw new Error("Connection Refused");
+                const data = await response.json();
+                processTimelineData(data);
+            } catch (e) {
+                document.getElementById('timelineLoader').innerHTML = `<span style="color:var(--stat-dead)">UPLINK FAILED: ${e.message}</span>`;
+            }
         }
-    }
 
-    function closeModal() { document.getElementById('deepModal').classList.remove('active'); }
-    document.getElementById('deepModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+        function processTimelineData(data) {
+            const datesSet = new Set();
 
-    // Initialize
-    init(datePicker.value);
-</script>
+            data.forEach(run => {
+                const ts = run.run_time_utc || run.run_time_ist;
+                if (!ts) return;
+                const dateStr = ts.split(" ")[0];
+                datesSet.add(dateStr);
+
+                const statusObj = run.status || {};
+                Object.keys(statusObj).forEach(channel => {
+                    if (!window.timelineRawData[channel]) window.timelineRawData[channel] = {};
+                    window.timelineRawData[channel][dateStr] = (window.timelineRawData[channel][dateStr] || 0) + statusObj[channel];
+                });
+            });
+
+            window.timelineAllDates = Array.from(datesSet).sort();
+
+            const latestDate = window.timelineAllDates[window.timelineAllDates.length - 1];
+            const datePicker = document.getElementById('timelineEndPicker');
+            datePicker.max = latestDate;
+            datePicker.value = latestDate;
+
+            applyTimelineWindow();
+        }
+
+        function applyTimelineWindow() {
+            const endDateStr = document.getElementById('timelineEndPicker').value;
+            if (!endDateStr) return;
+
+            const d = new Date(endDateStr + "T00:00:00");
+            d.setDate(d.getDate() - 7);
+
+            const sYear = d.getFullYear();
+            const sMonth = String(d.getMonth() + 1).padStart(2, '0');
+            const sDay = String(d.getDate()).padStart(2, '0');
+            const startDateStr = `${sYear}-${sMonth}-${sDay}`;
+
+            window.timelineCurrentDates = window.timelineAllDates.filter(date => date >= startDateStr && date <= endDateStr);
+
+            const displayStart = window.timelineCurrentDates.length > 0 ? window.timelineCurrentDates[0] : startDateStr;
+            document.getElementById('timelineStartDisplay').value = `From: ${displayStart}`;
+            document.getElementById('timelineStats').innerText = `Tracking ${Object.keys(window.timelineRawData).length} Nodes Across ${window.timelineCurrentDates.length} Coordinates`;
+
+            triggerTimelineRender();
+        }
+
+        function triggerTimelineRender() {
+            renderTimelineDashboard(window.timelineCurrentDates);
+        }
+
+        function renderTimelineDashboard(activeDates) {
+            const dashboard = document.getElementById('timelineDashboard');
+            const sortMethod = document.getElementById('timelineSort').value;
+
+            window.timelineActiveCharts.forEach(c => c.destroy());
+            window.timelineActiveCharts = [];
+            dashboard.innerHTML = '';
+            document.getElementById('timelineLoader').style.display = 'none';
+
+            const activeAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+            let channelsData = Object.keys(window.timelineRawData).map(channel => {
+                const ts = activeDates.map(d => window.timelineRawData[channel][d] || 0);
+                return { channel, timeSeries: ts, total: ts.reduce((a, b) => a + b, 0) };
+            });
+
+            channelsData.sort((a, b) => {
+                if (sortMethod === 'worst') return a.total - b.total || a.channel.localeCompare(b.channel);
+                if (sortMethod === 'best') return b.total - a.total || a.channel.localeCompare(b.channel);
+                return a.channel.localeCompare(b.channel);
+            });
+
+            channelsData.forEach((data, index) => {
+                let statusColor = "var(--stat-excellent)", label = "LIVE";
+                if (data.total === 0) { statusColor = "var(--stat-dead)"; label = "DEAD"; }
+                else if (data.timeSeries.includes(0)) { statusColor = "var(--stat-warn)"; label = "INTER"; }
+
+                const cleanName = data.channel.replace(/_/g, ' ');
+                const card = document.createElement('div');
+
+                card.className = 'dash-card timeline-card';
+                card.setAttribute('data-name', cleanName.toLowerCase());
+                card.style.padding = '1.5rem';
+                card.style.animationDelay = `${index * 0.02}s`;
+
+                card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; gap: 10px;">
+                    <!-- Added overflow ellipsis so long channel names truncate cleanly instead of pushing the badge off-screen -->
+                    <h3 style="margin:0; font-size: 1rem; color: ${statusColor}; text-shadow: 0 0 10px ${statusColor}50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${cleanName}</h3>
+                    
+                    <!-- Added white-space: nowrap and flex-shrink: 0 to freeze the badge -->
+                    <span style="font-size: 0.7rem; font-weight:800; border: 1px solid ${statusColor}; color: ${statusColor}; padding: 3px 8px; border-radius: 12px; white-space: nowrap; flex-shrink: 0;">${label}</span>
+                </div>
+                <div id="timeline-chart-${data.channel}" style="width:100%; height:100px; overflow:hidden;"></div>
+            `;
+
+                dashboard.appendChild(card);
+
+                const options = {
+                    series: [{ name: 'Extractions', data: data.timeSeries }],
+                    chart: { type: 'area', height: 100, sparkline: { enabled: true }, animations: { enabled: false } },
+                    grid: { padding: { top: 15, bottom: 5, left: 5, right: 5 } },
+                    yaxis: { min: 0, max: (val) => val > 0 ? val * 1.15 : 1 },
+                    stroke: { curve: 'smooth', width: 3, colors: [activeAccent] },
+                    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.0, stops: [0, 100], colorStops: [{ offset: 0, color: activeAccent, opacity: 0.4 }, { offset: 100, color: activeAccent, opacity: 0 }] } },
+                    tooltip: { theme: 'dark', fixed: { enabled: false }, x: { format: 'dd MMM yyyy' }, marker: { show: false } },
+                    xaxis: { categories: activeDates }
+                };
+
+                const chart = new ApexCharts(document.querySelector(`#timeline-chart-${data.channel}`), options);
+                chart.render();
+                window.timelineActiveCharts.push(chart);
+            });
+            filterTimeline();
+        }
+
+        function filterTimeline() {
+            const query = document.getElementById('timelineSearch').value.toLowerCase();
+            document.querySelectorAll('.timeline-card').forEach(card => {
+                card.style.display = card.getAttribute('data-name').includes(query) ? 'block' : 'none';
+            });
+        }
+
+        // Initialize System Engine
+        init(datePicker.value);
+
+    </script>
 </body>
+
 </html>
