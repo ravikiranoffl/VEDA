@@ -18,7 +18,7 @@
 
     <style>
         /* ========================================================== */
-        /* --- CORE OVERRIDES & MENU SPACING ENHANCEMENTS --- */
+        /* --- CORE OVERRIDES --- */
         /* ========================================================== */
         body, .card-title, .modal-text, .live-clock, .date-picker, .read-btn, input, button, select {
             font-family: 'Plus Jakarta Sans', 'Mandali', sans-serif !important;
@@ -306,7 +306,7 @@
             </div>
         </div>
 
-        <!-- VIEW: TERMINAL (NEW - Simulated Logs) -->
+        <!-- VIEW: TERMINAL (Simulated Logs) -->
         <div id="view-terminal" class="view-section">
             <h2 class="section-title">Live Terminal</h2>
             <div class="terminal-box" id="terminalOutput">
@@ -347,6 +347,90 @@
         </div>
     </div>
 
+    <!-- ======================================================= -->
+    <!-- VEDA SECURE NAP TIME PROTOCOL                           -->
+    <!-- ======================================================= -->
+    <style>
+        #vedaNapOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(3, 4, 7, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 1s ease;
+            text-align: center; padding: 1rem; overflow: hidden;
+        }
+        
+        #vedaNapOverlay.active { opacity: 1; pointer-events: all; }
+
+        .nap-content {
+            background: linear-gradient(180deg, rgba(10, 15, 25, 0.9) 0%, rgba(0,0,0,0.98) 100%);
+            border: 1px solid var(--accent); border-radius: 24px;
+            padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 4rem);
+            max-width: 600px; width: 100%; box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 30px var(--accent-glow);
+            transform: translateY(30px) scale(0.95); transition: all 1s ease;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        
+        #vedaNapOverlay.active .nap-content { transform: translateY(0) scale(1); }
+
+        .nap-title {
+            font-size: clamp(1.5rem, 5vw, 3.5rem); font-weight: 800; margin: 0 0 10px 0;
+            background: linear-gradient(135deg, #ffffff 10%, var(--accent) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--accent-glow); letter-spacing: clamp(1px, 1vw, 4px);
+            white-space: nowrap; /* ENFORCED NON-WRAPPING */
+        }
+
+        .nap-subtitle {
+            color: var(--accent); font-weight: 800; letter-spacing: clamp(2px, 1vw, 4px); text-transform: uppercase;
+            font-size: clamp(0.7rem, 2vw, 1rem); margin-bottom: 2rem;
+            animation: blinker 2s linear infinite; text-align: center;
+        }
+
+        .nap-text {
+            color: var(--text-muted); font-size: clamp(0.9rem, 2vw, 1.1rem); line-height: 1.6;
+            font-weight: 500; margin-bottom: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            text-align: center; max-width: 95%;
+        }
+
+        .nap-timer-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 15px clamp(30px, 6vw, 60px); border-radius: 50px;
+            background: rgba(0,0,0,0.8); border: 1px solid var(--border-highlight);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9); width: fit-content;
+        }
+
+        .nap-timer-text {
+            color: var(--stat-excellent); font-family: 'Fira Code', monospace;
+            font-size: clamp(1.3rem, 4vw, 2.2rem); font-weight: 700; letter-spacing: 2px;
+            margin-top: 5px; white-space: nowrap;
+        }
+
+        /* Floating Zzz Particles */
+        .zzz { position: absolute; color: var(--accent); font-weight: 800; opacity: 0; animation: floatZ 4s linear infinite; text-shadow: 0 0 15px var(--accent-glow); }
+        .z1 { left: 15%; top: 50%; animation-delay: 0s; font-size: 1.5rem; }
+        .z2 { left: 85%; top: 60%; animation-delay: 1.5s; font-size: 2rem; }
+        .z3 { left: 45%; top: 75%; animation-delay: 3s; font-size: 1.2rem; }
+
+        @keyframes floatZ { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 0.8; } 80% { opacity: 0.8; } 100% { transform: translateY(-80px) scale(1.5) translateX(20px); opacity: 0; } }
+        @keyframes blinker { 50% { opacity: 0.3; } }
+    </style>
+
+    <div id="vedaNapOverlay">
+        <div class="nap-content">
+            <div class="zzz z1">Z</div><div class="zzz z2">Z</div><div class="zzz z3">Z</div>
+            <h1 class="nap-title">SORRY, NAP TIME</h1>
+            <div class="nap-subtitle"><span class="status-dot"></span> NEURAL CORE COOLING PROTOCOL</div>
+            <p class="nap-text">
+                To maintain peak quantum extraction speeds, the global Matrix undergoes a mandatory deep-sleep thermal venting cycle. Intelligence nodes are currently resting and realigning their temporal arrays.
+            </p>
+            <div class="nap-timer-container">
+                <span style="color:var(--text-main); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; white-space: nowrap;">Uplink Resumes At</span>
+                <span class="nap-timer-text">02:00:00 IST</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         const MATRIX_UPLINK = 'https://ravikiranoffl.github.io/VEDA/';
 
@@ -362,7 +446,6 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
             
-            // Highlight active menu item
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active-menu'));
             const activeTrigger = document.querySelector(`.menu-item[onclick="switchView('${viewId}')"]`);
             if(activeTrigger) activeTrigger.classList.add('active-menu');
@@ -499,7 +582,6 @@
             }
         }
 
-        // --- GRID RENDERING WITH LIKE BUTTON ---
         function populateChannels(sources) {
             const c = document.getElementById('channelOptions'); c.innerHTML = '<div class="dropdown-option" data-value="all">Global Matrix (All)</div>';
             sources.sort().forEach(s => { const opt = document.createElement('div'); opt.className = 'dropdown-option'; opt.setAttribute('data-value', s); opt.innerText = s.replace(/_/g, ' '); c.appendChild(opt); });
@@ -532,7 +614,6 @@
                     <span class="timestamp">${item.published_at && item.published_at !== "N/A" ? formatStrictDate(item.published_at, true) : 'RECENT'}</span>
                 </div>
                 <h3 class="card-title">${item.title}</h3>
-                
                 <div class="card-actions">
                     <button class="like-btn ${isLiked}" onclick="toggleRegistry(event, '${item.id}', '${safeTitle}', '${item.url}', '${item.source}', '${item.published_at}')" title="Save to Registry">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -546,7 +627,6 @@
             return card;
         }
 
-        // --- MODULE: REGISTRY ---
         function toggleRegistry(event, id, title, url, source, published_at) {
             const btn = event.currentTarget;
             if (registryCache[id]) {
@@ -570,7 +650,6 @@
             items.forEach(item => regGrid.appendChild(createCardHTML(item, false, datePicker.value)));
         }
 
-        // --- MODULE: SEMANTIC MATRIX ---
         function generateLexicon() {
             const container = document.getElementById('lexiconContainer');
             if(rawData.length === 0) { container.innerHTML = "<p style='color:var(--text-muted); letter-spacing:2px;'>AWAITING DATA NODES...</p>"; return; }
@@ -583,7 +662,7 @@
                 words.forEach(w => { if(w.length > 3 && !stopWords.has(w)) counts[w] = (counts[w] || 0) + 1; });
             });
 
-            const sortedWords = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 45); // Top 45
+            const sortedWords = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 45);
             if(sortedWords.length === 0) return;
             const maxCount = sortedWords[0][1];
 
@@ -597,7 +676,7 @@
                 span.className = 'semantic-tag';
                 span.innerText = word;
                 span.style.fontSize = `${fontSize}rem`;
-                span.style.animationDelay = `${index * 0.04}s`; // Dynamic stagger
+                span.style.animationDelay = `${index * 0.04}s`;
                 span.title = `Found ${count} times in current temporal scan`;
                 
                 span.onclick = () => {
@@ -609,7 +688,6 @@
             });
         }
 
-        // --- MODULE: TERMINAL ---
         let terminalInterval;
         function startTerminal() {
             const box = document.getElementById('terminalOutput');
@@ -625,7 +703,6 @@
                 "[SYS] Memory usage: 42% (Stable)"
             ];
             
-            // Remove cursor from previous lines if it exists
             const existingCursor = box.querySelector('.cursor-blink');
             if(existingCursor) existingCursor.remove();
 
@@ -637,7 +714,6 @@
                 newLine.className = 'terminal-line';
                 const randLine = lines[Math.floor(Math.random() * lines.length)];
                 
-                // Color formatting logic
                 let formatted = randLine;
                 if(formatted.includes('[WARN]')) formatted = formatted.replace('[WARN]', '<span class="term-prefix term-warn">[WARN]</span>');
                 else if(formatted.includes('[SYS]')) formatted = formatted.replace('[SYS]', '<span class="term-prefix term-accent">[SYS]</span>');
@@ -647,13 +723,11 @@
                 box.appendChild(newLine);
                 box.scrollTop = box.scrollHeight;
 
-                // Keep terminal from getting too long in DOM
                 if(box.childElementCount > 50) box.removeChild(box.firstChild);
             }, 1500);
         }
         function stopTerminal() { clearInterval(terminalInterval); }
 
-        // --- MODULE: EXPORTER ---
         function exportDataToCSV() {
             if(rawData.length === 0) { alert("No data available to export in current coordinate."); return; }
             const headers = ["Source Node", "Headline Title", "Publication Timestamp", "Original Payload URL"];
@@ -672,10 +746,65 @@
             status.style.opacity = 1; setTimeout(() => status.style.opacity = 0, 3000);
         }
 
-        // --- ORIGINAL LOGIC (Health, Vault, Deep Archive, Telemetry) ---
         async function fetchAccurateHFSize(dateStr) { try { const headReq = await fetch(`https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`, { method: 'HEAD' }); if (headReq.ok) { document.getElementById('vaultDeepSize').innerText = (headReq.headers.get('content-length') / (1024 * 1024)).toFixed(2) + ' MB'; } } catch (e) {} }
         async function loadStatusLog() { try { const res = await fetch(MATRIX_UPLINK + 'status.json'); if (res.ok) { statusLogData = await res.json(); renderNodeHealth(); } } catch (e) {} }
-        function renderNodeHealth() { /* Maintained existing node health logic internally */ }
+
+        // --- FIXED AND FULLY POPULATED NODE HEALTH FUNCTION ---
+        function renderNodeHealth() {
+            if (!statusLogData || statusLogData.length === 0) return;
+            const nodeStats = {}; const totalRuns = statusLogData.length;
+            statusLogData.forEach(run => {
+                for (let [node, state] of Object.entries(run.status)) {
+                    if (!nodeStats[node]) nodeStats[node] = { success: 0, fail: 0, reportsToday: 0 };
+                    if (state === 1) nodeStats[node].success++; else nodeStats[node].fail++;
+                }
+            });
+            rawData.forEach(item => { if (nodeStats[item.source]) nodeStats[item.source].reportsToday++; });
+
+            let stableC = 0, warnC = 0, deadC = 0;
+            const sortedNodes = Object.entries(nodeStats).sort((a, b) => {
+                let rateA = a[1].success / totalRuns; let rateB = b[1].success / totalRuns;
+                if (rateB !== rateA) return rateB - rateA; return b[1].reportsToday - a[1].reportsToday;
+            });
+
+            const container = document.getElementById('nodeHealthContainer');
+            container.innerHTML = '';
+
+            sortedNodes.forEach(([node, stats]) => {
+                let rate = (stats.success / totalRuns) * 100;
+                let statusColor = "var(--stat-excellent)", statusTag = "STABLE", recText = "Active and Operational.";
+                if (rate === 100) { stableC++; }
+                else if (rate > 0) { statusColor = "var(--stat-warn)"; statusTag = "INTERMITTENT"; warnC++; recText = "WAF blocks detected. Engine bypassing when possible."; }
+                else { statusColor = "var(--stat-dead)"; statusTag = "DEAD NODE"; deadC++; recText = "Severe Firewall. Recommend deprecating node."; }
+
+                const cleanName = node.replace(/_/g, ' ');
+                const domNode = document.createElement('div');
+                domNode.className = 'health-node';
+
+                domNode.innerHTML = `
+                <div class="node-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span class="node-title">${cleanName}</span>
+                    <span class="node-tag" style="color: ${statusColor}; border: 1px solid ${statusColor}; box-shadow: 0 0 20px ${statusColor}50;">
+                        ${rate.toFixed(0)}% ${statusTag}
+                    </span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width: ${rate}%; background: ${statusColor}; box-shadow: 0 0 20px ${statusColor};"></div></div>
+                <div class="node-details">
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <span style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 0.95rem); letter-spacing:2px; font-weight: 600;">LIFETIME RUNS: <span style="color:var(--text-main); font-weight:800;">${stats.success}/${totalRuns} Success</span></span>
+                        <span style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 0.95rem); letter-spacing:2px; font-weight: 600;">REPORTS EXTRACTED TODAY: <span style="color:var(--text-main); font-weight:800;">${stats.reportsToday}</span></span>
+                    </div>
+                    <span style="color: ${statusColor}; font-size: clamp(0.85rem, 2.5vw, 1rem); max-width: 100%; font-weight:700;">${recText}</span>
+                </div>
+                `;
+                container.appendChild(domNode);
+            });
+
+            document.getElementById('healthStableCount').innerText = stableC;
+            document.getElementById('healthWarnCount').innerText = warnC;
+            document.getElementById('healthDeadCount').innerText = deadC;
+        }
+
         function calculateStats() {
             if (!rawData.length) return; document.getElementById('statTotal').innerText = rawData.length;
             const counts = {}; rawData.forEach(i => counts[i.source] = (counts[i.source] || 0) + 1);
@@ -734,7 +863,6 @@
                 card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;"><h3 style="margin:0; font-size: 1rem; color: ${statusColor};">${data.channel.replace(/_/g, ' ')}</h3></div><div id="timeline-chart-${data.channel}" style="width:100%; height:100px;"></div>`;
                 dashboard.appendChild(card);
                 
-                // EXPLICIT SMOOTH CURVE SETTINGS
                 const chartOptions = { 
                     series: [{ name: 'Extractions', data: data.timeSeries }], 
                     chart: { type: 'area', height: 100, sparkline: { enabled: true }, animations: { enabled: true, easing: 'easeinout', speed: 800 } }, 
@@ -751,97 +879,16 @@
         function filterTimeline() { const query = document.getElementById('timelineSearch').value.toLowerCase(); document.querySelectorAll('.timeline-card').forEach(card => card.style.display = card.getAttribute('data-name').includes(query) ? 'block' : 'none'); }
 
         init(datePicker.value);
-    </script>
-    
-    <!-- ======================================================= -->
-    <!-- VEDA SECURE NAP TIME PROTOCOL (APPEND BEFORE </body>)   -->
-    <!-- ======================================================= -->
-    <style>
-        #vedaNapOverlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(3, 4, 7, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 1.2s cubic-bezier(0.19, 1, 0.22, 1);
-            text-align: center; padding: 2rem; overflow: hidden;
-        }
-        
-        #vedaNapOverlay.active { opacity: 1; pointer-events: all; }
 
-        .nap-content {
-            background: linear-gradient(180deg, rgba(10, 15, 25, 0.8) 0%, rgba(0,0,0,0.95) 100%);
-            border: 1px solid var(--accent); border-radius: 30px;
-            padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
-            max-width: 700px; width: 100%; box-shadow: 0 30px 80px rgba(0,0,0,1), inset 0 0 40px var(--accent-glow);
-            transform: translateY(40px) scale(0.95); transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
-            position: relative; overflow: hidden;
-        }
-        
-        #vedaNapOverlay.active .nap-content { transform: translateY(0) scale(1); }
-
-        .nap-content::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 50%);
-            animation: pulseNap 6s infinite alternate; pointer-events: none; opacity: 0.3;
-        }
-
-        .nap-title {
-            font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin: 0 0 10px 0;
-            background: linear-gradient(135deg, #ffffff 10%, var(--accent) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px var(--accent-glow); letter-spacing: 4px;
-        }
-
-        .nap-subtitle {
-            color: var(--accent); font-weight: 800; letter-spacing: 6px; text-transform: uppercase;
-            font-size: clamp(0.8rem, 2.5vw, 1.2rem); margin-bottom: 2.5rem;
-            animation: blinker 2s linear infinite;
-        }
-
-        .nap-text {
-            color: var(--text-muted); font-size: clamp(1rem, 3vw, 1.3rem); line-height: 1.8;
-            font-weight: 500; margin-bottom: 3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-
-        .nap-timer-container {
-            display: inline-block; padding: 15px 40px; border-radius: 50px;
-            background: rgba(0,0,0,0.6); border: 1px solid var(--border-highlight);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-        }
-
-        .nap-timer-text {
-            color: var(--stat-excellent); font-family: 'Fira Code', monospace;
-            font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 700; letter-spacing: 3px;
-        }
-
-        /* Floating Zzz Particles */
-        .zzz { position: absolute; color: var(--accent); font-weight: 800; font-size: 1.5rem; opacity: 0; animation: floatZ 4s linear infinite; text-shadow: 0 0 15px var(--accent-glow); }
-        .z1 { left: 20%; top: 60%; animation-delay: 0s; }
-        .z2 { left: 80%; top: 70%; animation-delay: 1.5s; font-size: 2rem; }
-        .z3 { left: 50%; top: 80%; animation-delay: 3s; font-size: 1.2rem; }
-
-        @keyframes floatZ { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 0.8; } 80% { opacity: 0.8; } 100% { transform: translateY(-100px) scale(1.5) translateX(20px); opacity: 0; } }
-        @keyframes pulseNap { 0% { transform: scale(0.8); opacity: 0.2; } 100% { transform: scale(1.1); opacity: 0.5; } }
-        @keyframes blinker { 50% { opacity: 0.3; } }
-    </style>
-
-    <div id="vedaNapOverlay">
-        <div class="nap-content">
-            <div class="zzz z1">Z</div><div class="zzz z2">Z</div><div class="zzz z3">Z</div>
-            <h1 class="nap-title">SORRY, NAP TIME</h1>
-            <div class="nap-subtitle"><span class="status-dot"></span> NEURAL CORE COOLING PROTOCOL</div>
-            <p class="nap-text">
-                To maintain peak quantum extraction speeds, the global Matrix undergoes a mandatory deep-sleep thermal venting cycle. Intelligence nodes are currently resting and realigning their temporal arrays.
-            </p>
-            <div class="nap-timer-container">
-                <span style="color:var(--text-main); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 5px;">Uplink Resumes At</span>
-                <div class="nap-timer-text">02:00:00 IST</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
+        // --- NEW BYPASS ENABLED NAP TIME CHECK ---
         function checkMatrixNapTime() {
-            // Get current time and convert exactly to IST (UTC + 5:30)
+            // BACKDOOR: If bypass is set in localStorage, instantly unlock
+            if (localStorage.getItem('bypass') === '1') {
+                document.getElementById('vedaNapOverlay').classList.remove('active');
+                document.body.style.overflow = '';
+                return;
+            }
+
             const now = new Date();
             const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
             const istTime = new Date(utc + (3600000 * 5.5));
@@ -849,26 +896,20 @@
             const hours = istTime.getHours();
             const minutes = istTime.getMinutes();
 
-            // Definer Nap Window: 23:59 to 01:59 (inclusive)
             const isNapTime = (hours === 23 && minutes >= 59) || (hours === 0) || (hours === 1);
             
             const overlay = document.getElementById('vedaNapOverlay');
             
             if (isNapTime) {
                 overlay.classList.add('active');
-                // Lock the background scrolling so they can't bypass the UI
                 document.body.style.overflow = 'hidden'; 
             } else {
                 overlay.classList.remove('active');
-                // Restore scrolling
                 document.body.style.overflow = '';
             }
         }
 
-        // Run immediately on page load
         checkMatrixNapTime();
-        
-        // Continually check every 30 seconds to lock/unlock exactly on time without refreshing
         setInterval(checkMatrixNapTime, 30000);
     </script>
 </body>
