@@ -752,5 +752,124 @@
 
         init(datePicker.value);
     </script>
+    
+    <!-- ======================================================= -->
+    <!-- VEDA SECURE NAP TIME PROTOCOL (APPEND BEFORE </body>)   -->
+    <!-- ======================================================= -->
+    <style>
+        #vedaNapOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(3, 4, 7, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+            text-align: center; padding: 2rem; overflow: hidden;
+        }
+        
+        #vedaNapOverlay.active { opacity: 1; pointer-events: all; }
+
+        .nap-content {
+            background: linear-gradient(180deg, rgba(10, 15, 25, 0.8) 0%, rgba(0,0,0,0.95) 100%);
+            border: 1px solid var(--accent); border-radius: 30px;
+            padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+            max-width: 700px; width: 100%; box-shadow: 0 30px 80px rgba(0,0,0,1), inset 0 0 40px var(--accent-glow);
+            transform: translateY(40px) scale(0.95); transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative; overflow: hidden;
+        }
+        
+        #vedaNapOverlay.active .nap-content { transform: translateY(0) scale(1); }
+
+        .nap-content::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 50%);
+            animation: pulseNap 6s infinite alternate; pointer-events: none; opacity: 0.3;
+        }
+
+        .nap-title {
+            font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin: 0 0 10px 0;
+            background: linear-gradient(135deg, #ffffff 10%, var(--accent) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--accent-glow); letter-spacing: 4px;
+        }
+
+        .nap-subtitle {
+            color: var(--accent); font-weight: 800; letter-spacing: 6px; text-transform: uppercase;
+            font-size: clamp(0.8rem, 2.5vw, 1.2rem); margin-bottom: 2.5rem;
+            animation: blinker 2s linear infinite;
+        }
+
+        .nap-text {
+            color: var(--text-muted); font-size: clamp(1rem, 3vw, 1.3rem); line-height: 1.8;
+            font-weight: 500; margin-bottom: 3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .nap-timer-container {
+            display: inline-block; padding: 15px 40px; border-radius: 50px;
+            background: rgba(0,0,0,0.6); border: 1px solid var(--border-highlight);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+        }
+
+        .nap-timer-text {
+            color: var(--stat-excellent); font-family: 'Fira Code', monospace;
+            font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 700; letter-spacing: 3px;
+        }
+
+        /* Floating Zzz Particles */
+        .zzz { position: absolute; color: var(--accent); font-weight: 800; font-size: 1.5rem; opacity: 0; animation: floatZ 4s linear infinite; text-shadow: 0 0 15px var(--accent-glow); }
+        .z1 { left: 20%; top: 60%; animation-delay: 0s; }
+        .z2 { left: 80%; top: 70%; animation-delay: 1.5s; font-size: 2rem; }
+        .z3 { left: 50%; top: 80%; animation-delay: 3s; font-size: 1.2rem; }
+
+        @keyframes floatZ { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 0.8; } 80% { opacity: 0.8; } 100% { transform: translateY(-100px) scale(1.5) translateX(20px); opacity: 0; } }
+        @keyframes pulseNap { 0% { transform: scale(0.8); opacity: 0.2; } 100% { transform: scale(1.1); opacity: 0.5; } }
+        @keyframes blinker { 50% { opacity: 0.3; } }
+    </style>
+
+    <div id="vedaNapOverlay">
+        <div class="nap-content">
+            <div class="zzz z1">Z</div><div class="zzz z2">Z</div><div class="zzz z3">Z</div>
+            <h1 class="nap-title">SORRY, NAP TIME</h1>
+            <div class="nap-subtitle"><span class="status-dot"></span> NEURAL CORE COOLING PROTOCOL</div>
+            <p class="nap-text">
+                To maintain peak quantum extraction speeds, the global Matrix undergoes a mandatory deep-sleep thermal venting cycle. Intelligence nodes are currently resting and realigning their temporal arrays.
+            </p>
+            <div class="nap-timer-container">
+                <span style="color:var(--text-main); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 5px;">Uplink Resumes At</span>
+                <div class="nap-timer-text">02:00:00 IST</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkMatrixNapTime() {
+            // Get current time and convert exactly to IST (UTC + 5:30)
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const istTime = new Date(utc + (3600000 * 5.5));
+            
+            const hours = istTime.getHours();
+            const minutes = istTime.getMinutes();
+
+            // Definer Nap Window: 23:59 to 01:59 (inclusive)
+            const isNapTime = (hours === 23 && minutes >= 59) || (hours === 0) || (hours === 1);
+            
+            const overlay = document.getElementById('vedaNapOverlay');
+            
+            if (isNapTime) {
+                overlay.classList.add('active');
+                // Lock the background scrolling so they can't bypass the UI
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                overlay.classList.remove('active');
+                // Restore scrolling
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Run immediately on page load
+        checkMatrixNapTime();
+        
+        // Continually check every 30 seconds to lock/unlock exactly on time without refreshing
+        setInterval(checkMatrixNapTime, 30000);
+    </script>
 </body>
 </html>
