@@ -1,445 +1,549 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VEDA | Neural Matrix</title>
-       <!-- Core Fonts & Telugu Fallback -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Mandali&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
-        rel="stylesheet">
-
-    <!-- ApexCharts Engine -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAZR | Stats Matrix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <!-- EXTERNAL CSS LINK (UNTOUCHED) -->
-    <link rel="stylesheet" href="style.css">
-
-    <style>
-        /* ========================================================== */
-        /* --- CORE OVERRIDES --- */
-        /* ========================================================== */
-        body, .card-title, .modal-text, .live-clock, .date-picker, .read-btn, input, button, select {
-            font-family: 'Plus Jakarta Sans', 'Mandali', sans-serif !important;
-        }
-
-        /* Timeline Native Adaptations */
-        .timeline-controls { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 2rem; justify-content: center; }
-        .timeline-input {
-            background: rgba(10, 15, 25, 0.6); border: 1px solid var(--border-highlight);
-            color: var(--text-main); padding: 12px 20px; border-radius: 12px; font-weight: 600;
-            outline: none; transition: all 0.3s ease; flex: 1; min-width: 200px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); font-family: inherit;
-        }
-        .timeline-input:focus, .timeline-input:hover:not([readonly]) {
-            border-color: var(--accent); box-shadow: 0 15px 30px var(--accent-glow); transform: translateY(-2px);
-        }
-        select.timeline-input {
-            appearance: none; cursor: pointer;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat; background-position: right 20px top 50%; background-size: 12px auto;
-        }
-        select.timeline-input option { background: var(--bg-base); color: var(--text-main); }
-        .apexcharts-tooltip { background: var(--bg-base) !important; border: 1px solid var(--accent) !important; box-shadow: 0 0 20px var(--accent-glow) !important; color: var(--text-main) !important; }
-        .apexcharts-tooltip-title { background: rgba(0, 0, 0, 0.5) !important; border-bottom: 1px solid var(--border) !important; font-weight: 800 !important; }
-        .apexcharts-text { fill: var(--text-main) !important; }
-
-        /* ========================================================== */
-        /* --- DYNAMIC LIKE BUTTON & ANIMATIONS --- */
-        /* ========================================================== */
-        .card-actions {
-            display: flex; align-items: center; gap: 15px; margin-top: auto;
-            padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); width: 100%;
-        }
-        .like-btn {
-            background: transparent; border: none; outline: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            width: 45px; height: 45px; border-radius: 50%;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            background: rgba(0,0,0,0.4); border: 1px solid var(--border);
-        }
-        .like-btn svg { width: 20px; height: 20px; fill: transparent; stroke: var(--text-muted); stroke-width: 2px; transition: all 0.4s ease; }
-        .like-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 15px var(--accent-glow); }
-        .like-btn:hover svg { stroke: var(--accent); }
-        
-        .like-btn.liked { border-color: var(--accent); background: rgba(0,0,0,0.6); box-shadow: 0 0 20px var(--accent-glow); animation: heartPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .like-btn.liked svg { fill: var(--accent); stroke: var(--accent); filter: drop-shadow(0 0 5px var(--accent)); }
-        
-        @keyframes heartPop { 0% { transform: scale(1); } 40% { transform: scale(1.3) rotate(-10deg); } 70% { transform: scale(0.9) rotate(5deg); } 100% { transform: scale(1) rotate(0deg); } }
-
-        /* ========================================================== */
-        /* --- SEMANTIC LEXICON (WORD CLOUD) --- */
-        /* ========================================================== */
-        .lexicon-container {
-            display: flex; flex-wrap: wrap; gap: clamp(12px, 2.5vw, 25px); justify-content: center; align-items: center;
-            padding: clamp(2rem, 5vw, 4rem); background: rgba(5, 7, 12, 0.6); border-radius: 20px;
-            border: 1px solid var(--border-highlight); box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
-            min-height: 300px;
-        }
-        .semantic-tag {
-            background: linear-gradient(145deg, rgba(20,25,35,0.8) 0%, rgba(5,10,15,0.9) 100%);
-            border: 1px solid var(--accent); border-radius: 50px;
-            padding: clamp(8px, 1.5vw, 15px) clamp(16px, 3vw, 30px); color: var(--text-main); cursor: crosshair;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            text-transform: uppercase; font-weight: 800; display: inline-block;
-            opacity: 0; transform: scale(0.5); animation: tagPopIn 0.6s forwards;
-            position: relative; overflow: hidden;
-        }
-        .semantic-tag::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transform: skewX(-20deg); transition: 0s;
-        }
-        .semantic-tag:hover {
-            transform: translateY(-8px) scale(1.15) !important; background: var(--accent); color: var(--bg-base);
-            box-shadow: 0 20px 40px var(--accent-glow); text-shadow: none; z-index: 10;
-        }
-        .semantic-tag:hover::after { left: 200%; transition: 0.6s ease; }
-        
-        @keyframes tagPopIn { to { opacity: 1; transform: scale(1); } }
-
-        /* ========================================================== */
-        /* --- TERMINAL MODULE UI --- */
-        /* ========================================================== */
-        .terminal-box {
-            background: rgba(5, 5, 8, 0.95); border: 1px solid var(--border-highlight); border-radius: 16px;
-            padding: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.9);
-            width: 100%; height: clamp(400px, 60vh, 700px); overflow-y: auto; overflow-x: hidden;
-            font-family: 'Fira Code', monospace; position: relative;
-        }
-        .terminal-box::-webkit-scrollbar { width: 8px; }
-        .terminal-box::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-        .terminal-line { font-size: clamp(0.85rem, 2vw, 1rem); margin-bottom: 8px; line-height: 1.4; opacity: 0; animation: fadeInTerminal 0.2s forwards; word-wrap: break-word;}
-        .term-prefix { color: var(--text-muted); margin-right: 10px; }
-        .term-success { color: var(--stat-excellent); text-shadow: 0 0 10px var(--stat-excellent); }
-        .term-warn { color: var(--stat-warn); }
-        .term-err { color: var(--stat-dead); text-shadow: 0 0 10px var(--stat-dead); }
-        .term-accent { color: var(--accent); font-weight: 700; text-shadow: 0 0 10px var(--accent-glow); }
-        .cursor-blink { display: inline-block; width: 8px; height: 1em; background: var(--accent); vertical-align: middle; animation: blink 1s infinite; }
-        @keyframes fadeInTerminal { to { opacity: 1; } }
-
-        /* ========================================================== */
-        /* --- EXPORTER UI --- */
-        /* ========================================================== */
-        .exporter-box {
-            text-align: center; padding: clamp(3rem, 8vw, 6rem) 2rem; border-radius: 20px;
-            background: repeating-linear-gradient(45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 10px, rgba(10,15,25,0.4) 10px, rgba(10,15,25,0.4) 20px);
-            border: 2px dashed var(--accent); box-shadow: 0 0 40px rgba(0,0,0,0.5); max-width: 800px; margin: 0 auto;
-        }
-        .export-btn {
-            font-size: clamp(1rem, 3vw, 1.5rem); font-weight: 800; letter-spacing: 4px; padding: 20px 50px;
-            background: linear-gradient(90deg, var(--bg-base), var(--bg-grad1)); border: 2px solid var(--accent);
-            color: var(--accent); border-radius: 50px; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 10px 30px var(--accent-glow), inset 0 0 20px var(--accent-glow); transition: all 0.4s ease; font-family: inherit;
-        }
-        .export-btn:hover { background: var(--accent); color: var(--bg-base); box-shadow: 0 20px 50px var(--accent-glow); transform: scale(1.05); text-shadow: none; }
-    </style>
+    <link rel="stylesheet" href="index.css">
 </head>
-
 <body>
 
     <div class="ambient-engine">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+        <div class="orb orb-1"></div><div class="orb orb-2"></div>
     </div>
 
     <nav class="top-nav">
-        <h1 class="brand-logo">VEDA</h1>
+        <div class="brand-container">
+            <h1 class="brand-logo">NAZR</h1>
+            <div class="dispatch-time">Engine Pulse: <span id="nazrPulseTime">Tracking...</span></div>
+        </div>
+        <!-- VEDA Style Hamburger on Right -->
         <div class="hamburger" id="hamburgerBtn" onclick="toggleMenu()">
             <span></span><span></span><span></span>
         </div>
     </nav>
 
+    <!-- Sidebar Slides From Right -->
     <div class="sidebar" id="sidebarMenu">
-        <div class="sidebar-header">
-            <div id="liveClock" class="live-clock"></div>
-            <div class="close-btn" onclick="toggleMenu()">&#10005;</div>
-        </div>
-
-        <!-- REORDERED FOR OPTIMAL WORKFLOW (Most used to least used) -->
-        <a href="#" class="menu-item active-menu" onclick="switchView('view-home')">Datagrid</a>
-        <a href="#" class="menu-item" onclick="switchView('view-semantic')">SEMANTIC</a>
-        <a href="#" class="menu-item" onclick="switchView('view-timeline')">Temporal</a>
-        <a href="#" class="menu-item" onclick="switchView('view-registry')">REGISTRY</a>
-        <a href="#" class="menu-item" onclick="switchView('view-topography')">Topology</a>
-        <a href="#" class="menu-item" onclick="switchView('view-stats')">Rankings</a>
-        <a href="#" class="menu-item" onclick="switchView('view-health')">Nodestat</a>
-        <a href="#" class="menu-item" onclick="switchView('view-vault')">Payloads</a>
-        <a href="#" class="menu-item" onclick="switchView('view-telemetry')">Datalink</a>
-        <a href="#" class="menu-item" onclick="switchView('view-terminal')">TERMINAL</a>
-        <a href="#" class="menu-item" onclick="switchView('view-exporter')">EXPORTER</a>
-        <a href="#" class="menu-item" onclick="switchView('view-settings')">Controls</a>
+        <a href="#" class="menu-item active-menu" onclick="switchView('OVERVIEW')">OVERVIEW</a>
+        <a href="#" class="menu-item" onclick="switchView('TEMPORAL')">TEMPORAL</a>
+        <a href="#" class="menu-item" onclick="switchView('VITALITY')">VITALITY</a>
+        <a href="#" class="menu-item" onclick="switchView('VELOCITY')">VELOCITY</a>
+        <a href="#" class="menu-item" onclick="switchView('FAILURES')">FAILURES</a>
+        <a href="#" class="menu-item" onclick="switchView('TOPOLOGY')">TOPOLOGY</a>
+        <a href="#" class="menu-item" onclick="switchView('TERMINAL')">TERMINAL</a>
+        <a href="#" class="menu-item" onclick="switchView('REGISTRY')">REGISTRY</a>
+        <a href="#" class="menu-item" onclick="switchView('EXPORTER')">EXPORTER</a>
+        <a href="#" class="menu-item" onclick="switchView('SETTINGS')">SETTINGS</a>
     </div>
 
     <div class="container" id="mainContainer">
-
-        <!-- VIEW: HOME (Datagrid) -->
-        <div id="view-home" class="view-section active">
-            <header>
-                <h1>NEURAL MATRIX</h1>
-                <p style="color: var(--text-muted); font-size: clamp(0.85rem, 2.5vw, 1.1rem); margin-top: 1.5rem; text-transform: uppercase; letter-spacing: clamp(1px, 1vw, 4px); font-weight: 600;">
-                    <span class="status-dot"></span> Last Workflow Dispatch: <br class="mobile-break"><span id="lastSyncTimeMain" style="color: var(--accent); font-weight: 800; text-shadow: 0 0 15px var(--accent-glow); word-break: break-word;">Loading...</span>
-                </p>
-            </header>
-            <style>@media(min-width: 600px) { .mobile-break { display: none; } }</style>
-
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Initializing neural link...">
+        
+        <!-- VIEW 1: OVERVIEW -->
+        <div id="OVERVIEW" class="view-section active">
+            <div class="controls-wrapper">
+                <div>
+                    <h2 class="section-title" id="overviewTitle" style="margin:0; text-shadow:none;">Today's Matrix</h2>
+                    <div class="section-sub" style="margin:0; margin-top:5px;">Daily Execution Telemetry</div>
+                </div>
+                <input type="date" id="datePicker" class="date-picker">
             </div>
 
-            <div class="filters-wrapper">
-                <input type="date" id="datePicker" class="date-picker" min="2026-04-27">
-                <div class="custom-dropdown channel" id="channelDropdown">
-                    <div class="dropdown-selected" id="channelSelected">Global Matrix (All)</div>
-                    <div class="dropdown-options" id="channelOptions">
-                        <div class="dropdown-option" data-value="all">Global Matrix (All)</div>
-                    </div>
-                </div>
-                <div class="custom-dropdown" id="limitDropdown">
-                    <div class="dropdown-selected" id="limitSelected">Show 100 Intel</div>
-                    <div class="dropdown-options" id="limitOptions">
-                        <div class="dropdown-option" data-value="100">Show 100 Intel</div>
-                        <div class="dropdown-option" data-value="250">Show 250 Intel</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="news-grid"></div>
-        </div>
-
-        <!-- VIEW: SEMANTIC (Word Cloud) -->
-        <div id="view-semantic" class="view-section">
-            <h2 class="section-title">Semantic Matrix</h2>
-            <p style="text-align: center; color: var(--text-muted); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: -1.5rem; margin-bottom: 3rem;">Live Global Keyword Frequencies</p>
-            <div id="lexiconContainer" class="lexicon-container">
-                <!-- Javascript will inject word cloud tags here -->
+            <div class="data-grid" id="todayGrid">
+                <div style="color:var(--text-muted);">Establishing uplink to matrix...</div>
             </div>
         </div>
 
-        <!-- VIEW: TEMPORAL ANALYTICS (Smooth Curves) -->
-        <div id="view-timeline" class="view-section">
-            <h2 class="section-title">Temporal Analytics</h2>
-            <p id="timelineStats" style="text-align: center; color: var(--text-muted); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: -1.5rem; margin-bottom: 2rem;">Awaiting Telemetry Sync...</p>
-            <div class="timeline-controls">
-                <input type="text" id="timelineSearch" class="timeline-input" placeholder="Search specific node..." onkeyup="filterTimeline()">
-                <select id="timelineSort" class="timeline-input" onchange="triggerTimelineRender()"><option value="worst">Critical Nodes</option><option value="best">Stable Nodes</option><option value="alpha">Alpha Order</option></select>
-                <div style="display: flex; gap: 10px; flex: 2; min-width: 300px; align-items: center;">
-                    <input type="text" id="timelineStartDisplay" class="timeline-input" readonly placeholder="Start Date" style="background: rgba(0,0,0,0.4);" title="Calculated Start Window">
-                    <span style="color: var(--accent); font-weight: 800;">&rarr;</span>
-                    <input type="date" id="timelineEndPicker" class="timeline-input" min="2026-04-27" onchange="applyTimelineWindow()">
+        <!-- VIEW 2: TEMPORAL -->
+        <div id="TEMPORAL" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Temporal</h2>
+                    <div class="section-sub">Last 30 Days Execution Density Per Node</div>
+                </div>
+                <input type="text" id="temporalSearch" class="search-input" placeholder="Search Node..." onkeyup="renderTemporal()">
+            </div>
+            <div class="data-grid" id="temporalGrid"></div>
+        </div>
+
+        <!-- VIEW 3: VITALITY -->
+        <div id="VITALITY" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Vitality</h2>
+                    <div class="section-sub">Lifetime Success vs Failure Ratios</div>
                 </div>
             </div>
-            <div id="timelineLoader" style="text-align: center; padding: 60px; font-size: 1.2rem; font-weight: 800; letter-spacing: 3px; color: var(--accent); animation: blink 1.5s infinite;"><span class="status-dot"></span> ESTABLISHING UPLINK TO ARCHIVE...</div>
-            <div id="timelineDashboard" class="dashboard-grid"></div>
+            <div class="data-grid" id="vitalityGrid"></div>
         </div>
 
-        <!-- VIEW: REGISTRY (Memory Cache) -->
-        <div id="view-registry" class="view-section">
-            <h2 class="section-title">Local Registry</h2>
-            <p style="text-align: center; color: var(--text-muted); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: -1.5rem; margin-bottom: 3rem;">Pinned Intelligence Cached Locally</p>
-            <div id="registry-grid" class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));">
-                <!-- Javascript will inject liked articles here -->
+        <!-- VIEW 4: VELOCITY (Cards) -->
+        <div id="VELOCITY" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Velocity</h2>
+                    <div class="section-sub">Granular Duration Analytics (Seconds)</div>
+                </div>
             </div>
+            <div class="data-grid" id="velocityGrid"></div>
         </div>
 
-        <!-- VIEW: TOPOLOGY -->
-        <div id="view-topography" class="view-section">
-            <h2 class="section-title">Topology</h2>
-            <div class="glass-radar-container">
+        <!-- VIEW 5: FAILURES -->
+        <div id="FAILURES" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Failures</h2>
+                    <div class="section-sub">Isolated Workflow Disruptions</div>
+                </div>
+            </div>
+            <div class="data-grid" id="failuresGrid"></div>
+        </div>
+
+        <!-- VIEW 6: TOPOLOGY -->
+        <div id="TOPOLOGY" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Topology</h2>
+                    <div class="section-sub">Global Network Pulse Check</div>
+                </div>
+            </div>
+            <div class="radar-container">
                 <div class="radar-ring d1"></div><div class="radar-ring d2"></div><div class="radar-ring d3"></div>
                 <div class="sync-box">
-                    <h3 style="color: var(--text-main); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 300; margin-bottom: 1.5rem; margin-top: 0; letter-spacing: 2px;">Matrix Sync Status</h3>
-                    <p style="color: var(--accent); font-size: clamp(2.5rem, 8vw, 4rem); margin: 0; font-weight: 800; text-shadow: 0 0 40px var(--accent-glow);" id="liveIngestionRate">0.0 KB/s</p>
-                    <p style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 1.1rem); letter-spacing: clamp(2px, 1vw, 4px); margin-top: 15px; font-weight: 700;">LIVE INGESTION RATE</p>
-                    <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
-                    <p style="color: var(--text-main); font-size: clamp(1.1rem, 3vw, 1.5rem); margin: 0; font-weight: 600; word-break: break-word;" id="lastWorkflowTime">Awaiting Data...</p>
-                    <p style="color: var(--text-muted); font-size: clamp(0.7rem, 2vw, 0.9rem); letter-spacing: clamp(1px, 1vw, 3px); margin-top: 10px; font-weight: 700;">LAST WORKFLOW DISPATCH</p>
+                    <h3 style="color:var(--text-main); font-weight:300; font-size:2rem; margin:0;">Ecosystem Status</h3>
+                    <div style="font-size:4rem; font-weight:800; color:var(--stat-good); text-shadow:0 0 30px var(--stat-good);">SECURE</div>
+                    <p style="color:var(--text-muted); font-weight:700; letter-spacing:2px; margin-top:10px;">ALL NODES RESPONDING</p>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW: DIAGNOSTICS -->
-        <div id="view-stats" class="view-section">
-            <h2 class="section-title">Diagnostics</h2>
-            <div class="dashboard-grid">
-                <div class="dash-card"><h3>Total Headlines</h3><div class="value" id="statTotal">0</div><div class="sub">Active Nodes Checked</div></div>
-                <div class="dash-card"><h3>Dominant Node</h3><div class="value" id="statTopCount" style="font-size: clamp(2rem, 8vw, 3.5rem);">0</div><div class="sub" id="statTopName">Initializing...</div></div>
+        <!-- VIEW 7: TERMINAL -->
+        <div id="TERMINAL" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Terminal</h2>
+                    <div class="section-sub">Live Telemetry Handshake Logs</div>
+                </div>
             </div>
-            <div style="max-width: 1000px; margin: 0 auto; width: 100%;">
-                <h3 style="text-align: center; color: var(--accent); letter-spacing: clamp(2px, 1vw, 4px); margin-bottom: 2rem; text-transform: uppercase; font-size: clamp(1rem, 3vw, 1.3rem);">Node Activity Leaderboard</h3>
-                <ul class="lb-list" id="statLeaderboard"></ul>
+            <div class="chart-box" style="height: 500px; font-family:'Fira Code', monospace; background:rgba(5,7,12,0.95); overflow-y:auto;" id="terminalBox"></div>
+        </div>
+
+        <!-- VIEW 8: REGISTRY -->
+        <div id="REGISTRY" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Registry</h2>
+                    <div class="section-sub">Configured Ecosystem Endpoints</div>
+                </div>
+            </div>
+            <div class="data-grid" id="registryGrid"></div>
+        </div>
+
+        <!-- VIEW 9: EXPORTER -->
+        <div id="EXPORTER" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Exporter</h2>
+                    <div class="section-sub">Compile Flat Telemetry Extract</div>
+                </div>
+            </div>
+            <div class="chart-box" style="text-align: center; padding: 4rem 2rem;">
+                <h3 style="font-size:2rem; margin-top:0;">Download Complete Dataset</h3>
+                <p style="color:var(--text-muted); margin-bottom: 2rem;">Extracts all historical workflow execution logs across every connected node.</p>
+                <button class="theme-btn" style="background:var(--accent); color:#000;" onclick="downloadCSV()">Execute Dump &rarr;</button>
             </div>
         </div>
 
-        <!-- VIEW: HEALTH -->
-        <div id="view-health" class="view-section">
-            <h2 class="section-title">Node Health Status</h2>
-            <div class="dashboard-grid" style="margin-bottom: 3rem;">
-                <div class="dash-card"><h3 style="color: var(--stat-excellent);">Stable Nodes</h3><div class="value" id="healthStableCount">0</div><div class="sub" style="color: var(--stat-excellent);">100% UPTIME</div></div>
-                <div class="dash-card"><h3 style="color: var(--stat-warn);">Intermittent</h3><div class="value" id="healthWarnCount">0</div><div class="sub" style="color: var(--stat-warn);">WAF BLOCKS DETECTED</div></div>
-                <div class="dash-card"><h3 style="color: var(--stat-dead);">Dead Nodes</h3><div class="value" id="healthDeadCount">0</div><div class="sub" style="color: var(--stat-dead);">RECOMMEND REMOVAL</div></div>
+        <!-- VIEW 10: SETTINGS -->
+        <div id="SETTINGS" class="view-section">
+            <div class="header-flex">
+                <div>
+                    <h2 class="section-title">Settings</h2>
+                    <div class="section-sub">Matrix Calibration Themes</div>
+                </div>
             </div>
-            <div class="health-grid" id="nodeHealthContainer"><p style="text-align:center; color: var(--text-muted); font-size: clamp(1rem, 3vw, 1.2rem); letter-spacing: 2px;">Analyzing telemetry logs...</p></div>
+            <div class="theme-grid" id="themeGrid"></div>
         </div>
 
-        <!-- VIEW: VAULT -->
-        <div id="view-vault" class="view-section">
-            <h2 class="section-title">HEDA Vault Metrics</h2>
-            <div class="vault-grid">
-                <div class="dash-card vault-card"><h3>Light Archive Size</h3><div class="value vault-value" id="vaultLightSize">0 KB</div><div class="sub">GitHub Payload</div></div>
-                <div class="dash-card vault-card"><h3>Deep Archive Payload</h3><div class="value vault-value" id="vaultDeepSize">Loading...</div><div class="sub">Remote Content-Length</div></div>
-                <div class="dash-card vault-card"><h3>Extraction Status</h3><div class="value vault-value status-value"><span class="status-dot"></span> SECURE</div><div class="sub">LFS Storage Active</div></div>
-            </div>
-        </div>
-
-        <!-- VIEW: TELEMETRY -->
-        <div id="view-telemetry" class="view-section">
-            <h2 class="section-title">System Telemetry</h2>
-            <div class="dashboard-grid">
-                <div class="dash-card"><h3>Node Latency</h3><div class="value" id="telPing">12 ms</div><div class="sub">Local Uplink</div></div>
-                <div class="dash-card"><h3>HEDA CDN Routing</h3><div class="value" id="telCDN">24 ms</div><div class="sub">Global Edge Network</div></div>
-            </div>
-            <div style="text-align: center; margin-top: 4rem; padding: 0 10px;">
-                <p style="color: var(--text-muted); font-weight: 700; letter-spacing: clamp(1px, 1vw, 3px); font-size: clamp(0.7rem, 2vw, 1rem); padding: 20px clamp(15px, 4vw, 40px); border: 1px solid var(--border-highlight); border-radius: 50px; display: inline-block; background: rgba(10,15,25,0.8); box-shadow: 0 10px 30px rgba(0,0,0,0.5); word-break: break-word;">ENGINE: Python 3.12 &nbsp;|&nbsp; UI: Glass SPA &nbsp;|&nbsp; DATA: Trafilatura NLP</p>
-            </div>
-        </div>
-
-        <!-- VIEW: TERMINAL (Simulated Logs) -->
-        <div id="view-terminal" class="view-section">
-            <h2 class="section-title">Live Terminal</h2>
-            <div class="terminal-box" id="terminalOutput">
-                <div class="terminal-line"><span class="term-prefix">[SYS]</span> Initiating VEDA Terminal Protocol...</div>
-                <div class="terminal-line"><span class="term-prefix">[SYS]</span> Establishing secure WebSocket uplink... <span class="term-success">OK</span></div>
-                <!-- Terminal lines inject here -->
-            </div>
-        </div>
-
-        <!-- VIEW: EXPORTER (CSV DATA DUMP) -->
-        <div id="view-exporter" class="view-section">
-            <h2 class="section-title">Matrix Exporter</h2>
-            <div class="exporter-box">
-                <h3 style="font-size: clamp(1.2rem, 4vw, 2rem); margin-top: 0; color: var(--text-main); font-weight: 300;">Raw CSV Extraction</h3>
-                <p style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; margin-bottom: 3rem;">Convert current temporal coordinates and filtered intelligence into a flat CSV format for external Deep Learning ingestion.</p>
-                <button class="export-btn" onclick="exportDataToCSV()">Execute Dump &rarr;</button>
-                <p id="exportStatus" style="color: var(--stat-excellent); margin-top: 20px; font-weight: 800; opacity: 0; transition: opacity 0.4s ease;">DOWNLOAD INITIATED</p>
-            </div>
-        </div>
-
-        <!-- VIEW: SETTINGS -->
-        <div id="view-settings" class="view-section">
-            <h2 class="section-title">Matrix Calibration</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: clamp(2rem, 5vh, 4rem); font-size: clamp(0.9rem, 2.5vw, 1.2rem); letter-spacing: clamp(1px, 1vw, 3px); text-transform: uppercase; font-weight: 600;">Select Neural Core Color Interface</p>
-            <div style="display: flex; flex-wrap: wrap; gap: clamp(10px, 2vw, 25px); justify-content: center; max-width: 1400px; margin: 0 auto; width: 100%;" id="themeButtonsContainer"></div>
-        </div>
-
-    </div>
-
-    <!-- DEEP ARCHIVE MODAL -->
-    <div class="modal-overlay" id="deepModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">×</button>
-            <h2 id="modalTitle" style="color: var(--accent); margin-top:0; padding-right: clamp(40px, 8vw, 60px); line-height: 1.4; font-size: clamp(1.4rem, 4vw, 2.5rem); font-weight: 700; text-shadow: 0 0 30px var(--accent-glow);">Accessing Deep Archive...</h2>
-            <div id="modalBody" class="modal-text">
-                <p style="opacity:0.6; text-align:center; padding: clamp(30px, 5vw, 60px); font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; letter-spacing: 2px;"><span class="status-dot"></span> Establishing uplink to HEDA Vault...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ======================================================= -->
-    <!-- VEDA SECURE NAP TIME PROTOCOL                           -->
-    <!-- ======================================================= -->
-    <style>
-        #vedaNapOverlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(3, 4, 7, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 1s ease;
-            text-align: center; padding: 1rem; overflow: hidden;
-        }
-        
-        #vedaNapOverlay.active { opacity: 1; pointer-events: all; }
-
-        .nap-content {
-            background: linear-gradient(180deg, rgba(10, 15, 25, 0.9) 0%, rgba(0,0,0,0.98) 100%);
-            border: 1px solid var(--accent); border-radius: 24px;
-            padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 4rem);
-            max-width: 600px; width: 100%; box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 30px var(--accent-glow);
-            transform: translateY(30px) scale(0.95); transition: all 1s ease;
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        
-        #vedaNapOverlay.active .nap-content { transform: translateY(0) scale(1); }
-
-        .nap-title {
-            font-size: clamp(1.5rem, 5vw, 3.5rem); font-weight: 800; margin: 0 0 10px 0;
-            background: linear-gradient(135deg, #ffffff 10%, var(--accent) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px var(--accent-glow); letter-spacing: clamp(1px, 1vw, 4px);
-            white-space: nowrap; /* ENFORCED NON-WRAPPING */
-        }
-
-        .nap-subtitle {
-            color: var(--accent); font-weight: 800; letter-spacing: clamp(2px, 1vw, 4px); text-transform: uppercase;
-            font-size: clamp(0.7rem, 2vw, 1rem); margin-bottom: 2rem;
-            animation: blinker 2s linear infinite; text-align: center;
-        }
-
-        .nap-text {
-            color: var(--text-muted); font-size: clamp(0.9rem, 2vw, 1.1rem); line-height: 1.6;
-            font-weight: 500; margin-bottom: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-            text-align: center; max-width: 95%;
-        }
-
-        .nap-timer-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 15px clamp(30px, 6vw, 60px); border-radius: 50px;
-            background: rgba(0,0,0,0.8); border: 1px solid var(--border-highlight);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.9); width: fit-content;
-        }
-
-        .nap-timer-text {
-            color: var(--stat-excellent); font-family: 'Fira Code', monospace;
-            font-size: clamp(1.3rem, 4vw, 2.2rem); font-weight: 700; letter-spacing: 2px;
-            margin-top: 5px; white-space: nowrap;
-        }
-
-        /* Floating Zzz Particles */
-        .zzz { position: absolute; color: var(--accent); font-weight: 800; opacity: 0; animation: floatZ 4s linear infinite; text-shadow: 0 0 15px var(--accent-glow); }
-        .z1 { left: 15%; top: 50%; animation-delay: 0s; font-size: 1.5rem; }
-        .z2 { left: 85%; top: 60%; animation-delay: 1.5s; font-size: 2rem; }
-        .z3 { left: 45%; top: 75%; animation-delay: 3s; font-size: 1.2rem; }
-
-        @keyframes floatZ { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 0.8; } 80% { opacity: 0.8; } 100% { transform: translateY(-80px) scale(1.5) translateX(20px); opacity: 0; } }
-        @keyframes blinker { 50% { opacity: 0.3; } }
-    </style>
-
-    <div id="vedaNapOverlay">
-        <div class="nap-content">
-            <div class="zzz z1">Z</div><div class="zzz z2">Z</div><div class="zzz z3">Z</div>
-            <h1 class="nap-title">SORRY, NAP TIME</h1>
-            <div class="nap-subtitle"><span class="status-dot"></span> NEURAL CORE COOLING PROTOCOL</div>
-            <p class="nap-text">
-                To maintain peak quantum extraction speeds, the global Matrix undergoes a mandatory deep-sleep thermal venting cycle. Intelligence nodes are currently resting and realigning their temporal arrays.
-            </p>
-            <div class="nap-timer-container">
-                <span style="color:var(--text-main); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; white-space: nowrap;">Uplink Resumes At</span>
-                <span class="nap-timer-text">02:00:00 IST</span>
-            </div>
-        </div>
     </div>
 
     <script>
-        const MATRIX_UPLINK = 'https://ravikiranoffl.github.io/VEDA/';
+        // --- STRICT DD-MM-YYYY FORMATTER ---
+        function formatStrictDate(dateString) {
+            const d = new Date(dateString);
+            if (isNaN(d)) return "N/A";
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
 
-        // --- SPA ROUTING & MENU LOGIC ---
+        // --- SPA MENU LOGIC ---
         function toggleMenu() {
             document.getElementById('sidebarMenu').classList.toggle('active');
             document.getElementById('hamburgerBtn').classList.toggle('active');
-            const container = document.getElementById('mainContainer');
-            container.style.filter = document.getElementById('sidebarMenu').classList.contains('active') ? 'blur(10px) brightness(0.5)' : 'none';
+            document.getElementById('mainContainer').classList.toggle('blurred');
+        }
+
+        // --- THEME ENGINE ---
+        const themes = {
+            "Neon Matrix": { base: "#030507", grad1: "#0a111a", grad2: "#020204", accent: "#00ffcc", glow: "rgba(0,255,204,0.3)" },
+            "Magenta Fusion": { base: "#050003", grad1: "#17000d", grad2: "#030001", accent: "#e60073", glow: "rgba(230, 0, 115, 0.4)" },
+            "Azure Edge": { base: "#010306", grad1: "#051021", grad2: "#000103", accent: "#1e90ff", glow: "rgba(30, 144, 255, 0.4)" },
+            "Golden Vault": { base: "#050400", grad1: "#1a1600", grad2: "#030200", accent: "#ffd700", glow: "rgba(255, 215, 0, 0.4)" },
+            "Crimson Protocol": { base: "#050001", grad1: "#1c0005", grad2: "#030000", accent: "#dc143c", glow: "rgba(220, 20, 60, 0.4)" },
+            "Toxic Sludge": { base: "#020501", grad1: "#091703", grad2: "#010300", accent: "#77ff00", glow: "rgba(119, 255, 0, 0.3)" },
+            "Lavender Dream": { base: "#030105", grad1: "#0e061a", grad2: "#020103", accent: "#b366ff", glow: "rgba(179, 102, 255, 0.4)" },
+            "Obsidian Glass": { base: "#020202", grad1: "#0c0c0c", grad2: "#010101", accent: "#a9a9a9", glow: "rgba(169, 169, 169, 0.4)" },
+            "Copper Citadel": { base: "#040201", grad1: "#120904", grad2: "#030101", accent: "#d97736", glow: "rgba(217, 119, 54, 0.4)" },
+            "Teal Horizon": { base: "#000404", grad1: "#001412", grad2: "#000202", accent: "#00b3a6", glow: "rgba(0, 179, 166, 0.4)" }
+        };
+
+        function applyTheme(name) {
+            const t = themes[name];
+            document.documentElement.style.setProperty('--bg-base', t.base);
+            document.documentElement.style.setProperty('--bg-grad1', t.grad1);
+            document.documentElement.style.setProperty('--bg-grad2', t.grad2);
+            document.documentElement.style.setProperty('--accent', t.accent);
+            document.documentElement.style.setProperty('--accent-glow', t.glow);
+            document.documentElement.style.setProperty('--border-highlight', t.glow);
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText === name.toUpperCase()) btn.classList.add('active');
+            });
+            renderTemporal(); // Update chart colors instantly
+        }
+
+        function initThemes() {
+            const grid = document.getElementById('themeGrid');
+            Object.keys(themes).forEach(name => {
+                const btn = document.createElement('div');
+                btn.className = 'theme-btn'; btn.innerText = name.toUpperCase();
+                btn.style.background = `linear-gradient(135deg, ${themes[name].grad1}, ${themes[name].base})`;
+                btn.onclick = () => applyTheme(name);
+                grid.appendChild(btn);
+            });
+            applyTheme("Neon Matrix");
+        }
+
+        // --- CORE STATE ---
+        let allData = []; 
+        let projectsList = [];
+        let temporalCharts = [];
+
+        // --- DATE PICKER DYNAMICS ---
+        const datePicker = document.getElementById('datePicker');
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const todayStr = new Date(new Date().getTime() + istOffset).toISOString().split('T')[0];
+        
+        datePicker.min = "2026-02-01";
+        datePicker.max = todayStr;
+        datePicker.value = todayStr;
+        datePicker.setAttribute('data-date', formatStrictDate(todayStr));
+
+        datePicker.addEventListener('change', (e) => {
+            const selectedStr = e.target.value;
+            datePicker.setAttribute('data-date', formatStrictDate(selectedStr));
+            const titleDate = selectedStr === todayStr ? "Today's Matrix" : `Matrix: ${formatStrictDate(selectedStr)}`;
+            document.getElementById('overviewTitle').innerText = titleDate;
+            renderOverview(selectedStr);
+        });
+
+        // --- FETCH NAZR DISPATCH ---
+        async function fetchNAZRDispatch() {
+            try {
+                const res = await fetch('https://api.github.com/repos/ravikiranoffl/NAZR/actions/runs');
+                const data = await res.json();
+                if(data.workflow_runs && data.workflow_runs.length > 0) {
+                    const lastRun = new Date(data.workflow_runs[0].updated_at);
+                    const now = new Date();
+                    const diffMs = now - lastRun;
+                    const diffHrs = Math.floor(diffMs / 3600000);
+                    const diffMins = Math.floor((diffMs % 3600000) / 60000);
+                    document.getElementById('nazrPulseTime').innerText = diffHrs > 0 ? `${diffHrs} Hours Ago` : `${diffMins} Minutes Ago`;
+                }
+            } catch (e) {
+                document.getElementById('nazrPulseTime').innerText = "ONLINE";
+            }
+        }
+
+        // --- DATA INGESTION (WITH PAGES FILTER) ---
+        async function loadEcosystem() {
+            try {
+                fetchNAZRDispatch();
+                setInterval(fetchNAZRDispatch, 300000);
+
+                const regRes = await fetch('registry.json');
+                if (!regRes.ok) throw new Error("Registry missing.");
+                const registryData = await regRes.json();
+                
+                let fetchPromises = [];
+                registryData.repositories.forEach(url => {
+                    const repoName = url.split('/').pop();
+                    projectsList.push({ name: repoName, url: url });
+                    
+                    const promise = fetch(`REPOS/${repoName}/actions.json`)
+                        .then(res => res.ok ? res.json() : [])
+                        .then(data => {
+                            // IGNORE PAGES BUILD DEPLOYMENT
+                            const filteredData = data.filter(r => {
+                                const isPages = (r.name && r.name.toLowerCase().includes('pages build')) || 
+                                                (r.trigger_event && r.trigger_event.toLowerCase() === 'page_build') ||
+                                                (r.html_url && r.html_url.toLowerCase().includes('pages'));
+                                return !isPages;
+                            });
+                            filteredData.forEach(run => run.project = repoName); 
+                            allData.push(...filteredData); 
+                        })
+                        .catch(() => {});
+                    fetchPromises.push(promise);
+                });
+
+                await Promise.all(fetchPromises);
+                allData.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+                
+                renderOverview(datePicker.value);
+
+            } catch (err) {
+                document.getElementById('todayGrid').innerHTML = `<div style="color:var(--stat-dead)">Error: ${err.message}</div>`;
+            }
+        }
+
+        // --- RENDER: OVERVIEW ---
+        function renderOverview(targetDate) {
+            const grid = document.getElementById('todayGrid');
+            grid.innerHTML = '';
+
+            const dateRuns = allData.filter(run => run.updated_at.startsWith(targetDate));
+            if(dateRuns.length === 0) {
+                grid.innerHTML = `<div style="color:var(--text-muted); font-size:1.2rem; grid-column:1/-1;">NO TELEMETRY RECORDED FOR ${formatStrictDate(targetDate)}.</div>`;
+                return;
+            }
+
+            let projectGroups = [];
+            projectsList.forEach(proj => {
+                const projRuns = dateRuns.filter(r => r.project === proj.name);
+                if(projRuns.length > 0) {
+                    projRuns.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+                    projectGroups.push({ name: proj.name, latestTime: new Date(projRuns[0].updated_at).getTime(), runs: projRuns });
+                }
+            });
+            projectGroups.sort((a, b) => b.latestTime - a.latestTime);
+
+            projectGroups.forEach(group => {
+                const latestRun = group.runs[0];
+                const isSuccess = latestRun.conclusion === 'success';
+                const statusColor = isSuccess ? 'var(--stat-good)' : 'var(--stat-dead)';
+                
+                let logsHtml = '';
+                group.runs.forEach(r => {
+                    const tDate = new Date(r.updated_at);
+                    const hh = String(tDate.getHours()).padStart(2, '0');
+                    const mm = String(tDate.getMinutes()).padStart(2, '0');
+                    const ss = String(tDate.getSeconds()).padStart(2, '0');
+                    const iconColor = r.conclusion === 'success' ? 'var(--stat-good)' : 'var(--stat-dead)';
+                    logsHtml += `
+                        <div class="log-entry">
+                            <span><span class="log-time">[${hh}:${mm}:${ss}]</span> <span style="color:${iconColor}; margin-left:10px;">${r.conclusion==='success'?'✓':'✗'} ID:${r.run_id}</span></span>
+                            <span class="log-dur">${r.duration_seconds}s</span>
+                        </div>
+                    `;
+                });
+
+                const card = document.createElement('div');
+                card.className = 'node-card clickable';
+                card.setAttribute('onclick', "this.classList.toggle('expanded')");
+                card.innerHTML = `
+                    <div class="node-header">
+                        <div class="node-title">${group.name}</div>
+                        <div class="status-badge" style="color:${statusColor}; border-color:${statusColor};">${isSuccess ? 'STABLE' : 'FAILED'}</div>
+                    </div>
+                    <div class="stat-row"><span class="label">Total Executions:</span> <span class="val">${group.runs.length} Runs</span></div>
+                    <div class="stat-row"><span class="label">Latest Pulse (IST):</span> <span class="val">${new Date(latestRun.updated_at).toLocaleTimeString('en-IN', {timeZone: 'Asia/Kolkata', hour12:false})}</span></div>
+                    <div class="stat-row"><span class="label">Latest Duration:</span> <span class="val">${latestRun.duration_seconds}s</span></div>
+                    <div style="text-align:center; margin-top:10px; color:var(--accent); font-size:0.8rem; letter-spacing:2px; font-weight:800;">CLICK TO EXPAND LOGS ▾</div>
+                    <div class="run-logs" onclick="event.stopPropagation()">
+                        <div style="color:var(--text-muted); font-size:0.7rem; margin-bottom:10px; letter-spacing:1px;">Execution History (${formatStrictDate(targetDate)})</div>
+                        ${logsHtml}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- RENDER: TEMPORAL (With Search Filter) ---
+        function renderTemporal() {
+            const grid = document.getElementById('temporalGrid');
+            const query = document.getElementById('temporalSearch').value.toLowerCase();
+            
+            temporalCharts.forEach(c => c.destroy());
+            temporalCharts = [];
+            grid.innerHTML = '';
+
+            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+            const filteredProjects = projectsList.filter(p => p.name.toLowerCase().includes(query));
+            if(filteredProjects.length === 0) {
+                grid.innerHTML = `<div style="color:var(--text-muted);">NO MATCHING NODES.</div>`;
+                return;
+            }
+
+            filteredProjects.forEach(proj => {
+                const projRuns = allData.filter(r => r.project === proj.name);
+                if(projRuns.length === 0) return;
+
+                const dateMap = {};
+                projRuns.forEach(r => {
+                    const d = formatStrictDate(r.updated_at.split('T')[0]);
+                    dateMap[d] = (dateMap[d] || 0) + 1;
+                });
+
+                const sortedDates = Object.keys(dateMap).sort().slice(-30);
+                const counts = sortedDates.map(d => dateMap[d]);
+
+                const card = document.createElement('div');
+                card.className = 'node-card';
+                card.style.padding = '1.5rem';
+                card.innerHTML = `
+                    <div class="node-header" style="border:none; padding:0; margin-bottom:5px;">
+                        <div class="node-title" style="font-size:1.1rem;">${proj.name}</div>
+                        <div style="color:var(--accent); font-weight:800;">${counts.reduce((a,b)=>a+b,0)} Runs</div>
+                    </div>
+                    <div id="spark-${proj.name}" style="width:100%; height:80px;"></div>
+                `;
+                grid.appendChild(card);
+
+                const chart = new ApexCharts(document.querySelector(`#spark-${proj.name}`), {
+                    series: [{ name: 'Executions', data: counts }],
+                    chart: { type: 'area', height: 80, sparkline: { enabled: true } },
+                    stroke: { curve: 'smooth', width: 2, colors: [accent] },
+                    fill: { type: 'gradient', gradient: { opacityFrom: 0.5, opacityTo: 0.1, colorStops: [{offset:0, color:accent, opacity:0.4}, {offset:100, color:accent, opacity:0}] } },
+                    tooltip: { theme: 'dark', fixed: { enabled: false }, x: { show: false }, marker: { show: false } }
+                });
+                chart.render();
+                temporalCharts.push(chart);
+            });
+        }
+
+        // --- RENDER: VITALITY ---
+        function renderVitality() {
+            const grid = document.getElementById('vitalityGrid'); grid.innerHTML = '';
+            projectsList.forEach(proj => {
+                const projRuns = allData.filter(r => r.project === proj.name);
+                if(projRuns.length === 0) return;
+                const suc = projRuns.filter(r => r.conclusion === 'success').length;
+                const rate = ((suc / projRuns.length) * 100).toFixed(1);
+                let color = rate == 100 ? 'var(--stat-good)' : (rate > 80 ? 'var(--stat-warn)' : 'var(--stat-dead)');
+
+                grid.innerHTML += `
+                    <div class="node-card">
+                        <div class="node-header"><div class="node-title">${proj.name}</div><div style="font-size:1.5rem; font-weight:800; color:${color};">${rate}%</div></div>
+                        <div style="width:100%; height:8px; background:rgba(0,0,0,0.6); border-radius:4px; margin: 10px 0; overflow:hidden;">
+                            <div style="width:${rate}%; height:100%; background:${color}; box-shadow:0 0 10px ${color};"></div>
+                        </div>
+                        <div class="stat-row"><span class="label">Lifetime Scans:</span><span class="val">${projRuns.length}</span></div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- RENDER: VELOCITY (Cards Overhaul) ---
+        function renderVelocity() {
+            const grid = document.getElementById('velocityGrid'); grid.innerHTML = '';
+            projectsList.forEach(proj => {
+                const projRuns = allData.filter(r => r.project === proj.name);
+                if(projRuns.length === 0) return;
+                
+                let min = Infinity, max = 0, sum = 0;
+                projRuns.forEach(r => {
+                    const sec = r.duration_seconds;
+                    if(sec < min) min = sec;
+                    if(sec > max) max = sec;
+                    sum += sec;
+                });
+                const avg = (sum / projRuns.length).toFixed(1);
+                const latest = projRuns[0].duration_seconds;
+
+                grid.innerHTML += `
+                    <div class="node-card">
+                        <div class="node-header"><div class="node-title">${proj.name}</div><div class="status-badge" style="color:var(--accent); border-color:var(--accent);">SPEED</div></div>
+                        <div class="stat-row"><span class="label">Minimum Duration:</span><span class="val">${min}s</span></div>
+                        <div class="stat-row"><span class="label">Maximum Duration:</span><span class="val">${max}s</span></div>
+                        <div class="stat-row"><span class="label">Average Speed:</span><span class="val">${avg}s</span></div>
+                        <hr style="border-color:var(--border); margin:10px 0;">
+                        <div class="stat-row"><span class="label">Latest Pulse:</span><span class="val" style="color:var(--accent); text-shadow:0 0 10px var(--accent-glow);">${latest}s</span></div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- RENDER: FAILURES ---
+        function renderFailures() {
+            const grid = document.getElementById('failuresGrid'); grid.innerHTML = '';
+            const fails = allData.filter(r => r.conclusion !== 'success').slice(0, 30);
+            if(fails.length === 0) { grid.innerHTML = `<div style="color:var(--stat-good); font-weight:800; grid-column:1/-1;">NO CRITICAL FAILURES DETECTED.</div>`; return; }
+            fails.forEach(f => {
+                grid.innerHTML += `
+                    <div class="node-card" style="border-color:var(--stat-dead);">
+                        <div class="node-header"><div class="node-title">${f.project}</div><div class="status-badge" style="color:var(--stat-dead); border-color:var(--stat-dead);">CRASH</div></div>
+                        <div class="stat-row"><span class="label">Date:</span><span class="val">${formatStrictDate(f.updated_at.split('T')[0])}</span></div>
+                        <a href="${f.html_url}" target="_blank" class="btn" style="border-color:var(--stat-dead); color:var(--stat-dead); margin-top:15px; width:100%;">Inspect Log</a>
+                    </div>
+                `;
+            });
+        }
+
+        // --- RENDER: REGISTRY ---
+        function renderRegistry() {
+            const grid = document.getElementById('registryGrid'); grid.innerHTML = '';
+            projectsList.forEach(proj => {
+                grid.innerHTML += `
+                    <div class="node-card">
+                        <div class="node-header"><div class="node-title">${proj.name}</div></div>
+                        <div class="stat-row"><span class="label">Target Git:</span><span class="val" style="font-size:0.8rem;">${proj.url}</span></div>
+                        <div class="stat-row"><span class="label">Storage Path:</span><span class="val">REPOS/${proj.name}/actions.json</span></div>
+                        <a href="${proj.url}" target="_blank" class="btn" style="margin-top:15px; width:100%;">View Source</a>
+                    </div>
+                `;
+            });
+        }
+
+        // --- TERMINAL SIMULATOR ---
+        let termInt;
+        function startTerminal() {
+            const box = document.getElementById('terminalBox');
+            box.innerHTML = '';
+            const lines = ["[SYS] Initiating NAZR Engine...", "[NET] Scanning registry.json...", "[API] Handshake with GitHub Actions REST..."];
+            termInt = setInterval(() => {
+                const p = projectsList[Math.floor(Math.random()*projectsList.length)];
+                if(!p) return;
+                const newLines = [
+                    `[FET] GET /repos/ravikiranoffl/${p.name}/actions/runs`,
+                    `[DB] Deduplicating run_id for ${p.name}...`,
+                    `[SYS] ${p.name} updated successfully.`,
+                    `[WARN] Rate limit threshold stable (4900/5000)`
+                ];
+                const line = document.createElement('div');
+                line.style.marginBottom = '8px';
+                let text = newLines[Math.floor(Math.random()*newLines.length)];
+                if(text.includes('[SYS]')) text = `<span style="color:var(--stat-good)">${text}</span>`;
+                if(text.includes('[WARN]')) text = `<span style="color:var(--stat-warn)">${text}</span>`;
+                line.innerHTML = `<span style="color:var(--text-muted)">[${new Date().toLocaleTimeString()}]</span> ${text}`;
+                box.appendChild(line);
+                box.scrollTop = box.scrollHeight;
+                if(box.childElementCount > 50) box.removeChild(box.firstChild);
+            }, 1500);
+        }
+        function stopTerminal() { clearInterval(termInt); }
+
+        function downloadCSV() {
+            let csv = "Project,Run ID,Conclusion,Date,Duration(s),Log URL\n";
+            allData.forEach(r => csv += `${r.project},${r.run_id},${r.conclusion},${formatStrictDate(r.updated_at.split('T')[0])},${r.duration_seconds},${r.html_url}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `NAZR_EXPORT_${formatStrictDate(todayStr)}.csv`; a.click();
         }
 
         function switchView(viewId) {
@@ -447,470 +551,24 @@
             document.getElementById(viewId).classList.add('active');
             
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active-menu'));
-            const activeTrigger = document.querySelector(`.menu-item[onclick="switchView('${viewId}')"]`);
-            if(activeTrigger) activeTrigger.classList.add('active-menu');
+            event.currentTarget.classList.add('active-menu');
 
-            if (document.getElementById('sidebarMenu').classList.contains('active')) toggleMenu();
+            if(document.getElementById('sidebarMenu').classList.contains('active')) toggleMenu();
 
-            if (viewId === 'view-stats') calculateStats();
-            if (viewId === 'view-vault') calculateVaultMetrics();
-            if (viewId === 'view-timeline') { if (window.timelineAllDates && window.timelineAllDates.length === 0) fetchTimelineTelemetry(); }
-            if (viewId === 'view-registry') renderRegistry();
-            if (viewId === 'view-semantic') generateLexicon();
-            if (viewId === 'view-terminal') startTerminal(); else stopTerminal();
-
+            if(viewId === 'OVERVIEW') renderOverview(datePicker.value);
+            if(viewId === 'TEMPORAL') setTimeout(renderTemporal, 100);
+            if(viewId === 'VITALITY') renderVitality();
+            if(viewId === 'VELOCITY') renderVelocity();
+            if(viewId === 'FAILURES') renderFailures();
+            if(viewId === 'REGISTRY') renderRegistry();
+            if(viewId === 'TERMINAL') startTerminal(); else stopTerminal();
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function updateClock() {
-            const clockEl = document.getElementById('liveClock');
-            if (!clockEl) return;
-            const now = new Date();
-            const optionsTime = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            clockEl.innerHTML = now.toLocaleTimeString('en-US', optionsTime);
-        }
-        setInterval(updateClock, 1000); updateClock();
+        initThemes();
+        loadEcosystem();
 
-        function formatStrictDate(dateString, includeTime = false) {
-            const d = new Date(dateString); if (isNaN(d)) return "SELECT DATE";
-            const day = String(d.getDate()).padStart(2, '0'), month = String(d.getMonth() + 1).padStart(2, '0'), year = d.getFullYear();
-            let out = `${day}/${month}/${year}`;
-            if (includeTime) out += ` ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
-            return out;
-        }
-
-        // --- PREMIUM THEME ENGINE ---
-        const themes = {
-            "Magenta Fusion": { base: "#050003", grad1: "#17000d", grad2: "#030001", accent: "#e60073", glow: "rgba(230, 0, 115, 0.4)", text: "#ffe6f2" },
-            "Copper Citadel": { base: "#040201", grad1: "#120904", grad2: "#030101", accent: "#d97736", glow: "rgba(217, 119, 54, 0.4)", text: "#fdf0e6" },
-            "Teal Horizon": { base: "#000404", grad1: "#001412", grad2: "#000202", accent: "#00b3a6", glow: "rgba(0, 179, 166, 0.4)", text: "#e6fffd" },
-            "Lavender Dream": { base: "#030105", grad1: "#0e061a", grad2: "#020103", accent: "#b366ff", glow: "rgba(179, 102, 255, 0.4)", text: "#f4e6ff" },
-            "Golden Horizon": { base: "#050400", grad1: "#1a1600", grad2: "#030200", accent: "#ffd700", glow: "rgba(255, 215, 0, 0.4)", text: "#fffbe6" },
-            "Midnight Spruce": { base: "#000502", grad1: "#00170a", grad2: "#000301", accent: "#00fa9a", glow: "rgba(0, 250, 154, 0.4)", text: "#e6fff2" },
-            "Azure Nebula": { base: "#010306", grad1: "#051021", grad2: "#000103", accent: "#1e90ff", glow: "rgba(30, 144, 255, 0.4)", text: "#e6f2ff" },
-            "Crimson Velvet": { base: "#050001", grad1: "#1c0005", grad2: "#030000", accent: "#dc143c", glow: "rgba(220, 20, 60, 0.4)", text: "#ffe6eb" },
-            "Neon Chartreuse": { base: "#040500", grad1: "#141a00", grad2: "#020300", accent: "#dfff00", glow: "rgba(223, 255, 0, 0.4)", text: "#f9ffe6" },
-            "Obsidian Glass": { base: "#020202", grad1: "#0c0c0c", grad2: "#010101", accent: "#a9a9a9", glow: "rgba(169, 169, 169, 0.4)", text: "#f0f0f0" }
-        };
-
-        const themeNames = Object.keys(themes);
-        let currentTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
-
-        function applyTheme(themeName) {
-            const theme = themes[themeName]; if (!theme) return;
-            document.documentElement.style.setProperty('--bg-base', theme.base);
-            document.documentElement.style.setProperty('--bg-grad1', theme.grad1);
-            document.documentElement.style.setProperty('--bg-grad2', theme.grad2);
-            document.documentElement.style.setProperty('--accent', theme.accent);
-            document.documentElement.style.setProperty('--accent-glow', theme.glow);
-            document.documentElement.style.setProperty('--border-highlight', theme.glow);
-
-            document.querySelectorAll('.radar-ring').forEach(r => {
-                r.style.borderColor = theme.accent; r.style.boxShadow = `0 0 30px ${theme.glow}, inset 0 0 30px ${theme.glow}`;
-            });
-
-            if (window.timelineActiveCharts && window.timelineActiveCharts.length > 0 && document.getElementById('view-timeline').classList.contains('active')) triggerTimelineRender();
-        }
-
-        function highlightActiveTheme(selectedTheme) {
-            document.querySelectorAll('.theme-btn').forEach(b => {
-                if (b.innerText === selectedTheme) {
-                    b.classList.add('active-theme'); b.style.border = `2px solid ${themes[selectedTheme].accent}`;
-                    b.style.boxShadow = `0 15px 30px rgba(0,0,0,0.8), 0 0 25px ${themes[selectedTheme].glow}`;
-                } else {
-                    b.classList.remove('active-theme'); b.style.border = `1px solid transparent`; b.style.boxShadow = `0 5px 15px rgba(0,0,0,0.4)`;
-                }
-            });
-        }
-
-        applyTheme(currentTheme);
-        const themeContainer = document.getElementById('themeButtonsContainer');
-        themeNames.forEach(t => {
-            const btn = document.createElement('button'); btn.className = 'theme-btn'; btn.innerText = t;
-            btn.style.background = `linear-gradient(135deg, ${themes[t].grad1}, ${themes[t].base})`; btn.style.color = themes[t].text;
-            btn.onclick = () => { currentTheme = t; applyTheme(t); highlightActiveTheme(t); };
-            themeContainer.appendChild(btn);
-        });
-        highlightActiveTheme(currentTheme);
-
-        // --- FILTERS & SEARCH ---
-        function setupDropdown(dropdownId, selectedId, optionsId, onChangeCallback) {
-            const dropdown = document.getElementById(dropdownId), selected = document.getElementById(selectedId), optionsContainer = document.getElementById(optionsId);
-            selected.addEventListener('click', (e) => { e.stopPropagation(); document.querySelectorAll('.custom-dropdown').forEach(d => { if (d !== dropdown) d.classList.remove('active'); }); dropdown.classList.toggle('active'); });
-            optionsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('dropdown-option')) { selected.innerText = e.target.innerText; dropdown.classList.remove('active'); if (onChangeCallback) onChangeCallback(e.target.getAttribute('data-value')); } });
-        }
-        document.addEventListener('click', () => { document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active')); });
-
-        let currentChannelFilter = 'all'; setupDropdown('channelDropdown', 'channelSelected', 'channelOptions', (val) => { currentChannelFilter = val; filterAndRender(); });
-        let currentLimitFilter = 100; setupDropdown('limitDropdown', 'limitSelected', 'limitOptions', (val) => { currentLimitFilter = parseInt(val, 10); filterAndRender(); });
-
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('input', () => filterAndRender());
-
-        // --- DATA ENGINE ---
-        let rawData = []; let statusLogData = [];
-        const grid = document.getElementById('news-grid');
-        const datePicker = document.getElementById('datePicker');
-        let hfAccurateMb = "Loading...";
-
-        const istOffset = 5.5 * 60 * 60 * 1000;
-        const todayStr = new Date(new Date().getTime() + istOffset).toISOString().split('T')[0];
-
-        datePicker.value = todayStr; datePicker.max = todayStr; datePicker.setAttribute('data-date', formatStrictDate(todayStr, false));
-        datePicker.addEventListener('change', (e) => { datePicker.setAttribute('data-date', formatStrictDate(e.target.value, false)); init(e.target.value); });
-
-        let registryCache = JSON.parse(localStorage.getItem('veda_registry')) || {};
-
-        async function init(date) {
-            grid.innerHTML = '<p style="text-align:center; opacity:0.6; width:100%; grid-column: 1/-1; padding:clamp(20px,5vw,60px);"><span class="status-dot"></span> SECURE CONNECTION...</p>';
-            try {
-                const res = await fetch(MATRIX_UPLINK + `${date.split('-')[0]}/${date}.json`);
-                if (!res.ok) throw new Error("Data missing for coordinate.");
-                const data = await res.json();
-                rawData = [];
-                Object.keys(data.feeds).forEach(source => data.feeds[source].forEach(item => rawData.push({ ...item, source })));
-
-                if (rawData.length > 0) {
-                    const latestItem = rawData.reduce((a, b) => (new Date(b.published_at).getTime() || 0) > (new Date(a.published_at).getTime() || 0) ? b : a);
-                    document.getElementById('lastSyncTimeMain').innerText = formatStrictDate(latestItem.published_at, true);
-                    document.getElementById('lastWorkflowTime').innerText = formatStrictDate(latestItem.published_at, true);
-                }
-                populateChannels(Object.keys(data.feeds)); filterAndRender(); fetchAccurateHFSize(date); loadStatusLog();
-            } catch (e) {
-                grid.innerHTML = `<p style="text-align:center; color:var(--stat-dead); padding: 40px;">${e.message.toUpperCase()}</p>`;
-                rawData = [];
-            }
-        }
-
-        function populateChannels(sources) {
-            const c = document.getElementById('channelOptions'); c.innerHTML = '<div class="dropdown-option" data-value="all">Global Matrix (All)</div>';
-            sources.sort().forEach(s => { const opt = document.createElement('div'); opt.className = 'dropdown-option'; opt.setAttribute('data-value', s); opt.innerText = s.replace(/_/g, ' '); c.appendChild(opt); });
-            document.getElementById('channelSelected').innerText = 'Global Matrix (All)'; currentChannelFilter = 'all';
-        }
-
-        function filterAndRender() {
-            const query = searchInput.value.toLowerCase();
-            let filtered = rawData.filter(i => (currentChannelFilter === 'all' || i.source === currentChannelFilter) && (i.title.toLowerCase().includes(query) || i.source.toLowerCase().includes(query)));
-            if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; padding: 40px;">NO MATCHES.</p>'; return; }
-
-            filtered.sort((a, b) => (new Date(b.published_at).getTime() || 0) - (new Date(a.published_at).getTime() || 0));
-            filtered = filtered.slice(0, currentLimitFilter);
-
-            grid.innerHTML = '';
-            filtered.forEach((item, index) => {
-                grid.appendChild(createCardHTML(item, index === 0, datePicker.value));
-            });
-        }
-
-        function createCardHTML(item, isPinned, fallbackDate) {
-            const card = document.createElement('div');
-            card.className = `card ${isPinned ? 'pinned-latest' : ''}`;
-            const isLiked = registryCache[item.id] ? 'liked' : '';
-            const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-            
-            card.innerHTML = `
-                <div class="card-header">
-                    <span class="card-tag">${isPinned ? '<span class="status-dot"></span> BREAKING REAL-TIME' : item.source.replace(/_/g, ' ')}</span>
-                    <span class="timestamp">${item.published_at && item.published_at !== "N/A" ? formatStrictDate(item.published_at, true) : 'RECENT'}</span>
-                </div>
-                <h3 class="card-title">${item.title}</h3>
-                <div class="card-actions">
-                    <button class="like-btn ${isLiked}" onclick="toggleRegistry(event, '${item.id}', '${safeTitle}', '${item.url}', '${item.source}', '${item.published_at}')" title="Save to Registry">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
-                    </button>
-                    <button onclick="openDeepArchive('${item.id}', '${safeTitle}', '${item.url}', '${fallbackDate}')" class="read-btn" style="flex-grow:1;">Deep Scan &rarr;</button>
-                </div>
-            `;
-            setTimeout(() => card.style.opacity = 1, 50);
-            return card;
-        }
-
-        function toggleRegistry(event, id, title, url, source, published_at) {
-            const btn = event.currentTarget;
-            if (registryCache[id]) {
-                delete registryCache[id]; btn.classList.remove('liked');
-                if(document.getElementById('view-registry').classList.contains('active')) {
-                    const card = btn.closest('.card');
-                    card.style.opacity = 0; card.style.transform = 'scale(0.8)';
-                    setTimeout(() => card.remove(), 400);
-                }
-            } else {
-                registryCache[id] = { id, title, url, source, published_at, savedAt: new Date().getTime() };
-                btn.classList.add('liked');
-            }
-            localStorage.setItem('veda_registry', JSON.stringify(registryCache));
-        }
-
-        function renderRegistry() {
-            const regGrid = document.getElementById('registry-grid'); regGrid.innerHTML = '';
-            const items = Object.values(registryCache).sort((a,b) => b.savedAt - a.savedAt);
-            if (items.length === 0) { regGrid.innerHTML = '<p style="text-align:center; width:100%; color:var(--text-muted); font-size: 1.2rem; margin-top:50px;">NO INTEL CACHED YET. CLICK THE HEART ICON TO SAVE SECRETS.</p>'; return; }
-            items.forEach(item => regGrid.appendChild(createCardHTML(item, false, datePicker.value)));
-        }
-
-        function generateLexicon() {
-            const container = document.getElementById('lexiconContainer');
-            if(rawData.length === 0) { container.innerHTML = "<p style='color:var(--text-muted); letter-spacing:2px;'>AWAITING DATA NODES...</p>"; return; }
-            
-            const stopWords = new Set(['the','and','to','of','a','in','for','is','on','that','by','this','with','i','you','it','not','or','be','are','from','at','as','your','all','have','new','more','an','was','we','will','home','about','page','can','us','if','has','out','up']);
-            const counts = {};
-            
-            rawData.forEach(item => {
-                const words = item.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
-                words.forEach(w => { if(w.length > 3 && !stopWords.has(w)) counts[w] = (counts[w] || 0) + 1; });
-            });
-
-            const sortedWords = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 45);
-            if(sortedWords.length === 0) return;
-            const maxCount = sortedWords[0][1];
-
-            container.innerHTML = '';
-            sortedWords.forEach(([word, count], index) => {
-                const sizeRatio = (count / maxCount);
-                const fontSize = 0.85 + (sizeRatio * 1.5); 
-                const opacity = 0.5 + (sizeRatio * 0.5);
-                
-                const span = document.createElement('span');
-                span.className = 'semantic-tag';
-                span.innerText = word;
-                span.style.fontSize = `${fontSize}rem`;
-                span.style.animationDelay = `${index * 0.04}s`;
-                span.title = `Found ${count} times in current temporal scan`;
-                
-                span.onclick = () => {
-                    document.getElementById('searchInput').value = word;
-                    switchView('view-home');
-                    filterAndRender();
-                };
-                container.appendChild(span);
-            });
-        }
-
-        let terminalInterval;
-        function startTerminal() {
-            const box = document.getElementById('terminalOutput');
-            const lines = [
-                "[NET] Bypassing WAF protocols...",
-                "[EXT] Scraping XML RSS feeds from Node_Alpha...",
-                "[SYS] 200 OK - Payload size: 4.2MB",
-                "[AI] Running NLP Tokenization sequence...",
-                "[WARN] Node_Beta connection timed out. Retrying...",
-                "[DB] Writing to GitHub Pages artifact repository...",
-                "[NET] Establishing redundant P2P tunnels...",
-                "[EXT] Intercepting telemetry from foreign proxies...",
-                "[SYS] Memory usage: 42% (Stable)"
-            ];
-            
-            const existingCursor = box.querySelector('.cursor-blink');
-            if(existingCursor) existingCursor.remove();
-
-            terminalInterval = setInterval(() => {
-                const existingCursor = box.querySelector('.cursor-blink');
-                if(existingCursor) existingCursor.remove();
-
-                const newLine = document.createElement('div');
-                newLine.className = 'terminal-line';
-                const randLine = lines[Math.floor(Math.random() * lines.length)];
-                
-                let formatted = randLine;
-                if(formatted.includes('[WARN]')) formatted = formatted.replace('[WARN]', '<span class="term-prefix term-warn">[WARN]</span>');
-                else if(formatted.includes('[SYS]')) formatted = formatted.replace('[SYS]', '<span class="term-prefix term-accent">[SYS]</span>');
-                else formatted = `<span class="term-prefix">${formatted.split('] ')[0]}]</span> ` + formatted.split('] ')[1];
-                
-                newLine.innerHTML = `${formatted} <span class="cursor-blink"></span>`;
-                box.appendChild(newLine);
-                box.scrollTop = box.scrollHeight;
-
-                if(box.childElementCount > 50) box.removeChild(box.firstChild);
-            }, 1500);
-        }
-        function stopTerminal() { clearInterval(terminalInterval); }
-
-        function exportDataToCSV() {
-            if(rawData.length === 0) { alert("No data available to export in current coordinate."); return; }
-            const headers = ["Source Node", "Headline Title", "Publication Timestamp", "Original Payload URL"];
-            let csvContent = headers.join(",") + "\n";
-            rawData.forEach(row => {
-                const safeTitle = `"${row.title.replace(/"/g, '""')}"`;
-                csvContent += [row.source, safeTitle, row.published_at, row.url].join(",") + "\n";
-            });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob); link.download = `VEDA_EXPORT_${datePicker.value}.csv`;
-            link.style.visibility = 'hidden'; document.body.appendChild(link);
-            link.click(); document.body.removeChild(link);
-
-            const status = document.getElementById('exportStatus');
-            status.style.opacity = 1; setTimeout(() => status.style.opacity = 0, 3000);
-        }
-
-        async function fetchAccurateHFSize(dateStr) { try { const headReq = await fetch(`https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`, { method: 'HEAD' }); if (headReq.ok) { document.getElementById('vaultDeepSize').innerText = (headReq.headers.get('content-length') / (1024 * 1024)).toFixed(2) + ' MB'; } } catch (e) {} }
-        async function loadStatusLog() { try { const res = await fetch(MATRIX_UPLINK + 'status.json'); if (res.ok) { statusLogData = await res.json(); renderNodeHealth(); } } catch (e) {} }
-
-        // --- FIXED AND FULLY POPULATED NODE HEALTH FUNCTION ---
-        function renderNodeHealth() {
-            if (!statusLogData || statusLogData.length === 0) return;
-            const nodeStats = {}; const totalRuns = statusLogData.length;
-            statusLogData.forEach(run => {
-                for (let [node, state] of Object.entries(run.status)) {
-                    if (!nodeStats[node]) nodeStats[node] = { success: 0, fail: 0, reportsToday: 0 };
-                    if (state === 1) nodeStats[node].success++; else nodeStats[node].fail++;
-                }
-            });
-            rawData.forEach(item => { if (nodeStats[item.source]) nodeStats[item.source].reportsToday++; });
-
-            let stableC = 0, warnC = 0, deadC = 0;
-            const sortedNodes = Object.entries(nodeStats).sort((a, b) => {
-                let rateA = a[1].success / totalRuns; let rateB = b[1].success / totalRuns;
-                if (rateB !== rateA) return rateB - rateA; return b[1].reportsToday - a[1].reportsToday;
-            });
-
-            const container = document.getElementById('nodeHealthContainer');
-            container.innerHTML = '';
-
-            sortedNodes.forEach(([node, stats]) => {
-                let rate = (stats.success / totalRuns) * 100;
-                let statusColor = "var(--stat-excellent)", statusTag = "STABLE", recText = "Active and Operational.";
-                if (rate === 100) { stableC++; }
-                else if (rate > 0) { statusColor = "var(--stat-warn)"; statusTag = "INTERMITTENT"; warnC++; recText = "WAF blocks detected. Engine bypassing when possible."; }
-                else { statusColor = "var(--stat-dead)"; statusTag = "DEAD NODE"; deadC++; recText = "Severe Firewall. Recommend deprecating node."; }
-
-                const cleanName = node.replace(/_/g, ' ');
-                const domNode = document.createElement('div');
-                domNode.className = 'health-node';
-
-                domNode.innerHTML = `
-                <div class="node-header" onclick="this.parentElement.classList.toggle('active')">
-                    <span class="node-title">${cleanName}</span>
-                    <span class="node-tag" style="color: ${statusColor}; border: 1px solid ${statusColor}; box-shadow: 0 0 20px ${statusColor}50;">
-                        ${rate.toFixed(0)}% ${statusTag}
-                    </span>
-                </div>
-                <div class="progress-track"><div class="progress-fill" style="width: ${rate}%; background: ${statusColor}; box-shadow: 0 0 20px ${statusColor};"></div></div>
-                <div class="node-details">
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <span style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 0.95rem); letter-spacing:2px; font-weight: 600;">LIFETIME RUNS: <span style="color:var(--text-main); font-weight:800;">${stats.success}/${totalRuns} Success</span></span>
-                        <span style="color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 0.95rem); letter-spacing:2px; font-weight: 600;">REPORTS EXTRACTED TODAY: <span style="color:var(--text-main); font-weight:800;">${stats.reportsToday}</span></span>
-                    </div>
-                    <span style="color: ${statusColor}; font-size: clamp(0.85rem, 2.5vw, 1rem); max-width: 100%; font-weight:700;">${recText}</span>
-                </div>
-                `;
-                container.appendChild(domNode);
-            });
-
-            document.getElementById('healthStableCount').innerText = stableC;
-            document.getElementById('healthWarnCount').innerText = warnC;
-            document.getElementById('healthDeadCount').innerText = deadC;
-        }
-
-        function calculateStats() {
-            if (!rawData.length) return; document.getElementById('statTotal').innerText = rawData.length;
-            const counts = {}; rawData.forEach(i => counts[i.source] = (counts[i.source] || 0) + 1);
-            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-            document.getElementById('statTopName').innerText = sorted[0][0].replace(/_/g, ' ');
-            document.getElementById('statTopCount').innerText = sorted[0][1];
-            const lb = document.getElementById('statLeaderboard'); lb.innerHTML = '';
-            sorted.slice(0, 10).forEach(([s, c], i) => { lb.innerHTML += `<li><span class="lb-rank" style="color:var(--text-muted); font-weight:800; width:clamp(20px,4vw,40px);">#${i + 1}</span><span class="lb-name" style="flex-grow:1; font-weight:700; letter-spacing:2px; text-transform:uppercase;">${s.replace(/_/g, ' ')}</span><span class="lb-count" style="color:var(--accent); font-weight:800; text-shadow:0 0 15px var(--accent-glow);">${c}</span></li>`; });
-        }
-        function calculateVaultMetrics() { if (!rawData.length) return; const lightBytes = new TextEncoder().encode(JSON.stringify(rawData)).length; document.getElementById('vaultLightSize').innerText = (lightBytes / 1024).toFixed(1) + ' KB'; }
-
-        setInterval(() => {
-            document.getElementById('telPing').innerText = (Math.floor(Math.random() * 6) + 10) + ' ms';
-            document.getElementById('telCDN').innerText = (Math.floor(Math.random() * 10) + 18) + ' ms';
-            document.getElementById('liveIngestionRate').innerText = (Math.random() * 2.5 + 0.5).toFixed(2) + ' KB/s';
-        }, 2000);
-
-        let cachedDeepArchive = null; let cachedArchiveDate = null;
-        async function openDeepArchive(articleId, title, originalUrl, dateStr) {
-            const modal = document.getElementById('deepModal'), body = document.getElementById('modalBody');
-            document.getElementById('modalTitle').innerText = title; body.innerHTML = '<p style="opacity:0.7; text-align:center;"><span class="status-dot"></span> ESTABLISHING UPLINK TO VAULT...</p>'; modal.classList.add('active');
-            if (cachedArchiveDate !== dateStr || !cachedDeepArchive) {
-                try { const res = await fetch(`https://huggingface.co/datasets/ravikiranoffl/HEDA/resolve/main/data/${dateStr}.json`); if (!res.ok) throw new Error(); cachedDeepArchive = await res.json(); cachedArchiveDate = dateStr; } 
-                catch (e) { body.innerHTML = `<p style="color:var(--stat-dead); text-align:center;">VAULT NODE UNAVAILABLE.</p><div style="text-align:center;"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block;">FORCE ORIGINAL SOURCE</a></div>`; return; }
-            }
-            const txt = cachedDeepArchive[articleId];
-            if (txt) { body.innerText = txt; body.innerHTML += `<div style="text-align:center; margin-top: 40px;"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block;">ACCESS WEB INTERFACE</a></div>`; } 
-            else { body.innerHTML = `<p style="color:var(--stat-dead); text-align:center;">EXTRACTION FAILED.</p><div style="text-align:center;"><a href="${originalUrl}" target="_blank" class="read-btn" style="display:inline-block;">FORCE ORIGINAL SOURCE</a></div>`; }
-        }
-        function closeModal() { document.getElementById('deepModal').classList.remove('active'); }
-        document.getElementById('deepModal').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
-
-        window.timelineAllDates = []; window.timelineRawData = {}; window.timelineActiveCharts = []; window.timelineCurrentDates = [];
-        async function fetchTimelineTelemetry() { try { const response = await fetch(MATRIX_UPLINK + 'status.json'); if (!response.ok) throw new Error(); processTimelineData(await response.json()); } catch (e) { document.getElementById('timelineLoader').innerHTML = `<span style="color:var(--stat-dead)">UPLINK FAILED</span>`; } }
-        function processTimelineData(data) {
-            const datesSet = new Set();
-            data.forEach(run => { const ts = run.run_time_utc || run.run_time_ist; if (!ts) return; const dateStr = ts.split(" ")[0]; datesSet.add(dateStr); const statusObj = run.status || {}; Object.keys(statusObj).forEach(channel => { if (!window.timelineRawData[channel]) window.timelineRawData[channel] = {}; window.timelineRawData[channel][dateStr] = (window.timelineRawData[channel][dateStr] || 0) + statusObj[channel]; }); });
-            window.timelineAllDates = Array.from(datesSet).sort(); const latestDate = window.timelineAllDates[window.timelineAllDates.length - 1]; document.getElementById('timelineEndPicker').max = latestDate; document.getElementById('timelineEndPicker').value = latestDate; applyTimelineWindow();
-        }
-        function applyTimelineWindow() {
-            const endDateStr = document.getElementById('timelineEndPicker').value; if (!endDateStr) return; const d = new Date(endDateStr + "T00:00:00"); d.setDate(d.getDate() - 7);
-            const startDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            window.timelineCurrentDates = window.timelineAllDates.filter(date => date >= startDateStr && date <= endDateStr);
-            document.getElementById('timelineStartDisplay').value = `From: ${window.timelineCurrentDates.length > 0 ? window.timelineCurrentDates[0] : startDateStr}`;
-            triggerTimelineRender();
-        }
-        function triggerTimelineRender() {
-            const dashboard = document.getElementById('timelineDashboard'); const sortMethod = document.getElementById('timelineSort').value;
-            window.timelineActiveCharts.forEach(c => c.destroy()); window.timelineActiveCharts = []; dashboard.innerHTML = ''; document.getElementById('timelineLoader').style.display = 'none';
-            const activeAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-            let channelsData = Object.keys(window.timelineRawData).map(channel => { const ts = window.timelineCurrentDates.map(d => window.timelineRawData[channel][d] || 0); return { channel, timeSeries: ts, total: ts.reduce((a, b) => a + b, 0) }; });
-            channelsData.sort((a, b) => sortMethod === 'worst' ? a.total - b.total : sortMethod === 'best' ? b.total - a.total : a.channel.localeCompare(b.channel));
-            channelsData.forEach((data, index) => {
-                let statusColor = data.total === 0 ? "var(--stat-dead)" : data.timeSeries.includes(0) ? "var(--stat-warn)" : "var(--stat-excellent)";
-                const card = document.createElement('div'); card.className = 'dash-card timeline-card'; card.setAttribute('data-name', data.channel.replace(/_/g, ' ').toLowerCase()); card.style.padding = '1.5rem';
-                card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;"><h3 style="margin:0; font-size: 1rem; color: ${statusColor};">${data.channel.replace(/_/g, ' ')}</h3></div><div id="timeline-chart-${data.channel}" style="width:100%; height:100px;"></div>`;
-                dashboard.appendChild(card);
-                
-                const chartOptions = { 
-                    series: [{ name: 'Extractions', data: data.timeSeries }], 
-                    chart: { type: 'area', height: 100, sparkline: { enabled: true }, animations: { enabled: true, easing: 'easeinout', speed: 800 } }, 
-                    stroke: { curve: 'smooth', width: 3, colors: [activeAccent] }, 
-                    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.0, stops: [0, 100], colorStops: [{ offset: 0, color: activeAccent, opacity: 0.4 }, { offset: 100, color: activeAccent, opacity: 0 }] } }, 
-                    tooltip: { theme: 'dark' }, 
-                    xaxis: { categories: window.timelineCurrentDates } 
-                };
-                
-                const chart = new ApexCharts(document.querySelector(`#timeline-chart-${data.channel}`), chartOptions);
-                chart.render(); window.timelineActiveCharts.push(chart);
-            });
-        }
-        function filterTimeline() { const query = document.getElementById('timelineSearch').value.toLowerCase(); document.querySelectorAll('.timeline-card').forEach(card => card.style.display = card.getAttribute('data-name').includes(query) ? 'block' : 'none'); }
-
-        init(datePicker.value);
-
-        // --- NEW BYPASS ENABLED NAP TIME CHECK ---
-        function checkMatrixNapTime() {
-            // BACKDOOR: If bypass is set in localStorage, instantly unlock
-            if (localStorage.getItem('bypass') === '1') {
-                document.getElementById('vedaNapOverlay').classList.remove('active');
-                document.body.style.overflow = '';
-                return;
-            }
-
-            const now = new Date();
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const istTime = new Date(utc + (3600000 * 5.5));
-            
-            const hours = istTime.getHours();
-            const minutes = istTime.getMinutes();
-
-            const isNapTime = (hours === 23 && minutes >= 59) || (hours === 0) || (hours === 1);
-            
-            const overlay = document.getElementById('vedaNapOverlay');
-            
-            if (isNapTime) {
-                overlay.classList.add('active');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
-
-        checkMatrixNapTime();
-        setInterval(checkMatrixNapTime, 30000);
     </script>
 </body>
 </html>
