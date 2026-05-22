@@ -36,6 +36,10 @@ TARGET_FEEDS = {
     "Times_of_India_National": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
     "Indian_Express_National": "https://indianexpress.com/section/india/feed/",
     "NDTV_Latest": "https://feeds.feedburner.com/ndtvnews-latest",
+    "Hindustan_Times":"https://www.hindustantimes.com/feeds/rss/latest/rssfeed.xml",
+    "India_Today":"https://www.indiatoday.in/rss/1206578",
+    "Times_Now":"https://www.timesnownews.com/feeds/gns-en-latest.xml",
+    "Telangana_Today":"https://telanganatoday.com/feed"
 
     # --- INDIA: FINANCIAL MARKETS ---
     "Moneycontrol_Markets": "https://www.moneycontrol.com/rss/marketreports.xml",
